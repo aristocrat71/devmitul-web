@@ -1,0 +1,40 @@
+/* ============================================================================
+   scene.css — the scene-manager stage (engine styles, not kit styles).
+
+   One sticky viewport composites every mounted scene; the wrapper's height is
+   set inline by <SceneManager> from the book config, so document height is a
+   constant — scenes mount and unmount without layout ever moving.
+   ========================================================================= */
+
+/* The void. Overscroll rubber-banding must never flash the browser's white. */
+html {
+  background: var(--ink);
+}
+
+/* Lenis drives scroll; CSS smooth-scrolling would fight its lerp. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.cm-book {
+  position: relative;
+}
+
+.cm-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+/* Scene layers stack full-frame; z-order and pointer-events are set inline by
+   the manager (earlier page above, only the active page interactive). */
+.cm-scene {
+  position: absolute;
+  inset: 0;
+}

@@ -1,122 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useRef } from "react";
+import { SceneManager } from "@/components/scene/SceneManager";
+import { useScene } from "@/components/scene/scene-context";
+import { useSceneScrub } from "@/hooks/useSceneScrub";
+import type { SceneDef } from "@/lib/book";
 
-function App() {
-  const [count, setCount] = useState(0)
+/**
+ * PLACEHOLDER page — §1–§6 (Opus 5) replace these with the real mockup
+ * ports, one scene at a time, passing `lazy(() => import(...))` components to
+ * code-split each page. This stub exists only so the §0 engine is verifiable:
+ * it names its scene and scrubs one marker across the scene's range, proving
+ * mount lifecycle, scrub wiring, and cleanup.
+ */
+function PlaceholderPage() {
+  const { label, index, lengthVh } = useScene();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const markerRef = useRef<HTMLDivElement>(null);
+
+  // Marker scrubs across the first 90% of the range; the page fades itself
+  // out over the last 10%, revealing the neighbor mounted beneath — the same
+  // shape every real page follows (a scene's tail is its outbound
+  // transition; the layer beneath is the next page assembling).
+  useSceneScrub((timeline) => {
+    timeline
+      .fromTo(
+        markerRef.current,
+        { xPercent: 0 },
+        { xPercent: 400, ease: "none", duration: 9 },
+      )
+      .to(rootRef.current, { autoAlpha: 0, ease: "none", duration: 1 });
+  });
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div
+      ref={rootRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "grid",
+        placeItems: "center",
+        background: "var(--ink)",
+        color: "var(--paper)",
+        fontFamily: '"Courier New", monospace',
+        fontWeight: 700,
+        letterSpacing: "0.2em",
+      }}
+    >
+      <div>
+        <p>
+          {index === 0 ? "COVER" : `PAGE 0${index}`} · {label.toUpperCase()} ·{" "}
+          {lengthVh}VH
+        </p>
+        <div
+          ref={markerRef}
+          style={{ width: 40, height: 40, background: "var(--acid)" }}
+        />
+      </div>
+    </div>
+  );
 }
 
-export default App
+/**
+ * The spine of Issue #01. Lengths are each scene's pin duration in vh —
+ * cover/projects/experience/about per implementation-plan §§1–5 (a scene's
+ * length includes its outbound transition); the back cover is a resting page
+ * with no internal scrub (§6). Stages tune their own numbers as they land.
+ */
+const BOOK: readonly SceneDef[] = [
+  { label: "cover", lengthVh: 330, Component: PlaceholderPage },
+  { label: "projects", lengthVh: 520, Component: PlaceholderPage },
+  { label: "experience", lengthVh: 460, Component: PlaceholderPage },
+  { label: "about", lengthVh: 520, Component: PlaceholderPage },
+  { label: "backcover", lengthVh: 0, Component: PlaceholderPage },
+];
+
+export default function App() {
+  return <SceneManager scenes={BOOK} />;
+}
