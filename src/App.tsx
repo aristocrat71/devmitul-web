@@ -1,9 +1,14 @@
-import { useRef } from "react";
+import { lazy, useRef } from "react";
 import { SceneManager } from "@/components/scene/SceneManager";
 import { useScene } from "@/components/scene/scene-context";
 import { useSceneScrub } from "@/hooks/useSceneScrub";
 import type { SceneDef } from "@/lib/book";
 import { CoverScene } from "@/sections/cover/CoverScene";
+
+// Every scene after the entry point is code-split: a page's chunk loads when
+// the scene manager mounts it as the active scene's neighbor, well before it
+// is on screen.
+const ProjectsScene = lazy(() => import("@/sections/projects/ProjectsScene"));
 
 /**
  * PLACEHOLDER page — §1–§6 (Opus 5) replace these with the real mockup
@@ -71,7 +76,7 @@ const BOOK: readonly SceneDef[] = [
   // eagerly — code-splitting it would only add a waterfall before first paint.
   // §3 onward should use `lazy()`.
   { label: "cover", lengthVh: 330, Component: CoverScene },
-  { label: "projects", lengthVh: 520, Component: PlaceholderPage },
+  { label: "projects", lengthVh: 520, Component: ProjectsScene },
   { label: "experience", lengthVh: 460, Component: PlaceholderPage },
   { label: "about", lengthVh: 520, Component: PlaceholderPage },
   { label: "backcover", lengthVh: 0, Component: PlaceholderPage },

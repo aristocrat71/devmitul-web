@@ -12,6 +12,14 @@ export interface SceneScrubOptions {
    * the site's smoothing lives in Lenis alone.
    */
   scrub?: boolean | number;
+  /**
+   * Per-frame progress callback for the imperative side of a scrub —
+   * threshold class toggles, ownership handoffs, `driveAssemble`,
+   * `setParallaxAmount`. Runs outside React; never set state here.
+   */
+  onUpdate?: (progress: number) => void;
+  /** Fires on every ScrollTrigger.refresh() — re-measure anchors here. */
+  onRefresh?: () => void;
 }
 
 /**
@@ -27,25 +35,30 @@ export interface SceneScrubOptions {
  *
  * The builder runs once per mount. Give the timeline `ease: "none"` steps and
  * quantized `steps()`-style poses per the motion language; the camera
- * exceptions own their own eases.
+ * exceptions own their own eases. A builder may return a cleanup function for
+ * its non-GSAP side effects (class toggles, measured styles) — it runs when
+ * the context reverts on unmount.
  */
 export function useSceneScrub(
-  build: (timeline: gsap.core.Timeline) => void,
+  build: (timeline: gsap.core.Timeline) => void | (() => void),
   options?: SceneScrubOptions,
 ): void {
   const { label, lengthVh } = useScene();
   useGSAP(() => {
     // A scene with no scrub distance (back cover) has no timeline to drive.
     if (lengthVh === 0) return;
+    const { onUpdate, onRefresh } = options ?? {};
     const timeline = gsap.timeline({
       scrollTrigger: {
         start: () => sceneStartPx(label),
         end: () => sceneEndPx(label),
         scrub: options?.scrub ?? true,
         invalidateOnRefresh: true,
+        onUpdate: onUpdate && ((self) => onUpdate(self.progress)),
+        onRefresh: onRefresh && (() => onRefresh()),
       },
     });
-    build(timeline);
+    return build(timeline) ?? undefined;
   }, []);
 }
 

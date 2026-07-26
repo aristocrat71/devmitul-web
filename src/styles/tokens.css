@@ -28,6 +28,17 @@
   /* Ink at panel depth — the fill behind cutouts and stickers, one step up
      from --ink so a sticker reads as sitting ON the page, not cut out of it. */
   --ink-panel: #171233;
+  /* The between-pages darkness (transition gutter, approved in
+     transition-mockup.html v5): the void behind the book, one step deeper
+     than --ink, and the faint glow at the gutter's centre. */
+  --void: #070511;
+  --gutter-glow: #14102b;
+  /* Paper stock in shadow — the printed edge of a page object seen against
+     the void (the mega page's border in projects-page-mockup.html v3). */
+  --paper-edge: #d8d2c2;
+  /* An empty image slot's diagonal weave, one step up from --ink-panel; the
+     darker band of the weave is a 50% mix of the two. */
+  --ink-slot: #23204a;
 
   /* ---- Type roles (design-doc §2) ---- */
   --font-display: "Bangers", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;

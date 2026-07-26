@@ -1,0 +1,169 @@
+/* ============================================================================
+   transition.css — §2, the perspective-dive transition system.
+
+   Styles for the pieces every page boundary reuses: the dive camera, the
+   gutter between pages, and the caption that glitches in over it. Timing
+   lives in each section's constants module (the scrub owns *when*; this file
+   owns *what it looks like*), mirroring the approved transition-mockup v5.
+   ========================================================================= */
+
+/* The camera. perspective-origin is driven by the transition scrub onto the
+   live dive target (the GitHub button for cover → projects) — re-measured
+   while the page is at rest and on every ScrollTrigger.refresh(), never
+   load-time-only (CLAUDE.md rule 12). The page layer inside rides translateZ
+   past this perspective. */
+.cm-dive {
+  position: absolute;
+  inset: 0;
+  perspective: 1200px;
+}
+
+/* The between-pages void. Sits beneath the diving page, above the next
+   scene's layer; the scrub fades it out as the next page assembles. */
+.cm-gutter {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 55%,
+    var(--gutter-glow),
+    var(--void) 70%
+  );
+  pointer-events: none;
+}
+.cm-gutter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgb(242 237 226 / 0.5) 1px,
+    transparent 1.1px
+  );
+  background-size: 34px 34px;
+  opacity: 0.06;
+}
+
+/* Caption ownership, three levels so nothing fights (CLAUDE.md rule 10):
+   the outer block is the scrub's (opacity + exit translate), the centre is
+   pure CSS layout, the inner box is the glitch keyframes'. */
+/* Opacity/exit-translate are written per tick by the transition scrub (the
+   resting state is 0, so a scrub-reversed tween from-value would clobber it);
+   `cm-caption--in` exists to fire the inner box's time-based glitch. */
+.cm-caption {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  /* Driven per scrub tick through its window; a small bounded layer that
+     exists only while a boundary's scene is mounted. */
+  will-change: transform, opacity;
+}
+.cm-caption__center {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+}
+.cm-caption__inner {
+  display: inline-block;
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: 8px 8px 0 color-mix(in srgb, var(--mag) 60%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.4vw, 46px);
+  letter-spacing: 0.04em;
+  padding: 0.5em 1em;
+  white-space: nowrap;
+}
+.cm-caption__kicker {
+  position: absolute;
+  top: -1.7em;
+  left: 0;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--paper);
+}
+/* Three stepped frames of RGB slice tear, then clean — the only glitch moment
+   a transition gets (design-doc §5). Time-based on purpose: the class toggles
+   at ~65% progress and the tear plays out in real time, like the mockup. */
+.cm-caption--in .cm-caption__inner {
+  animation: cm-cap-glitch 0.42s steps(2) both;
+}
+@keyframes cm-cap-glitch {
+  0% {
+    clip-path: polygon(0 0, 100% 0, 100% 32%, 0 32%);
+    transform: translateX(-12px);
+    box-shadow:
+      8px 8px 0 color-mix(in srgb, var(--mag) 60%, transparent),
+      -6px 0 0 var(--cyn),
+      6px 0 0 var(--mag);
+  }
+  33% {
+    clip-path: polygon(0 38%, 100% 38%, 100% 74%, 0 74%);
+    transform: translateX(10px);
+    box-shadow:
+      8px 8px 0 color-mix(in srgb, var(--mag) 60%, transparent),
+      6px 0 0 var(--cyn),
+      -6px 0 0 var(--mag);
+  }
+  66% {
+    clip-path: polygon(0 62%, 100% 62%, 100% 100%, 0 100%);
+    transform: translateX(-7px);
+    box-shadow:
+      8px 8px 0 color-mix(in srgb, var(--mag) 60%, transparent),
+      -4px 0 0 var(--cyn),
+      4px 0 0 var(--mag);
+  }
+  100% {
+    clip-path: none;
+    transform: none;
+    box-shadow: 8px 8px 0 color-mix(in srgb, var(--mag) 60%, transparent);
+  }
+}
+
+/* ---- Assembly poses -----------------------------------------------------
+   The last phase of every boundary: the outgoing scrub drives the incoming
+   page's `assemble(0..1)` over 79–100% and it stamps its furniture in
+   (design-doc §5). The driver writes ONE attribute per element — the pose
+   index — and each element's own stylesheet turns that into a transform that
+   re-states its resting pose (CLAUDE.md rule 10: a transform replaces, it
+   never merges, so a shared `transform` rule here would silently drop every
+   element's rotation).
+   Three discrete poses, matching the kit's stamp: gone → overshoot → landed.
+   An element with no attribute is simply at rest, which is what a page that
+   was never driven — a label jump, a fast flick, reduced motion — renders. */
+[data-assemble="0"] { opacity: 0; --cm-scale: 1.6; }
+[data-assemble="1"] { opacity: 1; --cm-scale: 0.94; }
+[data-assemble="2"] { opacity: 1; --cm-scale: 1; }
+
+/* Dive-target hook: the GitHub interior goes solid ink at 30% so the camera
+   has ink to fly into (the octocat fades later and we pass through it). */
+.cover__gbtn--dive {
+  background: var(--ink);
+}
+
+/* Once the printed elements start fading the cover is scenery, not UI —
+   invisible buttons must not stay hit-testable (CLAUDE.md rule 2). The scrub
+   toggles this at 30% and removes it on scroll-up. */
+.cover--diving {
+  pointer-events: none;
+}
+
+@media (max-width: 820px) {
+  .cm-caption__center {
+    width: 82vw;
+  }
+  .cm-caption__inner {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-caption--in .cm-caption__inner {
+    animation: none;
+  }
+}

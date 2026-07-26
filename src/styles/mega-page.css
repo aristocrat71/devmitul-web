@@ -1,0 +1,86 @@
+/* ============================================================================
+   mega-page.css — the camera-walk page object (design-doc §6 and §8).
+
+   One big comic page printed on paper stock, floating on the void, read by a
+   camera. Ported from `projects-page-mockup.html` v3, which is the layout
+   spec; ORIGIN STORY (§5) is the same object with different cell contents, so
+   everything structural lives here and nothing page-specific does.
+
+   TRANSFORM OWNERSHIP: `.cm-megapage`'s transform belongs to the camera
+   exclusively (CLAUDE.md conventions). Its entrance therefore fades rather
+   than scales, and the cells — which the camera never touches — own the
+   stamp. Nothing here declares `will-change`: this is a 104vw × 138vh
+   surface, and blanket-promoting one is exactly what the GPU layer budget in
+   implementation-plan §0 forbids. The camera promotes it while it moves.
+   ========================================================================= */
+
+.cm-megapage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 104vw;
+  height: 138vh;
+  background: var(--paper);
+  /* Paper stock catching the light at the page's cut edge. */
+  border: 5px solid var(--paper-edge);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+  /* The camera's transforms are all computed against the page's top-left. */
+  transform-origin: 0 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* Faint print texture on the paper. */
+.cm-megapage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ink) 16%, transparent) 1px,
+    transparent 1.1px
+  );
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+.cm-megapage__folio {
+  position: absolute;
+  bottom: 1.6vh;
+  right: 2vw;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--ink);
+  opacity: 0.7;
+}
+
+/* ---- The 2×2 cell grid --------------------------------------------------
+   Approved coordinates: 46vw × 56vh cells at 4vw/54vw × 16vh/76vh. The
+   camera's focus keyframes come from these cells' own layout offsets, so
+   they are positioned in layout space and carry no resting transform. */
+.cm-cell {
+  position: absolute;
+  width: 46vw;
+  height: 56vh;
+}
+.cm-cell--tl { left: 4vw; top: 16vh; }
+.cm-cell--tr { left: 54vw; top: 16vh; }
+.cm-cell--br { left: 54vw; top: 76vh; }
+.cm-cell--bl { left: 4vw; top: 76vh; }
+
+/* ---- Assembly poses -----------------------------------------------------
+   The scalar and opacity come from the shared `[data-assemble]` poses in
+   transition.css; each element re-states its own resting transform, which is
+   why these rules exist at all (a `transform` replaces, it never merges).
+   With no attribute present the page is simply at rest — the entrance is
+   choreography, never a precondition for the content being there. */
+.cm-cell[data-assemble] {
+  transform: scale(var(--cm-scale, 1));
+}
+/* The page fades; scaling it would be the camera's job, and there can only be
+   one owner. */
+.cm-megapage[data-assemble="0"] { opacity: 0; }
+.cm-megapage[data-assemble="1"] { opacity: 0.5; }
+.cm-megapage[data-assemble="2"] { opacity: 1; }

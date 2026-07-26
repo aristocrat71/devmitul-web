@@ -4,6 +4,7 @@ import {
   CutoutImage,
   FadeUp,
   GlitchTick,
+  GutterCaption,
   HalftoneBackground,
   Onomatopoeia,
   PaperLabel,
@@ -12,9 +13,15 @@ import {
 } from "@/components/comic";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { useParallax } from "@/hooks/useParallax";
-import { useSceneScrub } from "@/hooks/useSceneScrub";
 import { SpeakerSticker } from "./SpeakerSticker";
-import { beat, COVER_DEPTH, COVER_GLITCH, COVER_LOAD_IN } from "./timing";
+import { useCoverTransition } from "./useCoverTransition";
+import {
+  beat,
+  COVER_DEPTH,
+  COVER_GLITCH,
+  COVER_LOAD_IN,
+  COVER_ROT,
+} from "./timing";
 import "./cover.css";
 
 const GITHUB_URL = "https://github.com/aristocrat71";
@@ -42,40 +49,33 @@ const CHARACTER_DELAY: CSSVarStyle = {
  */
 export function CoverScene() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const diveRef = useRef<HTMLDivElement>(null);
+  const gutterRef = useRef<HTMLDivElement>(null);
 
   // Idle pointer parallax — desktop fine-pointers only, and the loop is shared
   // and refcounted, so mounting this scene simply joins it.
   useParallax();
 
-  // TEMPORARY — belongs to §2 (Fable 5), not to this port.
-  //
-  // The engine requires every page to be opaque at rest and to hand the frame
-  // over across its range's tail, or the next scene mounts invisibly beneath a
-  // cover that never leaves. Until the transition system lands, this is a bare
-  // fade over the final 10% standing in for the perspective dive into the
-  // GitHub button (design-doc §5). Deliberately the same shape the engine's
-  // placeholder page used, so the smoke harness's boundary-fade check keeps
-  // measuring what it was written to measure.
-  //
-  // It drives only the scene root, which carries no CSS animation of its own —
-  // so CLAUDE.md rule 11's ownership handoff isn't needed here. It will be the
-  // moment §2 starts driving the individual entrance-animated elements.
-  useSceneScrub((timeline) => {
-    timeline.to(
-      rootRef.current,
-      { autoAlpha: 0, ease: "none", duration: 1 },
-      9,
-    );
-  });
+  // §2 — the perspective dive into the GitHub button, the gutter caption, and
+  // the handoff to the projects page. Owns the cover root's transform and
+  // every element it fades; see useCoverTransition for the phase map.
+  useCoverTransition({ dive: diveRef, cover: rootRef, gutter: gutterRef });
 
   return (
-    <div ref={rootRef} className="cover">
+    <>
+      <GutterCaption
+        ref={gutterRef}
+        kicker="PAGE 01"
+        text="OHHH THIS IS THE GOOD PART..."
+      />
+      <div ref={diveRef} className="cm-dive">
+        <div ref={rootRef} className="cover">
       <HalftoneBackground register depth={COVER_DEPTH.background} />
 
       {/* ---- Cover furniture, stamping in reverse-print order ---- */}
       <StampIn
         className="cover__issue"
-        rotate={-2}
+        rotate={COVER_ROT.issueBox}
         delay={beat(COVER_LOAD_IN.issueBox)}
       >
         <PaperLabel variant="paper" tone="mag" className="cover__issue-label">
@@ -86,7 +86,7 @@ export function CoverScene() {
 
       <StampIn
         className="cover__location"
-        rotate={3}
+        rotate={COVER_ROT.locationStamp}
         delay={beat(COVER_LOAD_IN.locationStamp)}
       >
         <PaperLabel
@@ -102,7 +102,7 @@ export function CoverScene() {
 
       <StampIn
         className="cover__barcode-slot"
-        rotate={1.5}
+        rotate={COVER_ROT.barcode}
         delay={beat(COVER_LOAD_IN.barcode)}
       >
         <div className="cover__barcode">
@@ -203,7 +203,7 @@ export function CoverScene() {
       >
         <StampIn
           className="cover__speaker-inner"
-          rotate={-7}
+          rotate={COVER_ROT.speaker}
           delay={beat(COVER_LOAD_IN.speaker)}
         >
           <SpeakerSticker />
@@ -225,7 +225,9 @@ export function CoverScene() {
           <span className="cover__cue-arrow">▼</span>
         </FadeUp>
       </div>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
 

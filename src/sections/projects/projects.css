@@ -1,0 +1,341 @@
+/* ============================================================================
+   projects.css — Page 01, THE GOOD PART. Ported from the approved
+   `projects-page-mockup.html` v3, which is the layout and timing spec.
+
+   The page object itself (paper, print texture, folio, 2×2 cell grid) lives in
+   `styles/mega-page.css`, because ORIGIN STORY is the same object with
+   different cells. Everything here is what's printed in those cells.
+
+   Three things differ from the mockup's markup, all of them repairs to bugs
+   that were measured in the rendered mockup, not read out of its CSS:
+
+   1. `.abtn`'s halftone sweep never appears. Its `::before` sits at
+      `z-index:-1` while the button creates no stacking context, so the sweep
+      is painted in the mega page's negative-z layer — underneath the panel's
+      own opaque background. Hovering therefore only flips the label to ink on
+      an unchanged dark panel, which reads as the label going out. Here the
+      sweep paints normally and the label is an element that can sit above it
+      (the same pattern as the cover's social buttons).
+   2. The BROWSE THE BACK ISSUES hover lift is dead in the mockup: the outro
+      `stampIn` fills `forwards`, and a filling animation outranks `:hover`
+      for the rest of the page's life, so the box never moves. The stamp and
+      the lift are split across two elements here — CLAUDE.md rule 10, and the
+      third instance of this bug family in the approved mockups.
+   3. `will-change:transform` is not declared on the page (see mega-page.css).
+
+   Selectors that override a kit class are written `.projects .x` so they win
+   on specificity rather than on stylesheet order.
+   ========================================================================= */
+
+/* The void the page floats on. Opaque: the scene beneath is the next page,
+   and the design requires void — not the next chapter — around the edges. */
+.projects {
+  position: absolute;
+  inset: 0;
+  background: var(--void);
+  color: var(--paper);
+  font-family: var(--font-body);
+}
+
+/* Printed on the page, top-left. The rotation is the component's. */
+.projects__page-title {
+  position: absolute;
+  left: 4vw;
+  top: 3vh;
+}
+
+/* ---- Panels -------------------------------------------------------------- */
+.projects__panel {
+  background: var(--ink-panel);
+  border: 6px solid var(--ink);
+  box-shadow: 10px 10px 0 color-mix(in srgb, var(--ink) 35%, transparent);
+  display: flex;
+  flex-direction: column;
+  /* The hook bubble hangs off the top edge. */
+  overflow: visible;
+}
+/* Cyan halftone over the whole panel — print texture, not a layer of its own. */
+.projects__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--cyn) 22%, transparent) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
+/* The stand-in screenshot slot, until the real captures land. */
+.projects__shot {
+  flex: 1;
+  margin: 10px;
+  border: 3px solid var(--paper);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ink-slot) 0 14px,
+    color-mix(in srgb, var(--ink-slot) 50%, var(--ink-panel)) 14px 28px
+  );
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.projects__shot span {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--paper);
+  opacity: 0.85;
+  border: 2px dashed var(--paper);
+  padding: 4px 8px;
+  transform: rotate(-3deg);
+  background: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+
+.projects__panel-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 32px);
+  letter-spacing: 0.03em;
+  color: var(--paper);
+  transform: skew(-6deg, -2deg);
+  text-shadow: 3px 3px 0 var(--mag);
+  padding: 2px 16px 0;
+}
+
+/* ---- Focus beats --------------------------------------------------------
+   The camera's arrival is what starts the performance: the engine adds
+   `cm-cell--on` to the focused cell and the panel plays. Only the focused
+   panel performs — except during the pull-back, when they all do (design-doc
+   §8's global rule). Every beat is stepped; nothing tweens. */
+.projects__bubble {
+  position: absolute;
+  top: -26px;
+  left: 4%;
+  max-width: 88%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--ink) 40%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.2vw, 18px);
+  letter-spacing: 0.04em;
+  padding: 0.45em 0.9em;
+  opacity: 0;
+  z-index: 6;
+  /* It overhangs the panel above it; nothing in it is interactive (rule 2). */
+  pointer-events: none;
+}
+.projects__bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 28px;
+  border: 8px solid transparent;
+  border-top-color: var(--ink);
+}
+.cm-cell--on .projects__bubble {
+  animation: projects-bubble-in 0.22s steps(2) both 0.15s;
+}
+@keyframes projects-bubble-in {
+  0% { opacity: 0; transform: scale(0.4) rotate(-4deg); }
+  60% { opacity: 1; transform: scale(1.08) rotate(1deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.projects__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 16px 2px;
+  /* Holds the row open while the chips are still unstamped. */
+  min-height: 32px;
+}
+.projects__chip {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+  background: var(--paper);
+  padding: 3px 8px;
+  opacity: 0;
+}
+/* One chip at a time — the stagger is per-chip, from the section's table. */
+.cm-cell--on .projects__chip {
+  animation: projects-chip-in 0.18s steps(2) both var(--cm-delay, 0.25s);
+}
+@keyframes projects-chip-in {
+  0% { opacity: 0; transform: scale(1.5) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Action buttons ------------------------------------------------------ */
+.projects__actions {
+  display: flex;
+  gap: 10px;
+  padding: 9px 16px 15px;
+}
+.projects__abtn {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 0.4em 1.1em;
+  text-decoration: none;
+  border: 3px solid var(--paper);
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+/* Halftone sweep, wiped in over three steps. No negative z-index: the button
+   creates no stacking context, so a negative layer lands behind the panel
+   (see the header). The label rides above it instead. */
+.projects__abtn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--ink) 1.3px, transparent 1.4px);
+  background-size: 8px 8px;
+  background-color: var(--acid);
+  transform: translateX(-101%);
+  transition: transform 0.15s steps(3);
+}
+.projects__abtn-label {
+  position: relative;
+  z-index: 1;
+}
+.projects__abtn:hover { color: var(--ink); }
+.projects__abtn:hover::before { transform: translateX(0); }
+
+/* LIVE is the dominant action (design-doc §6). */
+.projects__abtn--live {
+  background: var(--acid);
+  color: var(--ink);
+  border-color: var(--acid);
+  box-shadow: 4px 4px 0 var(--mag);
+}
+.projects__abtn--live::before { background-color: var(--paper); }
+/* The one paint-property loop in the issue: a 5px ring on a ~90×30px button,
+   quantized to two frames per 1.2s, only while its panel is focused. Cheap
+   enough to keep the approved look rather than rebuild it as a wrapper +
+   opacity (CLAUDE.md rule 1's spirit: nothing per-frame). */
+.cm-cell--on .projects__abtn--live {
+  animation: projects-live-pulse 1.2s steps(2) infinite 0.5s;
+}
+/* Interacting stills it — same rule as the glitch ticks. */
+.cm-cell--on .projects__abtn--live:hover { animation: none; }
+@keyframes projects-live-pulse {
+  0%, 100% { box-shadow: 4px 4px 0 var(--mag); }
+  50% {
+    box-shadow:
+      4px 4px 0 var(--mag),
+      0 0 0 5px color-mix(in srgb, var(--acid) 35%, transparent);
+  }
+}
+
+/* ---- Fourth cell: the catalogue and the dive target ---------------------- */
+.projects__extra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5vh;
+}
+
+/* The stamp owner. Holds the resting angle so the kit's keyframes — which
+   re-state `rotate(var(--cm-rot))` — land on it, and so the elements inside
+   keep their own transforms. */
+.projects__outro-el {
+  opacity: 0;
+  transform: rotate(var(--cm-rot, 0deg));
+}
+.cm-megapage--outro .projects__outro-el {
+  animation: cm-stamp-in 0.28s steps(2) forwards;
+  animation-delay: var(--cm-delay, 0s);
+}
+
+.projects__back-issues {
+  display: block;
+  background: var(--paper);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--cyn);
+  padding: 1.4vh 1.4vw 1.2vh;
+  text-decoration: none;
+}
+/* This element's transform is the hover lift's alone (see the header). */
+.projects__back-issues:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--cyn);
+}
+.projects__bi-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.7vw, 26px);
+  letter-spacing: 0.05em;
+}
+.projects__bi-sub {
+  display: block;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  margin-top: 3px;
+}
+.projects__bi-bars {
+  display: block;
+  margin-top: 8px;
+  height: 13px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px, transparent 2px 4px,
+    var(--ink) 4px 7px, transparent 7px 9px
+  );
+}
+
+.projects__crew-pass {
+  width: clamp(130px, 12vw, 180px);
+}
+.projects__crew-pass svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(6px 6px 0 color-mix(in srgb, var(--mag) 45%, transparent));
+}
+.projects__cp-note {
+  margin-top: 9px;
+  text-align: center;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--ink);
+}
+.projects__cp-note b {
+  background: var(--mag);
+  color: var(--paper);
+  padding: 2px 6px;
+}
+
+/* ---- Mobile -------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .projects__bubble { font-size: 14px; }
+  .projects .cm-title-box__title { font-size: 11vw; }
+}
+
+/* ---- Reduced motion -----------------------------------------------------
+   No camera walk means no `cm-cell--on` and no pull-back, so every element
+   whose resting state is invisible needs a complete one: the whole page
+   renders performed (design-doc §6 acceptance). */
+@media (prefers-reduced-motion: reduce) {
+  .projects__bubble,
+  .projects__chip,
+  .projects__outro-el {
+    opacity: 1;
+  }
+  .cm-cell--on .projects__abtn--live { animation: none; }
+}
