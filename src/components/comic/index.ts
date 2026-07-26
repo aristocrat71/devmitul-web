@@ -15,6 +15,7 @@
  */
 export { Banner } from "./Banner";
 export { CutoutImage } from "./CutoutImage";
+export { EvidenceTag } from "./EvidenceTag";
 export { FadeUp } from "./FadeUp";
 export { GlitchTick } from "./GlitchTick";
 export { GutterCaption } from "./GutterCaption";

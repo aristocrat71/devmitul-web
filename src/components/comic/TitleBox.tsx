@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 import { cn } from "@/lib/utils";
 import type { CSSVarStyle } from "@/lib/css-vars";
 
@@ -17,14 +17,17 @@ export function TitleBox({
   children,
   className,
   style,
+  ref,
 }: {
   kicker: string;
   children: ReactNode;
   className?: string;
   style?: CSSVarStyle;
+  /** For pages whose entrance poses the title box directly (§4's header). */
+  ref?: Ref<HTMLDivElement>;
 }) {
   return (
-    <div className={cn("cm-title-box", className)} style={style}>
+    <div ref={ref} className={cn("cm-title-box", className)} style={style}>
       <div className="cm-title-box__kicker">{kicker}</div>
       <h2 className="cm-title-box__title">{children}</h2>
     </div>

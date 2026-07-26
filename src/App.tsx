@@ -9,6 +9,10 @@ import { CoverScene } from "@/sections/cover/CoverScene";
 // the scene manager mounts it as the active scene's neighbor, well before it
 // is on screen.
 const ProjectsScene = lazy(() => import("@/sections/projects/ProjectsScene"));
+const ExperienceScene = lazy(
+  () => import("@/sections/experience/ExperienceScene"),
+);
+const AboutScene = lazy(() => import("@/sections/about/AboutScene"));
 
 /**
  * PLACEHOLDER page — §1–§6 (Opus 5) replace these with the real mockup
@@ -83,6 +87,13 @@ function PlaceholderPage() {
  * less scroll. Note ~21% of the range (≈63vh) is the closing hold, reserved
  * for the Projects → Experience dive that hasn't been built yet; until it
  * lands, that tail is a static full-page view.
+ *
+ * About followed projects down to 300vh when §5 landed, for the same reason and
+ * to the same number: ORIGIN STORY is THE GOOD PART's structural twin and runs
+ * an identical camera walk, so the two were always the same length (520 each
+ * originally, 400 each after the uniform cut). Leaving about at 400 would have
+ * made the same walk read a third slower than the one that was just tightened
+ * for reading a beat too long.
  */
 const BOOK: readonly SceneDef[] = [
   // Scene 0 is the entry point and always mounts first, so it is imported
@@ -90,8 +101,8 @@ const BOOK: readonly SceneDef[] = [
   // §3 onward should use `lazy()`.
   { label: "cover", lengthVh: 260, Component: CoverScene },
   { label: "projects", lengthVh: 300, Component: ProjectsScene },
-  { label: "experience", lengthVh: 360, Component: PlaceholderPage },
-  { label: "about", lengthVh: 400, Component: PlaceholderPage },
+  { label: "experience", lengthVh: 360, Component: ExperienceScene },
+  { label: "about", lengthVh: 300, Component: AboutScene },
   { label: "backcover", lengthVh: 0, Component: PlaceholderPage },
 ];
 

@@ -23,7 +23,7 @@ const VH = 9; // viewport 1440×900 → 1vh = 9px
  * the engine's arithmetic against the config rather than against itself.
  * Update alongside BOOK — a scene length change lands here too.
  */
-const LENGTHS = { cover: 260, projects: 300, experience: 360, about: 400, backcover: 0 };
+const LENGTHS = { cover: 260, projects: 300, experience: 360, about: 300, backcover: 0 };
 const START = {
   projects: LENGTHS.cover,
   experience: LENGTHS.cover + LENGTHS.projects,
@@ -70,7 +70,11 @@ const snap = (): Promise<Snap> =>
       scrollY: Math.round(window.scrollY),
       docH: document.documentElement.scrollHeight,
       lenis: document.documentElement.classList.contains("lenis"),
-      nodes: document.querySelectorAll("*").length,
+      // Body only. The memory rule is about scene DOM being released, and a
+      // code-split page's stylesheet is not a scene: <head> grows by one
+      // <style> the first time a lazy chunk loads and never shrinks again, so
+      // counting it made §5 landing look like a one-node leak.
+      nodes: document.querySelectorAll("body *").length,
       layers: [...document.querySelectorAll(".cm-scene")].map((el) => ({
         label: (el as HTMLElement).dataset.scene,
         state: (el as HTMLElement).dataset.sceneState,

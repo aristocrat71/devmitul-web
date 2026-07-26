@@ -1,0 +1,430 @@
+/* ============================================================================
+   experience.css — Page 02, CASE FILES. Ported from the approved
+   `experience-page-mockup.html`, which is the layout and timing spec.
+
+   The only interior page that isn't a camera walk: the reader stays put and the
+   documents move, so there is no mega page here — the stack is the subject.
+
+   Five things differ from the mockup, all deliberate:
+
+   1. **The witness statements are a temporary placeholder** (lorem text, an
+      obviously fake name), added at Mitul's request so the strip reviews with
+      both slots filled — see the marker in `content.ts`, which is the one place
+      to delete. The shipping rule is design-doc §7 / CLAUDE.md: real supplied
+      quotes only, and a file without one omits the slot so its exhibit widens
+      (`.experience__exhibit--wide` below is that path, and still works).
+   2. `will-change` is not declared on the files. Three folders at up to
+      700×660px are ~1.8MB of GPU layer each; the leaf scrub promotes them while
+      they move and releases them after (implementation-plan §0 layer budget).
+   3. The polaroid's pulse and its resting angle sit on separate nested elements,
+      so the pulse doesn't have to restate `rotate(6deg)` to avoid flattening the
+      photo — and the boundary's dive gets an element of its own between them
+      (CLAUDE.md rule 10).
+   4. Reduced motion keeps the leaf and drops the motion, rather than reverting
+      to the mockup's static column: the stage is one clipped 100vh viewport, so
+      a column of three tall files would simply be cut off, and this page's
+      content is only reachable *through* the leaf. See `useCaseLeaf`.
+   5. The backdrop dot field is written here rather than reusing
+      `<HalftoneBackground>`: that primitive is the cover's, with two radial
+      colour washes this page doesn't have, and this field is over `--ink` at a
+      lower opacity.
+   6. This mockup's title `h2` is `display: inline-block`; the other two
+      interior mockups' are blocks, and the shared `<TitleBox>` follows them.
+      The three mockups disagree, and CLAUDE.md's one-chapter-heading-device
+      rule breaks the tie — the pages must match each other, and reproducing
+      the outlier here is exactly the title drift that rule exists to stop.
+      The box itself measures identical either way (the kicker is the wider
+      element on all three pages, so it sets the width); only the skew's pivot
+      moves, by under 2px of glyph offset. Do not "fix" this per page.
+
+   Selectors that override a kit class are written `.experience .x` so they win
+   on specificity rather than on stylesheet order.
+   ========================================================================= */
+
+/* Ink, not void: this page is the only one whose backdrop is the page stock
+   itself rather than the darkness between pages. Opaque — the layer beneath is
+   the next scene. */
+.experience {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+/* Two offset dot fields — the CMYK misregistration read as print texture. */
+.experience::before,
+.experience::after {
+  content: "";
+  position: absolute;
+  inset: -2%;
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.3px);
+  background-size: 14px 14px;
+  opacity: 0.09;
+  pointer-events: none;
+}
+.experience::before { color: var(--cyn); }
+.experience::after {
+  color: var(--mag);
+  background-position: 7px 7px;
+}
+
+/* The shared chapter-heading device. Positioning is the page's; the rotation is
+   the component's. */
+.experience__head {
+  position: absolute;
+  top: 3.5vh;
+  left: 5vw;
+  z-index: 2;
+}
+
+/* ---- The stack ----------------------------------------------------------
+   The stack's transform is its own centring, and the entrance re-states it —
+   the files inside are the leaf scrub's (CLAUDE.md rule 10). */
+.experience__stack {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: min(58vw, 700px);
+  height: min(72vh, 660px);
+  transform: translate(-50%, -50%);
+}
+.experience__stack[data-assemble] {
+  transform: translate(-50%, -50%) scale(var(--cm-scale, 1));
+}
+
+/* ---- One case folder ---------------------------------------------------- */
+.experience__file {
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: 10px 12px 0 color-mix(in srgb, var(--ink) 50%, transparent);
+  padding: 4.2vh 2.2vw 2vh;
+  display: flex;
+  flex-direction: column;
+}
+/* Folder paper grain. */
+.experience__file::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ink) 12%, transparent) 1px,
+    transparent 1.1px
+  );
+  background-size: 15px 15px;
+  pointer-events: none;
+}
+
+/* Tabs sit at three different offsets so all three read in the resting fan. */
+.experience__tab {
+  position: absolute;
+  top: -30px;
+  height: 30px;
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-bottom: none;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  padding: 4px 16px 0;
+  color: var(--ink);
+}
+.experience__file--pos1 .experience__tab { left: 6%; }
+.experience__file--pos2 .experience__tab { left: 38%; }
+.experience__file--pos3 .experience__tab { left: 70%; }
+
+.experience__case-no {
+  position: absolute;
+  top: 2vh;
+  right: 1.6vw;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 4px 8px;
+  transform: rotate(2deg);
+  opacity: 0.85;
+}
+
+/* The STATUS stamp slams in when the file reaches the top of the stack. */
+.experience__status {
+  position: absolute;
+  top: 8.5vh;
+  right: 2vw;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.6vw, 24px);
+  letter-spacing: 0.12em;
+  padding: 0.2em 0.6em;
+  border: 3px solid currentColor;
+  --cm-rot: 8deg;
+  transform: rotate(var(--cm-rot));
+  opacity: 0;
+}
+.experience__status--active { color: var(--mag); }
+.experience__status--closed { color: var(--ink); }
+/* Same beat for all three files, so the delay lives here, not in timing.ts. */
+.experience__file--on .experience__status {
+  animation: cm-stamp-in 0.25s steps(2) both 0.25s;
+}
+
+/* ---- File contents ------------------------------------------------------ */
+.experience__org {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 44px);
+  letter-spacing: 0.03em;
+  transform: skew(-6deg, -2deg);
+  text-shadow: 2px 2px 0 color-mix(in srgb, var(--mag) 50%, transparent);
+}
+.experience__role {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(11px, 1vw, 14px);
+  letter-spacing: 0.2em;
+  margin-top: 0.8vh;
+  opacity: 0.9;
+}
+/* Highlighter treatment — acid marker over the printed line. */
+.experience__brief {
+  margin-top: 1.6vh;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.4vw, 21px);
+  letter-spacing: 0.03em;
+  background: color-mix(in srgb, var(--acid) 55%, transparent);
+  display: inline-block;
+  padding: 0.2em 0.5em;
+  border-left: 4px solid var(--ink);
+}
+
+.experience__ops {
+  margin-top: 1.8vh;
+  list-style: none;
+}
+.experience__ops li {
+  position: relative;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(11px, 1.05vw, 14px);
+  line-height: 1.55;
+  padding-left: 22px;
+  margin-bottom: 0.9vh;
+}
+.experience__ops li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--mag);
+}
+/* The redaction gag (design-doc §7) — the bars are set solid. */
+.experience__redact {
+  color: var(--ink);
+  letter-spacing: 0;
+}
+
+.experience__ev-label {
+  margin-top: 1.6vh;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+}
+.experience__evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 0.8vh;
+}
+/* This mockup sets the shared punched ticket one step smaller than ORIGIN
+   STORY's appendix does. */
+.experience .cm-tag {
+  font-size: 10px;
+  padding: 4px 9px 4px 16px;
+}
+/* Reaching the top of the stack is what stamps the evidence in; the ticket is
+   the shared primitive, whose gate is always the page's. */
+.experience__file--on .cm-tag {
+  animation: cm-tag-in 0.18s steps(2) both var(--cm-delay, 0.35s);
+}
+
+/* ---- Attachments strip, pinned to the file's base ----------------------- */
+.experience__attachments {
+  margin-top: auto;
+  display: flex;
+  gap: 1.2vw;
+  align-items: stretch;
+  padding-top: 1.6vh;
+}
+/* The oldest file carries the polaroid in its bottom-right corner; the strip
+   stops short of it. */
+.experience__attachments--clear-dive {
+  padding-right: clamp(110px, 10.5vw, 155px);
+}
+
+.experience__exhibit {
+  flex: 0 0 34%;
+  border: 3px dashed var(--ink);
+  display: grid;
+  place-items: center;
+  min-height: 11vh;
+  transform: rotate(-1.5deg);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+/* The dive file's strip gives up ~150px to the polaroid, so its exhibit takes a
+   bigger share of what's left to stay the same size as the other two. */
+.experience__attachments--clear-dive .experience__exhibit {
+  flex: 0 0 44%;
+}
+/* No witness slip on this file, so the exhibit takes the whole strip. Wins over
+   the rule above by source order, at equal specificity. */
+.experience__exhibit--wide {
+  flex: 1;
+}
+.experience__exhibit span {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-align: center;
+  line-height: 1.7;
+  opacity: 0.75;
+  padding: 6px;
+}
+
+/* Styled and waiting: rendered only for files with a real supplied quote. */
+.experience__witness {
+  flex: 1;
+  position: relative;
+  background: var(--paper-doc);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 25%, transparent);
+  padding: 1vh 1vw 1vh 1.2vw;
+  transform: rotate(0.6deg);
+}
+.experience__w-label {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--mag);
+}
+.experience__w-quote {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(10px, 0.95vw, 13px);
+  line-height: 1.5;
+  margin-top: 0.5vh;
+  font-style: italic;
+}
+.experience__w-attrib {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  margin-top: 0.5vh;
+  opacity: 0.7;
+  text-align: right;
+}
+
+/* ---- The polaroid: dive target into ORIGIN STORY ------------------------ */
+.experience__polaroid {
+  position: absolute;
+  bottom: 3vh;
+  right: 2vw;
+  width: clamp(100px, 9.5vw, 140px);
+  transform: rotate(6deg);
+}
+.experience__polaroid svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(4px 5px 0 color-mix(in srgb, var(--ink) 35%, transparent));
+}
+.experience__pl-note {
+  margin-top: 6px;
+  text-align: center;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--ink);
+}
+.experience__pl-note b {
+  background: var(--mag);
+  color: var(--paper);
+  padding: 2px 5px;
+}
+/* Once the last file is settled the dive target announces itself. The
+   counter-rotation composes with the wrapper's resting angle to reach the
+   approved 6° → 4° swing without this element having to know it. */
+.experience--outro .experience__polaroid-card {
+  animation: experience-polaroid-pulse 1.4s steps(2) infinite;
+}
+@keyframes experience-polaroid-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05) rotate(-2deg); }
+}
+
+/* ---- Mobile -------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .experience__head {
+    left: 4vw;
+    top: 2.5vh;
+  }
+  .experience .cm-title-box__title { font-size: 9vw; }
+
+  .experience__stack {
+    width: 88vw;
+    height: min(76vh, 700px);
+    top: 55%;
+  }
+  .experience__file { padding: 4.2vh 4vw 2vh; }
+  .experience__tab {
+    font-size: 13px;
+    padding: 5px 10px 0;
+    top: -28px;
+    height: 28px;
+  }
+  .experience__file--pos1 .experience__tab { left: 2%; }
+  .experience__file--pos2 .experience__tab { left: 34%; }
+  .experience__file--pos3 .experience__tab { left: 66%; }
+
+  /* The strip stacks, so nothing needs to clear the polaroid — which flows
+     into the column instead of floating in the corner. This rule follows the
+     clearance rule in source order, so it wins without `!important`. */
+  .experience__attachments {
+    flex-direction: column;
+    gap: 1.6vh;
+    padding-right: 0;
+  }
+  .experience__exhibit {
+    flex: 0 0 auto;
+    min-height: 9vh;
+  }
+  .experience__polaroid {
+    position: static;
+    transform: rotate(3deg);
+    margin: 1.5vh auto 0;
+    width: 30vw;
+  }
+}
+
+/* ---- Reduced motion -----------------------------------------------------
+   The leaf still runs (it is how the content is reached) but without motion —
+   see `useCaseLeaf`. These are the elements whose *resting* state is invisible,
+   so they need a complete one rather than a fast animation. */
+@media (prefers-reduced-motion: reduce) {
+  .experience__status,
+  .experience .cm-tag {
+    opacity: 1;
+  }
+  .experience--outro .experience__polaroid-card {
+    animation: none;
+  }
+}

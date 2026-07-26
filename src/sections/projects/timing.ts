@@ -9,6 +9,7 @@
  * used, `projects.css`, rather than being mirrored here and drifting.
  */
 import type { CameraWalk } from "@/components/scene/CameraWalkScene";
+import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
  * The camera's reading path over the scene's 520vh (design-doc §6): hold Tablo
@@ -80,7 +81,7 @@ export const PROJECTS_OUTRO = {
  * second panel. Nothing waits on anything: the pan's destination is complete
  * long before the camera starts moving.
  */
-export const PROJECTS_ASSEMBLE = {
+export const PROJECTS_ASSEMBLE: MegaPageAssemble = {
   window: 0.3,
   page: 0,
   title: 0.08,

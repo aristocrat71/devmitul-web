@@ -39,6 +39,15 @@
   /* An empty image slot's diagonal weave, one step up from --ink-panel; the
      darker band of the weave is a 50% mix of the two. */
   --ink-slot: #23204a;
+  /* Document white — a brighter stock than --paper: speech bubbles, narration
+     captions and the POWERS panel in about-page-mockup v3, and the WITNESS
+     STATEMENT slips in §4. Paper is the printed page; this is a document
+     lying ON it. */
+  --paper-doc: #fffdf6;
+  /* The acid pass darkened until it reads as ink: acid yellow on a near-white
+     document is illegible, so the third personality stamp in ORIGIN STORY's
+     C1 prints in this instead. */
+  --acid-ink: #8a7a00;
 
   /* ---- Type roles (design-doc §2) ---- */
   --font-display: "Bangers", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;

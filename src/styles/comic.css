@@ -177,10 +177,10 @@
    opaque pixels to fake the die-cut edge, then the print-offset shadow. */
 .cm-cutout--alpha > img {
   filter:
-    drop-shadow(var(--cm-edge, 6px) 0 0 var(--paper))
-    drop-shadow(calc(var(--cm-edge, 6px) * -1) 0 0 var(--paper))
-    drop-shadow(0 var(--cm-edge, 6px) 0 var(--paper))
-    drop-shadow(0 calc(var(--cm-edge, 6px) * -1) 0 var(--paper))
+    drop-shadow(var(--cm-edge, 6px) 0 0 var(--cm-edge-color, var(--paper)))
+    drop-shadow(calc(var(--cm-edge, 6px) * -1) 0 0 var(--cm-edge-color, var(--paper)))
+    drop-shadow(0 var(--cm-edge, 6px) 0 var(--cm-edge-color, var(--paper)))
+    drop-shadow(0 calc(var(--cm-edge, 6px) * -1) 0 var(--cm-edge-color, var(--paper)))
     drop-shadow(var(--cm-shadow-x, 6px) var(--cm-shadow-y, 6px) 0 var(--cm-shadow-color, rgb(255 45 120 / 0.55)));
 }
 /* Placeholder note on the stand-in silhouette, until the real asset lands. */
@@ -314,6 +314,47 @@
   transform: rotate(var(--cm-rot, -1deg)) scale(var(--cm-scale, 1));
 }
 
+/* ---- EvidenceTag: the punched evidence ticket ---------------------------
+   ORIGIN STORY's skills appendix (§8 C3) and CASE FILES' evidence rows (§7)
+   print the same ticket: a pointed left edge with a punched hole through it.
+   The two mockups differ only by 1px of type and padding, so pages that want
+   the smaller size override `.cm-tag` from their own stylesheet.
+
+   The entrance is here but the *gate* is the page's — only the page knows what
+   arriving means (a camera reaching a cell, a folder reaching the top of a
+   stack), so consumers write `.<gate> .cm-tag { animation: cm-tag-in … }` and
+   share these keyframes rather than redeclaring them a third time. */
+.cm-tag {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  background: var(--ink);
+  color: var(--paper);
+  /* The left padding clears the punched corner. */
+  padding: 5px 10px 5px 17px;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+  opacity: 0;
+}
+/* The hole. */
+.cm-tag::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--paper);
+  transform: translateY(-50%);
+}
+@keyframes cm-tag-in {
+  0% { opacity: 0; transform: scale(1.5) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* ---- Banner: the rotated acid slab ------------------------------------- */
 .cm-banner {
   display: inline-block;
@@ -343,7 +384,8 @@
 @media (prefers-reduced-motion: reduce) {
   .cm-stamp-in,
   .cm-fade-up,
-  .cm-burst {
+  .cm-burst,
+  .cm-tag {
     opacity: 1;
   }
   .cm-burst--ghost {

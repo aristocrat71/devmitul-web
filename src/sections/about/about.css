@@ -1,0 +1,431 @@
+/* ============================================================================
+   about.css — Page 03, ORIGIN STORY. Ported from the approved
+   `about-page-mockup.html` v3, which is the layout and timing spec.
+
+   The page object itself (paper, print texture, folio, 2×2 cell grid) lives in
+   `styles/mega-page.css` and the walk in `<CameraWalkScene>`: this page is
+   THE GOOD PART's structural twin (design-doc §8), so everything the two share
+   is shared and only what's printed in the cells lives here.
+
+   Four things differ from the mockup's markup, all of them repairs:
+
+   1. `capPop`'s final keyframe is a bare `transform: scale(1)`, so it DROPS the
+      resting rotation of anything it lands on — in the mockup the scribble's
+      −1.5° and the gag inset's +1.5° are both silently reset the moment their
+      pop finishes. `about-pop` below re-states `rotate(var(--cm-rot))` at every
+      keyframe instead, which reproduces capPop exactly for the elements that
+      have no angle and keeps the angle for the two that do (CLAUDE.md rule 10;
+      the fourth and fifth instances of this bug family in the mockups).
+   2. The finale bubble stacks three animations on one element in the mockup —
+      the outro stamp, then the settled pulse, which has to re-declare
+      `opacity: 1` because replacing the `animation` shorthand throws away the
+      stamp's `forwards` fill. Here the stamp, the reserved dive zoom and the
+      pulse sit on three nested elements owning one transform each, so they
+      compose instead of overwriting, and crossing the settle threshold
+      backwards doesn't re-fire the stamp.
+   3. WORKAHOLIC's border is `--acid-ink` rather than the mockup's one-step
+      lighter `#b09e10`. Two near-identical olives are not worth two tokens for
+      a 3px border, and the difference is invisible at this size.
+   4. `will-change: transform` is not declared on the page (see mega-page.css).
+
+   Selectors that override a kit class are written `.about .x` so they win on
+   specificity rather than on stylesheet order.
+   ========================================================================= */
+
+/* The void the page floats on. Opaque: the scene beneath is the next page, and
+   the design requires void — not the next chapter — around the edges. */
+.about {
+  position: absolute;
+  inset: 0;
+  background: var(--void);
+  color: var(--paper);
+  font-family: var(--font-body);
+}
+
+/* Printed on the page, top-left. The rotation is the component's. */
+.about__page-title {
+  position: absolute;
+  left: 4vw;
+  top: 3vh;
+}
+
+/* ---- The shared pop -----------------------------------------------------
+   The mockup's `capPop`, generalized to carry a resting angle (see note 1).
+   With no `--cm-rot` set it is the mockup's curve exactly. */
+@keyframes about-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(calc(var(--cm-rot, 0deg) - 2deg));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06) rotate(calc(var(--cm-rot, 0deg) + 1deg));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(var(--cm-rot, 0deg));
+  }
+}
+
+/* ---- The ink comic frame (C1, C2) ---------------------------------------- */
+.about__frame {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-panel);
+  border: 6px solid var(--ink);
+  box-shadow: 8px 8px 0 color-mix(in srgb, var(--ink) 30%, transparent);
+  /* The stamps hang off the frame's edges. */
+  overflow: visible;
+}
+/* Cyan halftone over the panel — print texture, not a layer of its own. */
+.about__frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--cyn) 20%, transparent) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+/* Each panel is pressed at its own angle. */
+.about__frame--greeting { transform: rotate(-1deg); }
+.about__frame--origin { transform: rotate(1deg); }
+
+/* ---- C1: the subject introduces himself --------------------------------- */
+
+/* Stand-in for the one required asset (design-doc §8). When the action photo
+   lands this becomes a <CutoutImage src=…> filling the frame, and this rule
+   goes with it. */
+.about__slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--paper);
+  opacity: 0.85;
+  border: 2px dashed var(--paper);
+  padding: 5px 9px;
+  background: color-mix(in srgb, var(--ink) 65%, transparent);
+  text-align: center;
+  line-height: 1.7;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The greeting hangs off the frame's top edge, over the page (rule 2 — it
+   overhangs, so it must not hit-test). */
+.about__greet {
+  position: absolute;
+  top: -3.4vh;
+  left: 4%;
+  max-width: 94%;
+  background: var(--paper-doc);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--ink) 35%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(14px, 1.35vw, 20px);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  padding: 0.6em 1em;
+  opacity: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+/* The tail. */
+.about__greet::after {
+  content: "";
+  position: absolute;
+  bottom: -13px;
+  left: 34px;
+  border: 9px solid transparent;
+  border-top-color: var(--ink);
+}
+.cm-cell--on .about__greet {
+  animation: about-pop 0.24s steps(2) both 0.1s;
+}
+
+/* Personality stamps, slammed around the frame. They reuse the kit's stamp
+   keyframes, which already re-state `rotate(var(--cm-rot))`. */
+.about__tag {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.3vw, 19px);
+  letter-spacing: 0.12em;
+  color: var(--mag);
+  border: 3px solid var(--mag);
+  padding: 0.15em 0.5em;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  opacity: 0;
+  z-index: 5;
+  transform: rotate(var(--cm-rot, 0deg));
+  pointer-events: none;
+}
+.cm-cell--on .about__tag {
+  animation: cm-stamp-in 0.25s steps(2) both;
+  animation-delay: var(--cm-delay, 0s);
+}
+.about__tag--1 {
+  top: 16%;
+  right: -3%;
+  --cm-rot: 7deg;
+}
+.about__tag--2 {
+  top: 52%;
+  left: -4%;
+  --cm-rot: -6deg;
+  color: var(--cyn);
+  border-color: var(--cyn);
+}
+/* Acid on a near-white stamp is illegible, so this one prints in the darkened
+   acid pass (see note 3). */
+.about__tag--3 {
+  bottom: 8%;
+  right: 6%;
+  --cm-rot: 4deg;
+  color: var(--acid-ink);
+  border-color: var(--acid-ink);
+}
+
+/* The photography gag, in the one place the handwritten face is allowed
+   (CLAUDE.md conventions). */
+.about__scribble {
+  position: absolute;
+  bottom: 6px;
+  left: 10px;
+  z-index: 5;
+  font-family: var(--font-hand);
+  font-size: clamp(10px, 1vw, 14px);
+  color: var(--paper);
+  opacity: 0;
+  --cm-rot: -1.5deg;
+  transform: rotate(var(--cm-rot));
+  text-shadow: 1px 1px 0 color-mix(in srgb, var(--ink) 80%, transparent);
+}
+.cm-cell--on .about__scribble {
+  animation: about-pop 0.22s steps(2) both var(--cm-delay, 0.7s);
+}
+
+/* ---- C2: the origin narration ------------------------------------------- */
+.about__narr {
+  position: absolute;
+  inset: 0;
+  padding: 3vh 1.4vw;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2vh;
+}
+.about__cap {
+  align-self: flex-start;
+  max-width: 92%;
+  background: var(--paper-doc);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 45%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.25vw, 19px);
+  letter-spacing: 0.04em;
+  padding: 0.5em 0.9em;
+  opacity: 0;
+}
+/* The captions alternate sides down the panel. */
+.about__cap--right {
+  align-self: flex-end;
+}
+/* The code motto, which opens the panel. */
+.about__cap--code {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(12px, 1.15vw, 17px);
+  letter-spacing: 0.06em;
+  background: var(--ink);
+  color: var(--acid);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--mag) 50%, transparent);
+}
+.cm-cell--on .about__cap {
+  animation: about-pop 0.22s steps(2) both var(--cm-delay, 0s);
+}
+
+/* The optional browser-frame gag — a stand-in until the asset exists, and
+   deletable without a trace if it never does (design-doc §8). */
+.about__gag {
+  margin-top: auto;
+  align-self: flex-end;
+  width: 44%;
+  aspect-ratio: 16 / 10;
+  border: 3px dashed color-mix(in srgb, var(--paper) 70%, transparent);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  --cm-rot: 1.5deg;
+  transform: rotate(var(--cm-rot));
+}
+.about__gag span {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--paper);
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.7;
+}
+.cm-cell--on .about__gag {
+  animation: about-pop 0.22s steps(2) both var(--cm-delay, 0.7s);
+}
+
+/* ---- C3: POWERS & ABILITIES — a document lying on the page --------------- */
+.about__powers {
+  position: absolute;
+  inset: 0;
+  background: var(--paper-doc);
+  border: 6px solid var(--ink);
+  box-shadow: 8px 8px 0 color-mix(in srgb, var(--ink) 30%, transparent);
+  padding: 3vh 1.6vw;
+  transform: rotate(-0.8deg);
+  color: var(--ink);
+}
+.about__powers-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 32px);
+  letter-spacing: 0.05em;
+  /* The display skew, on the type only — the document keeps its own angle. */
+  transform: skew(-6deg, -2deg);
+  text-shadow: 2px 2px 0 var(--mag);
+}
+.about__powers-sub {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+  margin-top: 0.4vh;
+}
+.about__powers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2vh;
+}
+/* The camera's arrival is what stamps the appendix in; the ticket itself is
+   the shared `<EvidenceTag>` primitive, whose gate is always the page's. */
+.about .cm-cell--on .cm-tag {
+  animation: cm-tag-in 0.16s steps(2) both var(--cm-delay, 0s);
+}
+
+/* ---- C4: the finale — revealed by the pull-back -------------------------- */
+.about__finale {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.4vw;
+  padding: 3vh 1vw;
+}
+
+/* The stamp owner. Holds the resting angle so the kit's keyframes — which
+   re-state `rotate(var(--cm-rot))` — land on it, and so the elements inside
+   keep their own transforms for the dive and the pulse. */
+.about__outro-el {
+  opacity: 0;
+  transform: rotate(var(--cm-rot, 0deg));
+}
+.cm-megapage--outro .about__outro-el {
+  animation: cm-stamp-in 0.28s steps(2) forwards;
+  animation-delay: var(--cm-delay, 0s);
+}
+
+.about__figure {
+  flex: 0 0 32%;
+}
+.about__finale-bubble {
+  flex: 1;
+}
+/* Exists to be zoomed: the About → Contact boundary scales its dive target
+   about its own centre until the ink fills the frame (design-doc §5), and every
+   other element here already owns a transform. Deliberately styleless — do not
+   fold it into the bubble. */
+.about__bubble {
+  display: block;
+}
+/* The printed bubble, and the owner of the settled pulse. */
+.about__bubble-box {
+  position: relative;
+  background: var(--paper-doc);
+  color: var(--ink);
+  border: 5px solid var(--ink);
+  box-shadow: 7px 7px 0 color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 18px;
+  padding: 3vh 1.6vw;
+  text-align: center;
+}
+/* The tail, pointing back at the figure. */
+.about__bubble-box::after {
+  content: "";
+  position: absolute;
+  bottom: 22%;
+  left: -24px;
+  border: 14px solid transparent;
+  border-right-color: var(--ink);
+}
+.about__bb-line {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.3vw, 34px);
+  letter-spacing: 0.04em;
+  transform: skew(-6deg, -2deg);
+  text-shadow: 2px 2px 0 var(--mag);
+}
+.about__bb-note {
+  margin-top: 1.2vh;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+}
+.about__bb-note b {
+  background: var(--mag);
+  color: var(--paper);
+  padding: 2px 6px;
+}
+/* Once the camera has come to rest on the whole page, the bubble invites a
+   reply. The counter-rotation composes with the wrapper's resting angle to
+   reach the approved 1° → 0.4° swing without this element having to know it. */
+.about__page--settled .about__bubble-box {
+  animation: about-bubble-pulse 1.4s steps(2) infinite;
+}
+@keyframes about-bubble-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03) rotate(-0.6deg); }
+}
+
+/* ---- Mobile -------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .about__greet { font-size: 13px; }
+  .about__cap { font-size: 12px; }
+  .about .cm-title-box__title { font-size: 9vw; }
+}
+
+/* ---- Reduced motion -----------------------------------------------------
+   No camera walk means no `cm-cell--on` and no pull-back, so every element
+   whose resting state is invisible needs a complete one: the whole page renders
+   performed (design-doc §8 acceptance). */
+@media (prefers-reduced-motion: reduce) {
+  .about__greet,
+  .about__tag,
+  .about__scribble,
+  .about__cap,
+  .about__gag,
+  .about__outro-el {
+    opacity: 1;
+  }
+  .about__page--settled .about__bubble-box {
+    animation: none;
+  }
+}

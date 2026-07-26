@@ -1,12 +1,13 @@
 import { useRef } from "react";
 import { MegaCell, TitleBox } from "@/components/comic";
 import { CameraWalkScene } from "@/components/scene/CameraWalkScene";
+import { useInterimExit } from "@/hooks/useInterimExit";
+import { useMegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { CrewPass } from "./CrewPass";
 import { ProjectPanel } from "./ProjectPanel";
-import { useProjectsAssemble } from "./useProjectsAssemble";
 import { BACK_ISSUES_URL, PROJECTS } from "./content";
-import { PROJECTS_OUTRO, PROJECTS_WALK } from "./timing";
+import { PROJECTS_ASSEMBLE, PROJECTS_OUTRO, PROJECTS_WALK } from "./timing";
 import "./projects.css";
 
 /** Grid slots in reading order: the camera walks TL → TR → BR, then pulls back. */
@@ -38,7 +39,9 @@ export function ProjectsScene() {
 
   // The cover's dive drives this over its final 79–100%. Registration stays
   // page-owned; the ref is shared with the camera, no property on it is.
-  useProjectsAssemble(pageRef);
+  useMegaPageAssemble(pageRef, PROJECTS_ASSEMBLE);
+  // TEMPORARY — remove with the projects → experience transition. See the hook.
+  useInterimExit(pageRef);
 
   return (
     <CameraWalkScene

@@ -11,8 +11,8 @@ const PLACEHOLDER_HAIR =
   "M92 92 C92 52 118 26 150 26 C182 26 208 52 208 92";
 
 /** The stand-in's headphone band and ear cups — drawn over the halftone. */
-function PlaceholderDetail({ edge }: { edge: number }) {
-  const cup = { fill: "var(--cyn)", stroke: "var(--paper)" };
+function PlaceholderDetail({ edge, edgeTone }: { edge: number; edgeTone: Tone }) {
+  const cup = { fill: "var(--cyn)", stroke: toneVar(edgeTone) };
   return (
     <>
       <path
@@ -41,6 +41,12 @@ type CutoutImageProps = {
   viewBox?: string;
   /** Width of the die-cut paper edge. */
   edge?: number;
+  /**
+   * Colour of that edge. Paper by default — a die cut lifted off the void.
+   * A cutout printed directly ON paper stock needs `"ink"` instead, or the
+   * edge is invisible against the page (ORIGIN STORY's finale figure).
+   */
+  edgeTone?: Tone;
   halftone?: {
     tone?: Tone;
     /** Grid pitch in user units. */
@@ -73,6 +79,7 @@ export function CutoutImage({
   silhouette,
   viewBox,
   edge = 7,
+  edgeTone = "paper",
   halftone,
   shadow,
   placeholder,
@@ -92,6 +99,7 @@ export function CutoutImage({
   const shadowAlpha = shadow?.alpha ?? 0.55;
   const vars = {
     "--cm-edge": `${edge}px`,
+    "--cm-edge-color": toneVar(edgeTone),
     "--cm-shadow-x": `${shadow?.x ?? 6}px`,
     "--cm-shadow-y": `${shadow?.y ?? 6}px`,
     "--cm-shadow-color": `color-mix(in srgb, ${toneVar(shadow?.tone ?? "mag")} ${Math.round(shadowAlpha * 100)}%, transparent)`,
@@ -137,7 +145,7 @@ export function CutoutImage({
           d={path}
           style={{
             fill: "var(--ink-panel)",
-            stroke: "var(--paper)",
+            stroke: toneVar(edgeTone),
             strokeWidth: edge,
           }}
         />
@@ -153,7 +161,7 @@ export function CutoutImage({
         ) : null}
         <path d={path} fill={`url(#${patternId})`} />
 
-        {src ? null : <PlaceholderDetail edge={edge} />}
+        {src ? null : <PlaceholderDetail edge={edge} edgeTone={edgeTone} />}
       </svg>
 
       {placeholder ? <div className="cm-cutout__note">{placeholder}</div> : null}
