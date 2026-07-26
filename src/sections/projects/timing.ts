@@ -8,6 +8,30 @@
  * pop at +0.15s, the LIVE pulse at 1.2s/+0.5s) live in the one place they're
  * used, `projects.css`, rather than being mirrored here and drifting.
  */
+import type { CameraWalk } from "@/components/scene/CameraWalkScene";
+
+/**
+ * The camera's reading path over the scene's 520vh — the approved mockup's
+ * own segment map, verbatim (design-doc §6): hold Tablo → pan → hold OptiLife
+ * → pan ↓ → hold DogVision → pull-back reveal → hold the full page. Focus
+ * zoom ≈ 60% viewport width / 72% height; fit leaves 8% of void all around.
+ * Do not retune without a design amendment.
+ */
+export const PROJECTS_WALK: CameraWalk = {
+  focus: { w: 0.6, h: 0.72 },
+  fitMargin: 0.92,
+  segments: [
+    { a: 0, b: 0.2, from: 0, to: 0 },
+    { a: 0.2, b: 0.32, from: 0, to: 1 },
+    { a: 0.32, b: 0.5, from: 1, to: 1 },
+    { a: 0.5, b: 0.62, from: 1, to: 2 },
+    { a: 0.62, b: 0.8, from: 2, to: 2 },
+    { a: 0.8, b: 0.94, from: 2, to: 3 },
+    { a: 0.94, b: 1, from: 3, to: 3 },
+  ],
+  focusUntil: [0.26, 0.56, 0.82],
+  outroAt: 0.82,
+} as const;
 
 /** Camera arrival → the panel performs (design-doc §6, "Focus beats"). */
 export const PROJECTS_FOCUS = {

@@ -91,6 +91,10 @@ function build(
     cutoutPop: q(".cover__cutout-pop"),
     github: q(".cover__gbtn--github"),
     githubIcon: q(".cover__gbtn--github svg"),
+    // The <GlitchTick> wrapper around the button. The zoom rides this rather
+    // than the button itself, so the button keeps its own transform for the
+    // hover lift and the two never overwrite each other (CLAUDE.md rule 10).
+    githubZoom: q(".cover__socials .cm-glitch:has(.cover__gbtn--github)"),
     linkedin: q(".cover__gbtn--linkedin"),
     caption: q(".cm-caption"),
     pops: T.pops.map((pop) => ({ ...pop, el: q(pop.selector) })),
@@ -106,20 +110,42 @@ function build(
     el.masthead,
     el.credit,
     el.cutoutPop,
+    // Its 5s tick would otherwise keep slicing the button while the zoom
+    // magnifies it — a 1-frame clip-path across a 30× element is a
+    // full-frame tear, which is not what the tick is for.
+    el.githubZoom,
     ...el.pops.map((pop) => pop.el),
   ];
-  /* ---- camera anchor (rule 12) ------------------------------------------- */
-  // Measured at mount, on font load, on every refresh (resize, orientation),
-  // and again at the ownership and dive-commit crossings — NOT per scrub tick:
-  // a getBoundingClientRect right after GSAP's style writes forces a reflow
-  // every frame (measured: it alone dents the 4×-throttle budget). Parallax is
-  // damped to zero well before the dive starts, so the button sits at its
-  // rest position when the anchor actually matters.
-  const measureOrigin = () => {
-    const r = el.github.getBoundingClientRect();
-    dive.style.perspectiveOrigin = `${r.left + r.width / 2}px ${r.top + r.height / 2}px`;
+  /* ---- how far the button has to grow (rule 12) --------------------------
+     The button zooms about its own centre, so the zoom itself needs no
+     measurement at all — only "how big is big enough to fill this viewport",
+     which is the distance from the button's centre to the furthest corner.
+
+     That distance is taken in LAYOUT space, walked up the offsetParent chain,
+     never from `getBoundingClientRect()`. A rect is measured through every
+     transform above it — including the zoom's own magnification — so a
+     refresh landing mid-zoom would read a button that is already 30× and
+     compute nonsense. `offsetLeft`/`offsetTop`/`offsetWidth` are
+     transform-immune (the safe measurement class the camera-walk pages
+     already use), so the answer is the same whether the zoom has started or
+     not, and it can't pick up the pointer parallax either. */
+  const fillScale = () => {
+    let x = el.github.offsetWidth / 2;
+    let y = el.github.offsetHeight / 2;
+    const half = Math.max(el.github.offsetWidth, el.github.offsetHeight) / 2;
+    for (
+      let node: HTMLElement | null = el.github;
+      node && node !== dive;
+      node = node.offsetParent as HTMLElement | null
+    ) {
+      x += node.offsetLeft;
+      y += node.offsetTop;
+    }
+    const dx = Math.max(x, window.innerWidth - x);
+    const dy = Math.max(y, window.innerHeight - y);
+    // Corner distance, so the ink covers the frame whatever the aspect.
+    return half > 0 ? (Math.hypot(dx, dy) / half) * 1.04 : 1;
   };
-  measureOrigin();
 
   let scrubOwns = false;
   const setOwnership = (on: boolean) => {
@@ -129,14 +155,7 @@ function build(
     // Restoring the animations replays the load-in — that's the design: the
     // cover re-assembles with its own choreography on scroll-up.
     else gsap.set(owned, { clearProps: "animation,opacity,transform" });
-    measureOrigin();
   };
-  // The socials settle ~1.75s into the load-in and web fonts reflow the
-  // column; both re-anchor. onRefresh covers resize and orientation.
-  let disposed = false;
-  document.fonts.ready.then(() => {
-    if (!disposed) measureOrigin();
-  });
 
   /* ---- the scrubbed timeline (positions = progress fractions) ------------ */
   // Scrub maps scroll progress onto the timeline's TOTAL duration — if the
@@ -146,10 +165,9 @@ function build(
   // positions read as scroll-progress fractions.
   timeline.set({}, {}, 1);
   // Layer promotion for the transition, profiled at 4× CPU throttle:
-  //  - `cover` pins its raster scale for the dive — without it Chrome
-  //    re-rasters the whole layer every frame the scale changes (19fps);
-  //    slightly soft at extreme z, which reads as motion. The approved
-  //    mockup shipped the same hint.
+  //  - the zooming button pins its raster scale — without it Chrome re-rasters
+  //    it every frame the scale changes, and by the end it is a frame-filling
+  //    surface being re-rastered per tick.
   //  - bg/slab (the viewport-sized gradient surfaces) and the printed-fade
   //    set (the masthead's stacked text-shadows, the cutout's drop-shadow
   //    filter) each need their own pinned layers or they repaint/re-raster
@@ -159,7 +177,7 @@ function build(
   //    reverses below that: the resting cover holds no promoted layers, and
   //    unmount releases everything (implementation-plan §0 GPU budget).
   const promoted = [
-    cover,
+    el.githubZoom,
     el.bg,
     el.slab,
     el.mastheadSlam,
@@ -215,13 +233,38 @@ function build(
     T.printedFade.at,
   );
 
-  // THE DIVE: the whole cover flies past the camera on Z.
+  // THE ZOOM. The cover itself never moves — not a pixel — it only fades. The
+  // GitHub button is the one thing that travels: it grows about its own
+  // centre until its ink interior fills the frame, so the icon is the fixed
+  // point of the shot by construction and everything else simply prints out.
+  //
+  // (Design-doc §5 specified this as a perspective dive with the WHOLE cover
+  // riding translateZ toward the button. Anchored correctly that still slides
+  // every part of the cover outward from the anchor — the top edge alone
+  // travelled 3300px by 62% — which read as the page dropping away rather
+  // than as a zoom. Amended 2026-07-26 on Mitul's call: fade only, zoom the
+  // icon. It also removes a whole class of bug, because nothing is anchored
+  // any more: rule 12 prefers mechanics that need no measurement at all.)
+  //
+  // The curve is the approved one, re-expressed. The dive's magnification was
+  // perspective 1200 with z = pow(f, 1.6) × 1163; here that same magnification
+  // curve is normalised onto the scale tween, so the acceleration a reader
+  // sees is unchanged — only what moves is different.
+  const PERSPECTIVE = 1200;
+  const zoomEase = (t: number) => {
+    const z = Math.pow(t, T.dive.pow) * T.dive.z;
+    const magnify = PERSPECTIVE / (PERSPECTIVE - z);
+    const peak = PERSPECTIVE / (PERSPECTIVE - T.dive.z);
+    return (magnify - 1) / (peak - 1);
+  };
   timeline.fromTo(
-    cover,
-    { z: 0 },
+    el.githubZoom,
+    { scale: 1 },
     {
-      z: T.dive.z,
-      ease: (t: number) => Math.pow(t, T.dive.pow),
+      // Function-based, so `invalidateOnRefresh` re-evaluates it on resize and
+      // orientation change rather than holding a stale viewport's number.
+      scale: () => fillScale(),
+      ease: zoomEase,
       duration: T.dive.duration,
       immediateRender: false,
     },
@@ -290,8 +333,7 @@ function build(
     cover.classList.toggle("cover--diving", p > T.printedFade.at);
     if (p > T.diveSolid !== diveCommitted) {
       diveCommitted = p > T.diveSolid;
-      // Last re-anchor before the camera commits, then the interior flips.
-      if (diveCommitted) measureOrigin();
+      // The button's interior goes solid ink, so the zoom has ink to fill with.
       el.github.classList.toggle("cover__gbtn--dive", diveCommitted);
     }
 
@@ -309,10 +351,8 @@ function build(
       driveAssemble("projects", assemble);
     }
   };
-  handlers.onRefresh = measureOrigin;
 
   return () => {
-    disposed = true;
     handlers.onUpdate = undefined;
     handlers.onRefresh = undefined;
     setParallaxAmount(1);
@@ -321,6 +361,5 @@ function build(
     el.caption.classList.remove("cm-caption--in");
     el.caption.style.opacity = "";
     el.caption.style.transform = "";
-    dive.style.perspectiveOrigin = "";
   };
 }

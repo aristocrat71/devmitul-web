@@ -28,7 +28,13 @@ html.lenis body {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow: hidden;
+  /* `clip`, not `hidden`: a hidden box is still a programmatic scroll
+     container, and focusing an off-camera element (a camera-walk page keeps
+     most of its links outside the viewport) scrolls it internally — which
+     shears the whole stage out from under every scene's transform. `clip`
+     forbids scrolling outright; keyboard focus then falls through to the
+     document scroll, which is the scrub and knows how to move. */
+  overflow: clip;
   background: var(--ink);
 }
 
