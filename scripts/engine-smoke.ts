@@ -18,6 +18,21 @@ const SHOTS = "node_modules/.cache/engine-smoke/";
 mkdirSync(SHOTS, { recursive: true });
 const VH = 9; // viewport 1440×900 → 1vh = 9px
 
+/**
+ * An independent restatement of `App.tsx`'s BOOK, so the checks below assert
+ * the engine's arithmetic against the config rather than against itself.
+ * Update alongside BOOK — a scene length change lands here too.
+ */
+const LENGTHS = { cover: 260, projects: 300, experience: 360, about: 400, backcover: 0 };
+const START = {
+  projects: LENGTHS.cover,
+  experience: LENGTHS.cover + LENGTHS.projects,
+  about: LENGTHS.cover + LENGTHS.projects + LENGTHS.experience,
+  backcover: LENGTHS.cover + LENGTHS.projects + LENGTHS.experience + LENGTHS.about,
+};
+/** Total scrub distance plus the final resting viewport (see `buildBook`). */
+const DOC_VH = START.backcover + 100;
+
 let failures = 0;
 function check(name: string, ok: boolean, detail = "") {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? `  [${detail}]` : ""}`);
@@ -116,7 +131,7 @@ check(
   s.layers[0].pointer !== "none" && s.layers[1].pointer === "none",
 );
 check("initial: lenis smooth scroll engaged", s.lenis);
-check("initial: document height = 1930vh", s.docH === 1930 * VH, String(s.docH));
+check(`initial: document height = ${DOC_VH}vh`, s.docH === DOC_VH * VH, String(s.docH));
 const baselineNodes = s.nodes;
 await page.screenshot({ path: `${SHOTS}1-cover-at-rest.png` });
 
@@ -142,7 +157,8 @@ check(
 );
 
 /* 3 ── mid-transition: cover fading out over the incoming page */
-await setScroll(315 * VH); // 95% through cover's 330vh range, past the 20vh activation lead
+// 95% through the cover's range, past the 20vh activation lead.
+await setScroll(LENGTHS.cover * 0.95 * VH);
 await page.waitForTimeout(500);
 s = await snap();
 check(
@@ -172,8 +188,8 @@ await jump("experience");
 await page.waitForTimeout(500);
 s = await snap();
 check(
-  "jump(experience): lands exactly on the scene start (850vh)",
-  Math.abs(s.scrollY - 850 * VH) <= 1,
+  `jump(experience): lands exactly on the scene start (${START.experience}vh)`,
+  Math.abs(s.scrollY - START.experience * VH) <= 1,
   `y=${s.scrollY}`,
 );
 check(
@@ -191,7 +207,7 @@ check(
   "jump(backcover): end of book, backcover active, about beneath",
   s.layers.map((l) => l.label).join(",") === "about,backcover" &&
     s.layers[1].state === "active" &&
-    Math.abs(s.scrollY - 1830 * VH) <= 1,
+    Math.abs(s.scrollY - START.backcover * VH) <= 1,
   `y=${s.scrollY} layers=${s.layers.map((l) => `${l.label}:${l.state}`).join(",")}`,
 );
 await page.screenshot({ path: `${SHOTS}3-backcover.png` });

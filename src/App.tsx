@@ -70,15 +70,28 @@ function PlaceholderPage() {
  * cover/projects/experience/about per implementation-plan §§1–5 (a scene's
  * length includes its outbound transition); the back cover is a resting page
  * with no internal scrub (§6). Stages tune their own numbers as they land.
+ *
+ * Tightened ~22% on 2026-07-26 (330/520/460/520 → 260/400/360/400): the issue
+ * read as too much scrolling end to end. Every scene came down by the same
+ * proportion on purpose — each one's choreography is expressed in progress
+ * fractions, so a uniform cut tightens the whole book without retuning a
+ * single phase, and the relative pacing between pages is preserved.
+ *
+ * Projects came down again the same day, 400 → 300vh: the camera walk was
+ * still the longest read in the issue. Its segment map is untouched — the
+ * approved reading path keeps its proportions, every hold and pan just covers
+ * less scroll. Note ~21% of the range (≈63vh) is the closing hold, reserved
+ * for the Projects → Experience dive that hasn't been built yet; until it
+ * lands, that tail is a static full-page view.
  */
 const BOOK: readonly SceneDef[] = [
   // Scene 0 is the entry point and always mounts first, so it is imported
   // eagerly — code-splitting it would only add a waterfall before first paint.
   // §3 onward should use `lazy()`.
-  { label: "cover", lengthVh: 330, Component: CoverScene },
-  { label: "projects", lengthVh: 520, Component: ProjectsScene },
-  { label: "experience", lengthVh: 460, Component: PlaceholderPage },
-  { label: "about", lengthVh: 520, Component: PlaceholderPage },
+  { label: "cover", lengthVh: 260, Component: CoverScene },
+  { label: "projects", lengthVh: 300, Component: ProjectsScene },
+  { label: "experience", lengthVh: 360, Component: PlaceholderPage },
+  { label: "about", lengthVh: 400, Component: PlaceholderPage },
   { label: "backcover", lengthVh: 0, Component: PlaceholderPage },
 ];
 
