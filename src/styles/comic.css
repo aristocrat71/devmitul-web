@@ -113,25 +113,35 @@
    Active window is 4% of the period (96% -> 100%), inside the <=3%-ish budget
    in CLAUDE.md rule 4. Consumers stagger --cm-delay so ticks never sync. */
 .cm-glitch {
+  /* The resting pose, stated here and not only in the keyframes: an offset
+     tick can be seconds away, and without this the element would sit
+     untransformed until the first tick fired and then snap into its base
+     pose. It is also what reduced motion falls back to. */
+  transform: var(--cm-base, none);
   animation: cm-glitch-tick var(--glitch-period, 5s) steps(1) infinite;
   animation-delay: var(--cm-delay, 0s);
 }
+/* The shove rides the independent `translate` property, which composes with
+   `transform` instead of replacing it. That keeps the base pose out of the
+   keyframes entirely — no identity-transform placeholder to append to, and an
+   element with no base pose stays genuinely untransformed at rest rather than
+   carrying a permanent scale(1). */
 @keyframes cm-glitch-tick {
   0%, 95% {
     clip-path: none;
-    transform: var(--cm-base, scale(1));
+    translate: 0;
   }
   96% {
     clip-path: polygon(0 12%, 100% 12%, 100% 44%, 0 44%);
-    transform: var(--cm-base, scale(1)) translateX(var(--cm-shove, 9px));
+    translate: var(--cm-shove, 9px);
   }
   97.5% {
     clip-path: polygon(0 55%, 100% 55%, 100% 90%, 0 90%);
-    transform: var(--cm-base, scale(1)) translateX(calc(var(--cm-shove, 9px) * -0.9));
+    translate: calc(var(--cm-shove, 9px) * -0.9);
   }
   99%, 100% {
     clip-path: none;
-    transform: var(--cm-base, scale(1));
+    translate: 0;
   }
 }
 /* Touch stabilizes the signal (CLAUDE.md rule 4) — and a running animation
@@ -195,7 +205,6 @@
   display: inline-block;
   font-family: var(--font-display);
   font-size: clamp(18px, 2.2vw, 34px);
-  line-height: 1;
   color: var(--ink);
   background: var(--acid);
   padding: 0.35em 0.7em;
@@ -231,7 +240,6 @@
   font-weight: bold;
   font-size: clamp(10px, 1vw, 13px);
   letter-spacing: 0.2em;
-  line-height: 1.25;
   text-align: center;
   padding: 8px 12px;
   transform: rotate(var(--cm-rot, 0deg));
@@ -262,7 +270,9 @@
 .cm-label__display {
   font-family: var(--font-display);
   font-size: clamp(22px, 2.6vw, 34px);
-  letter-spacing: 0.02em;
+  /* Reset the label's tracking: display numerals are set solid, and inheriting
+     0.2em widened the issue box by 2px against the approved cover. */
+  letter-spacing: normal;
   line-height: 1;
 }
 .cm-label__sub {

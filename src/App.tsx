@@ -3,6 +3,7 @@ import { SceneManager } from "@/components/scene/SceneManager";
 import { useScene } from "@/components/scene/scene-context";
 import { useSceneScrub } from "@/hooks/useSceneScrub";
 import type { SceneDef } from "@/lib/book";
+import { CoverScene } from "@/sections/cover/CoverScene";
 
 /**
  * PLACEHOLDER page — §1–§6 (Opus 5) replace these with the real mockup
@@ -66,7 +67,10 @@ function PlaceholderPage() {
  * with no internal scrub (§6). Stages tune their own numbers as they land.
  */
 const BOOK: readonly SceneDef[] = [
-  { label: "cover", lengthVh: 330, Component: PlaceholderPage },
+  // Scene 0 is the entry point and always mounts first, so it is imported
+  // eagerly — code-splitting it would only add a waterfall before first paint.
+  // §3 onward should use `lazy()`.
+  { label: "cover", lengthVh: 330, Component: CoverScene },
   { label: "projects", lengthVh: 520, Component: PlaceholderPage },
   { label: "experience", lengthVh: 460, Component: PlaceholderPage },
   { label: "about", lengthVh: 520, Component: PlaceholderPage },

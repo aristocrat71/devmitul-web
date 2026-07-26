@@ -2,10 +2,11 @@ import type { ElementType } from "react";
 import { cn } from "@/lib/utils";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import type { PolymorphicProps } from "./polymorphic";
+import { toTime, type TimeValue } from "./time";
 
 type StampInOwnProps = {
-  /** Seconds before the stamp lands. Furniture stamps sit ~80ms apart. */
-  delay?: number;
+  /** Seconds before the stamp lands, or a CSS `<time>`. Furniture stamps sit ~80ms apart. */
+  delay?: TimeValue;
   /** Resting angle in degrees — the stamp settles here and stays. */
   rotate?: number;
   style?: CSSVarStyle;
@@ -30,7 +31,7 @@ export function StampIn<T extends ElementType = "div">({
       className={cn("cm-stamp-in", className)}
       style={
         {
-          "--cm-delay": `${delay}s`,
+          "--cm-delay": toTime(delay),
           "--cm-rot": `${rotate}deg`,
           ...style,
         } satisfies CSSVarStyle

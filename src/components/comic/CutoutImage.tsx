@@ -10,6 +10,23 @@ const PLACEHOLDER_BUST =
 const PLACEHOLDER_HAIR =
   "M92 92 C92 52 118 26 150 26 C182 26 208 52 208 92";
 
+/** The stand-in's headphone band and ear cups — drawn over the halftone. */
+function PlaceholderDetail({ edge }: { edge: number }) {
+  const cup = { fill: "var(--cyn)", stroke: "var(--paper)" };
+  return (
+    <>
+      <path
+        d={PLACEHOLDER_HAIR}
+        fill="none"
+        strokeLinecap="round"
+        style={{ stroke: "var(--cyn)", strokeWidth: 9 }}
+      />
+      <rect x="80" y="84" width="20" height="34" rx="8" strokeWidth={edge * 0.57} style={cup} />
+      <rect x="200" y="84" width="20" height="34" rx="8" strokeWidth={edge * 0.57} style={cup} />
+    </>
+  );
+}
+
 type CutoutImageProps = {
   /** The photo. Omit to render the stand-in silhouette. */
   src?: string;
@@ -112,34 +129,31 @@ export function CutoutImage({
           </pattern>
         </defs>
 
-        <g clipPath={`url(#${clipId})`}>
-          {src ? (
+        {/* Layered exactly as the mockups draw it: body and die-cut edge
+            first, subject over it, halftone over that. The edge is a centred
+            stroke, so the halftone covering its inner half is what makes the
+            paper rim read as a die cut rather than an outline. */}
+        <path
+          d={path}
+          style={{
+            fill: "var(--ink-panel)",
+            stroke: "var(--paper)",
+            strokeWidth: edge,
+          }}
+        />
+        {src ? (
+          <g clipPath={`url(#${clipId})`}>
             <image
               href={src}
               width="100%"
               height="100%"
               preserveAspectRatio="xMidYMid slice"
             />
-          ) : (
-            <>
-              <rect width="100%" height="100%" style={{ fill: "var(--ink-panel)" }} />
-              <path
-                d={PLACEHOLDER_HAIR}
-                fill="none"
-                strokeLinecap="round"
-                style={{ stroke: "var(--cyn)", strokeWidth: 9 }}
-              />
-            </>
-          )}
-          <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-        </g>
+          </g>
+        ) : null}
+        <path d={path} fill={`url(#${patternId})`} />
 
-        {/* The die-cut edge, drawn last so it sits over the halftone. */}
-        <path
-          d={path}
-          fill="none"
-          style={{ stroke: "var(--paper)", strokeWidth: edge }}
-        />
+        {src ? null : <PlaceholderDetail edge={edge} />}
       </svg>
 
       {placeholder ? <div className="cm-cutout__note">{placeholder}</div> : null}

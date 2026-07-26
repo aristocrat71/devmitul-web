@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { CSSVarStyle } from "@/lib/css-vars";
+import { toTime, type TimeValue } from "./time";
 
 type OnomatopoeiaProps = {
   children: ReactNode;
   /** Angle of the burst, degrees. */
   rotate?: number;
-  /** Seconds before it pops. */
-  delay?: number;
+  /** Seconds before it pops, or a CSS `<time>`. */
+  delay?: TimeValue;
   /**
    * Opacity it settles to after the pop, so it stops competing with whatever
    * it's hugging. Pass `false` to hold full strength.
    */
   ghost?: number | false;
-  /** Seconds before the ghost fade begins. */
-  ghostDelay?: number;
+  /** Seconds before the ghost fade begins, or a CSS `<time>`. */
+  ghostDelay?: TimeValue;
   className?: string;
   style?: CSSVarStyle;
   /**
@@ -42,9 +43,9 @@ export function Onomatopoeia({
 }: OnomatopoeiaProps) {
   const vars = {
     "--cm-rot": `${rotate}deg`,
-    "--cm-delay": `${delay}s`,
+    "--cm-delay": toTime(delay),
     ...(ghost !== false
-      ? { "--cm-ghost": ghost, "--cm-ghost-delay": `${ghostDelay}s` }
+      ? { "--cm-ghost": ghost, "--cm-ghost-delay": toTime(ghostDelay) }
       : null),
     ...style,
   } satisfies CSSVarStyle;

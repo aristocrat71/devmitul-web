@@ -44,6 +44,13 @@
   /* Layout breakpoint mirror — 820px (CLAUDE.md conventions). Media queries
      can't read custom properties, so this is documentation, not plumbing. */
   --bp-mobile: 820px;
+
+  /* Tailwind's preflight sets `line-height: 1.5` on <html>. Every mockup in
+     this project was authored against the browser default, so inheriting 1.5
+     silently inflates every text box and shifts everything stacked below it —
+     measured against the approved cover, it moved the socials 9px on mobile.
+     Preflight is layered, this rule isn't, so this wins without !important. */
+  line-height: normal;
 }
 
 /* ---- Accessibility floor (CLAUDE.md rule 7) ------------------------------

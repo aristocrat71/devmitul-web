@@ -15,10 +15,12 @@
  */
 export { Banner } from "./Banner";
 export { CutoutImage } from "./CutoutImage";
+export { FadeUp } from "./FadeUp";
 export { GlitchTick } from "./GlitchTick";
 export { HalftoneBackground } from "./HalftoneBackground";
 export { Onomatopoeia } from "./Onomatopoeia";
 export { PaperLabel } from "./PaperLabel";
 export { Parallax } from "./Parallax";
 export { StampIn } from "./StampIn";
+export { toTime, type TimeValue } from "./time";
 export { toneVar, type Tone } from "./tone";
