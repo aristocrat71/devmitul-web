@@ -1,0 +1,71 @@
+/* ============================================================================
+   tokens.css — the single source of colour and type for the whole issue.
+   Every colour in this codebase comes from here (CLAUDE.md rule 5). Adding a
+   hex value anywhere else means the design doc needs updating first.
+   ========================================================================= */
+
+/* --px/--py are written every frame by the parallax loop. Registering them as
+   typed <number> lets the engine skip re-parsing the value on each write. */
+@property --px {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --py {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+:root {
+  /* ---- Print passes (design-doc §2) ---- */
+  --ink: #0e0b1f;     /* deep ink-navy background — never pure black */
+  --paper: #f2ede2;   /* caption paper, outlines, primary text */
+  --mag: #ff2d78;     /* hot magenta print pass */
+  --cyn: #19e3ff;     /* electric cyan print pass */
+  --acid: #f2e838;    /* acid yellow — stamps, onomatopoeia, banners */
+
+  /* Ink at panel depth — the fill behind cutouts and stickers, one step up
+     from --ink so a sticker reads as sitting ON the page, not cut out of it. */
+  --ink-panel: #171233;
+
+  /* ---- Type roles (design-doc §2) ---- */
+  --font-display: "Bangers", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  --font-utility: "Courier New", Courier, monospace;
+  --font-body: Arial, Helvetica, sans-serif;
+  /* Permitted in exactly one place: the photography scribble in ORIGIN
+     STORY's C1 panel (CLAUDE.md conventions). Nowhere else. */
+  --font-hand: "Comic Sans MS", "Segoe Print", cursive;
+
+  /* ---- Motion constants ---- */
+  --glitch-period: 5s;   /* one tick per loop, active window <= 3% */
+  --parallax-ease: 0.08; /* documented here; the lerp itself lives in lib/parallax.ts */
+
+  /* Layout breakpoint mirror — 820px (CLAUDE.md conventions). Media queries
+     can't read custom properties, so this is documentation, not plumbing. */
+  --bp-mobile: 820px;
+}
+
+/* ---- Accessibility floor (CLAUDE.md rule 7) ------------------------------
+   Every interactive element gets the dashed cyan treatment. Individual
+   components may reposition the outline but must never remove it. */
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px dashed var(--cyn);
+  outline-offset: 4px;
+}
+
+/* ---- Reduced motion ------------------------------------------------------
+   Collapse every animation to its completed state. Entrances use `forwards`
+   fill, so compressing duration and dropping delay lands each element on its
+   final pose rather than hiding it. Components that start at opacity:0 must
+   also opt into .rm-visible so nothing is left invisible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}

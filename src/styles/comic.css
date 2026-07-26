@@ -1,0 +1,319 @@
+/* ============================================================================
+   comic.css — the shared motion-comic kit.
+
+   TRANSFORM OWNERSHIP (CLAUDE.md rule 10, and the reason this kit layers
+   wrappers instead of stacking effects on one element):
+   `transform` replaces, it never merges, and a `forwards`-fill animation
+   outranks the base rule for good. In the mockups the character cutout carries
+   its entrance, its layout translateX(-50%) AND its parallax on a single
+   element — so the moment charIn settles, its final keyframe pins the
+   transform and the parallax silently stops. Every effect here therefore owns
+   exactly one element: <Parallax> outside, <StampIn> inside it, <GlitchTick>
+   inside that. Nesting composes the transforms for free and nothing fights.
+
+   Where an effect genuinely must sit on an element that already has a resting
+   transform, that transform goes in --cm-base and the keyframes re-state it.
+   --cm-base defaults to scale(1) — an identity that stays valid when a
+   keyframe appends to it.
+   ========================================================================= */
+
+/* ---- Parallax carrier ---------------------------------------------------
+   Reads the --px/--py the shared rAF loop writes on <html>. Depths are px
+   multipliers per design-doc §4: bg -8, masthead column -14, character +16,
+   speaker +10. Owns nothing but the parallax. */
+.cm-parallax {
+  transform: translate3d(
+    calc(var(--px) * var(--cm-depth-x, 0px)),
+    calc(var(--py) * var(--cm-depth-y, 0px)),
+    0
+  );
+}
+
+/* ---- Halftone background + CMYK misregistration intro ------------------- */
+.cm-bg {
+  position: absolute;
+  inset: -6%;
+  background:
+    radial-gradient(circle at 22% 65%, rgb(255 45 120 / 0.18), transparent 45%),
+    radial-gradient(circle at 82% 30%, rgb(25 227 255 / 0.14), transparent 40%),
+    var(--ink);
+}
+.cm-bg::before,
+.cm-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.3px);
+  background-size: 14px 14px;
+  opacity: 0.14;
+}
+.cm-bg::before {
+  color: var(--cyn);
+}
+.cm-bg::after {
+  color: var(--mag);
+  background-position: 7px 7px;
+}
+/* The one-time misprint flash that opens the issue (~0.45s, design-doc §3.5). */
+.cm-bg--register::before {
+  animation: cm-register-c 0.45s steps(3) 0.05s both;
+}
+.cm-bg--register::after {
+  animation: cm-register-m 0.45s steps(3) 0.05s both;
+}
+@keyframes cm-register-c {
+  0% { transform: translate(-7px, 4px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes cm-register-m {
+  0% { transform: translate(6px, -5px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Diagonal speedline slab. */
+.cm-slab {
+  position: absolute;
+  width: 130%;
+  height: 42%;
+  left: -15%;
+  top: 52%;
+  background: repeating-linear-gradient(
+    112deg,
+    rgb(242 237 226 / 0.05) 0 3px,
+    transparent 3px 26px
+  );
+  transform: rotate(-6deg);
+  pointer-events: none;
+}
+
+/* ---- StampIn: the stepped rubber-stamp entrance ------------------------- */
+.cm-stamp-in {
+  opacity: 0;
+  animation: cm-stamp-in 0.28s steps(2) forwards;
+  animation-delay: var(--cm-delay, 0s);
+}
+@keyframes cm-stamp-in {
+  0% { opacity: 0; transform: scale(1.6) rotate(var(--cm-rot, 0deg)); }
+  60% { opacity: 1; transform: scale(0.94) rotate(var(--cm-rot, 0deg)); }
+  100% { opacity: 1; transform: scale(1) rotate(var(--cm-rot, 0deg)); }
+}
+
+/* The softer entrance for text that shouldn't slam (credit, socials, cue). */
+.cm-fade-up {
+  opacity: 0;
+  animation: cm-fade-up 0.4s ease forwards;
+  animation-delay: var(--cm-delay, 0s);
+}
+@keyframes cm-fade-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- GlitchTick: 1-frame slice glitch, once per 5s loop ------------------
+   Active window is 4% of the period (96% -> 100%), inside the <=3%-ish budget
+   in CLAUDE.md rule 4. Consumers stagger --cm-delay so ticks never sync. */
+.cm-glitch {
+  animation: cm-glitch-tick var(--glitch-period, 5s) steps(1) infinite;
+  animation-delay: var(--cm-delay, 0s);
+}
+@keyframes cm-glitch-tick {
+  0%, 95% {
+    clip-path: none;
+    transform: var(--cm-base, scale(1));
+  }
+  96% {
+    clip-path: polygon(0 12%, 100% 12%, 100% 44%, 0 44%);
+    transform: var(--cm-base, scale(1)) translateX(var(--cm-shove, 9px));
+  }
+  97.5% {
+    clip-path: polygon(0 55%, 100% 55%, 100% 90%, 0 90%);
+    transform: var(--cm-base, scale(1)) translateX(calc(var(--cm-shove, 9px) * -0.9));
+  }
+  99%, 100% {
+    clip-path: none;
+    transform: var(--cm-base, scale(1));
+  }
+}
+/* Touch stabilizes the signal (CLAUDE.md rule 4) — and a running animation
+   would otherwise outrank the element's hover styles anyway. */
+.cm-glitch:hover,
+.cm-glitch:focus-within {
+  animation: none;
+}
+
+/* ---- CutoutImage: halftone photo with a die-cut paper edge --------------
+   Container stays pointer-events:none forever (CLAUDE.md rule 2). A1 will
+   later re-enable hit-testing on the silhouette *path* only — never here. */
+.cm-cutout {
+  pointer-events: none;
+  display: block;
+  /* Positioning context for the stand-in caption. Consumers that absolutely
+     position the cutout override this and still get the containing block. */
+  position: relative;
+}
+.cm-cutout > svg,
+.cm-cutout > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* Silhouette path present -> the edge is an SVG stroke, and the filter only
+   carries the magenta print-offset shadow. */
+.cm-cutout--pathed > svg {
+  filter: drop-shadow(var(--cm-shadow-x, 6px) var(--cm-shadow-y, 6px) 0 var(--cm-shadow-color, rgb(255 45 120 / 0.55)));
+}
+/* No silhouette (a plain alpha PNG) -> stack hard 0-blur shadows around the
+   opaque pixels to fake the die-cut edge, then the print-offset shadow. */
+.cm-cutout--alpha > img {
+  filter:
+    drop-shadow(var(--cm-edge, 6px) 0 0 var(--paper))
+    drop-shadow(calc(var(--cm-edge, 6px) * -1) 0 0 var(--paper))
+    drop-shadow(0 var(--cm-edge, 6px) 0 var(--paper))
+    drop-shadow(0 calc(var(--cm-edge, 6px) * -1) 0 var(--paper))
+    drop-shadow(var(--cm-shadow-x, 6px) var(--cm-shadow-y, 6px) 0 var(--cm-shadow-color, rgb(255 45 120 / 0.55)));
+}
+/* Placeholder note on the stand-in silhouette, until the real asset lands. */
+.cm-cutout__note {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-4deg);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 6px 10px;
+  border: 2px dashed var(--ink);
+  white-space: nowrap;
+}
+
+/* ---- Onomatopoeia: the acid burst -------------------------------------- */
+.cm-burst {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2.2vw, 34px);
+  line-height: 1;
+  color: var(--ink);
+  background: var(--acid);
+  padding: 0.35em 0.7em;
+  text-shadow: none;
+  clip-path: polygon(
+    4% 18%, 20% 4%, 45% 12%, 66% 0%, 82% 16%, 100% 30%, 90% 58%,
+    100% 82%, 74% 88%, 52% 100%, 30% 86%, 8% 94%, 0 62%, 10% 40%
+  );
+  opacity: 0;
+  animation: cm-burst-pop 0.25s steps(2) forwards;
+  animation-delay: var(--cm-delay, 0s);
+  pointer-events: none;
+}
+/* Pops at full strength, then settles to a ghost so it never competes with
+   the element it's hugging. */
+.cm-burst--ghost {
+  animation:
+    cm-burst-pop 0.25s steps(2) var(--cm-delay, 0s) forwards,
+    cm-burst-ghost 1.4s ease var(--cm-ghost-delay, 1.6s) forwards;
+}
+@keyframes cm-burst-pop {
+  0% { opacity: 0; transform: rotate(var(--cm-rot, 9deg)) scale(0.3); }
+  100% { opacity: 1; transform: rotate(var(--cm-rot, 9deg)) scale(1); }
+}
+@keyframes cm-burst-ghost {
+  to { opacity: var(--cm-ghost, 0.28); }
+}
+
+/* ---- PaperLabel: courier stamps and tags -------------------------------- */
+.cm-label {
+  display: inline-block;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(10px, 1vw, 13px);
+  letter-spacing: 0.2em;
+  line-height: 1.25;
+  text-align: center;
+  padding: 8px 12px;
+  transform: rotate(var(--cm-rot, 0deg));
+}
+/* Printed on paper stock — the #01 ISSUE box. */
+.cm-label--paper {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--cm-tone, var(--mag));
+}
+/* Inked outline only — the location stamp. */
+.cm-label--outline {
+  background: transparent;
+  color: var(--cm-tone, var(--acid));
+  border: 2px solid var(--cm-tone, var(--acid));
+}
+/* Solid chip — the speaker's AUDIO: ON tag. */
+.cm-label--solid {
+  background: var(--cm-tone, var(--mag));
+  color: var(--paper);
+  padding: 3px 8px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+/* Display-face variant for the big numeral in the issue box. */
+.cm-label__display {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.6vw, 34px);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.cm-label__sub {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+/* ---- Banner: the rotated acid slab ------------------------------------- */
+.cm-banner {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2.2vw, 30px);
+  letter-spacing: 0.06em;
+  background: var(--cm-tone, var(--acid));
+  color: var(--ink);
+  padding: 0.35em 0.9em;
+  transform: rotate(var(--cm-rot, -3deg));
+  box-shadow: 5px 5px 0 var(--ink), 8px 8px 0 var(--cm-shadow-color, var(--mag));
+}
+/* Wipes on from the left rather than fading — a press roller, not a tween. */
+.cm-banner--wipe {
+  clip-path: inset(0 100% 0 0);
+  animation: cm-wipe 0.35s steps(4) forwards;
+  animation-delay: var(--cm-delay, 0s);
+}
+@keyframes cm-wipe {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* ---- Reduced motion -----------------------------------------------------
+   tokens.css compresses every animation to its final frame; these are the
+   elements whose *resting* state is invisible or clipped, so they need an
+   explicit complete state rather than a fast one. */
+@media (prefers-reduced-motion: reduce) {
+  .cm-stamp-in,
+  .cm-fade-up,
+  .cm-burst {
+    opacity: 1;
+  }
+  .cm-burst--ghost {
+    opacity: var(--cm-ghost, 0.28);
+  }
+  .cm-banner--wipe {
+    clip-path: none;
+  }
+  .cm-glitch {
+    animation: none;
+  }
+  .cm-parallax {
+    transform: none;
+  }
+}
