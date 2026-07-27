@@ -377,6 +377,52 @@
   to { clip-path: inset(0 0 0 0); }
 }
 
+/* ---- SocialButton: the halftone-sweep icon button -----------------------
+   The cover's socials and the back cover's bookends are the same button
+   (design-doc §9: "reprising the cover's styling — bookend symmetry"), so the
+   box, the sweep and the hover lift live here once. Pages own only what
+   genuinely differs between the two mockups: the size and the drop shadow.
+
+   The sweep is a ::before rather than a background-position trick because it
+   has to wipe across in four discrete steps; `overflow: hidden` on the button
+   is what clips it, and the icon is lifted above it with z-index rather than
+   the sweep being pushed behind — a negative z-index would escape to the
+   nearest stacking context and paint behind the page (CLAUDE.md rule 16). */
+.cm-gbtn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--paper);
+  border: 3px solid var(--paper);
+  cursor: pointer;
+  transition: transform 0.08s steps(1);
+  overflow: hidden;
+}
+.cm-gbtn svg {
+  width: 55%;
+  height: 55%;
+  fill: currentColor;
+  position: relative;
+  z-index: 1;
+}
+.cm-gbtn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--ink) 1.4px, transparent 1.5px);
+  background-size: 8px 8px;
+  background-color: var(--acid);
+  transform: translateX(-101%);
+  transition: transform 0.18s steps(4);
+}
+.cm-gbtn:hover {
+  color: var(--ink);
+  transform: translate(-2px, -2px);
+}
+.cm-gbtn:hover::before {
+  transform: translateX(0);
+}
+
 /* ---- Reduced motion -----------------------------------------------------
    tokens.css compresses every animation to its final frame; these are the
    elements whose *resting* state is invisible or clipped, so they need an

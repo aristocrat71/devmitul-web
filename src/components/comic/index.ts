@@ -24,6 +24,7 @@ export { MegaCell, MegaPage, type CellSlot } from "./MegaPage";
 export { Onomatopoeia } from "./Onomatopoeia";
 export { PaperLabel } from "./PaperLabel";
 export { Parallax } from "./Parallax";
+export { SocialButton, type SocialNetwork } from "./SocialButton";
 export { StampIn } from "./StampIn";
 export { TitleBox } from "./TitleBox";
 export { toTime, type TimeValue } from "./time";

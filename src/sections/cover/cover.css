@@ -147,43 +147,21 @@
   margin-left: 12vw;
 }
 
-/* ---- Social glitch icon buttons ---------------------------------------- */
+/* ---- Social glitch icon buttons ----------------------------------------
+   The button itself is the kit's `<SocialButton>` / `.cm-gbtn` — the box, the
+   halftone sweep and the hover lift are shared with the back cover, which
+   reprises these as its bookends (design-doc §9). What stays here is only what
+   the two mockups genuinely disagree on: this page's fluid size (the back
+   cover's are a fixed 54px) and the two-colour drop shadow.
+
+   `background: transparent` is the cover's alone, and load-bearing: the
+   boundary's `.cover__gbtn--dive` swaps it for solid ink so the camera has ink
+   to fly into (transition.css). */
 .cover__gbtn {
-  position: relative;
-  display: grid;
-  place-items: center;
   width: clamp(52px, 4.6vw, 64px);
   height: clamp(52px, 4.6vw, 64px);
-  color: var(--paper);
   background: transparent;
-  border: 3px solid var(--paper);
-  cursor: pointer;
-  transition: transform 0.08s steps(1);
-  overflow: hidden;
 }
-.cover__gbtn svg {
-  width: 55%;
-  height: 55%;
-  fill: currentColor;
-  position: relative;
-  z-index: 1;
-}
-/* Halftone sweep fill, wiped in over four steps. */
-.cover__gbtn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, var(--ink) 1.4px, transparent 1.5px);
-  background-size: 8px 8px;
-  background-color: var(--acid);
-  transform: translateX(-101%);
-  transition: transform 0.18s steps(4);
-}
-.cover__gbtn:hover {
-  color: var(--ink);
-  transform: translate(-2px, -2px);
-}
-.cover__gbtn:hover::before { transform: translateX(0); }
 .cover__gbtn--github { box-shadow: 5px 5px 0 var(--mag); }
 .cover__gbtn--linkedin { box-shadow: 5px 5px 0 var(--cyn); }
 

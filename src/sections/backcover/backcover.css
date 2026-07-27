@@ -1,0 +1,402 @@
+/* ============================================================================
+   backcover.css — the BACK COVER. Ported from the approved
+   `backcover-mockup.html`, which is the layout and timing spec.
+
+   The last page of the issue and the only one with no scrub: a resting
+   viewport the reader lands on. Everything here is either static or driven by
+   the *previous* scene's boundary.
+
+   Eight things differ from the mockup, all deliberate:
+
+   1. **The load-in cascade is a scroll-driven entrance.** In a standalone
+      mockup the furniture stamps in on page load (0.15s → 1.45s); in the book
+      the reader arrives through ORIGIN STORY's boundary, which drives
+      `assemble(0..1)` over its last 6%. Those delays map linearly onto that
+      window (`timing.ts`), so the order and the beats are the approved ones
+      and only the clock changed. Nothing here depends on it: with no
+      `[data-assemble]` attribute the page is simply at rest, which is what a
+      chapter jump, a fast flick and reduced motion all render.
+   2. **The rows slide; the furniture stamps.** Both come from the shared
+      three-pose contract in transition.css, and each element re-states its own
+      resting transform — a `transform` replaces, it never merges (rule 10).
+   3. **Hover-lifting elements are posed through a `__slot` wrapper.** The CTA,
+      the résumé burst and the two bookend buttons each own a `transform` on
+      `:hover` behind an 80ms stepped transition; a pose written onto the same
+      element would fight it in both directions and smear the entrance through
+      that transition. The wrapper scales, the button lifts, they compose.
+   4. **The glitch is the kit's `<GlitchTick>`, not this mockup's `rowGlitch`.**
+      Same device — two clipped bands thrown in opposite directions, one frame
+      each on the 5s loop — with band edges a couple of percent different. One
+      glitch across the whole site is the point of the kit; three near-copies
+      of the same keyframes is what it exists to prevent.
+   5. **`will-change` is not declared on the rows.** The mockup promotes three
+      full-viewport text layers permanently, for a one-frame tick every five
+      seconds; the wall is otherwise completely static (implementation-plan §0
+      layer budget).
+   6. **The dot field is written here rather than reusing
+      `<HalftoneBackground>`** — that primitive is the cover's, with two radial
+      colour washes this page doesn't have, and this field is over `--ink` at a
+      lower opacity. Same call as CASE FILES.
+   7. **The corner stamp is the page's `<h2>`.** The wall is decorative and
+      `aria-hidden`, so without this the section would have no heading at all
+      (rule 7). "BACK COVER ・ ISSUE #01" already *is* the page's title, so
+      nothing invisible was invented to satisfy the outline.
+   8. **The email button names the address it copies** (`aria-label`), and the
+      copy fallback's textarea is parked off-screen instead of appended raw.
+
+   Selectors that override a kit class are written `.backcover .x` so they win
+   on specificity rather than on stylesheet order.
+   ========================================================================= */
+
+/* Opaque page stock over the void — the layer beneath is the scene the reader
+   just left. */
+.backcover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+}
+/* Two offset dot fields — CMYK misregistration read as print texture. */
+.backcover::before,
+.backcover::after {
+  content: "";
+  position: absolute;
+  inset: -2%;
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.3px);
+  background-size: 14px 14px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+.backcover::before { color: var(--cyn); }
+.backcover::after {
+  color: var(--mag);
+  background-position: 7px 7px;
+}
+
+/* ---- The lettering wall -------------------------------------------------
+   Inset past every edge so the letterforms crop off the frame rather than
+   ending inside it, and tilted as one block. Decoration only: it never takes
+   a pointer event (rule 2). */
+.backcover__wall {
+  position: absolute;
+  inset: -10vh -8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4vh;
+  transform: rotate(-3deg) scale(1.08);
+  z-index: 1;
+  pointer-events: none;
+}
+/* Row: owns the entrance slide and the wall's printed opacity. */
+.backcover__row {
+  opacity: 0.9;
+}
+/* Row ink: owns the type and the glitch tick. */
+.backcover .backcover__row-ink {
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 38vh;
+  line-height: 0.86;
+  letter-spacing: 0.03em;
+}
+/* Track: owns its measured placement, written inline by `placeWall()`. */
+.backcover__track {
+  display: inline-block;
+}
+/* LOVE's offset is frozen — client-approved, never adjust it (design-doc §9).
+   BUILD and RISE are placed by measurement and carry no offset here. */
+.backcover__row--love .backcover__track {
+  transform: translateX(-9vw);
+}
+
+.backcover__row--build .backcover__row-ink {
+  color: transparent;
+  -webkit-text-stroke: 3px var(--paper);
+}
+.backcover__row--love .backcover__row-ink {
+  color: var(--acid);
+  text-shadow: 6px 6px 0 var(--mag);
+}
+.backcover__row--rise .backcover__row-ink {
+  color: transparent;
+  -webkit-text-stroke: 3px var(--cyn);
+}
+.backcover__sep {
+  color: var(--mag);
+  -webkit-text-stroke: 0;
+  padding: 0 0.12em;
+}
+/* On the solid row the separator prints as a hole in the letterform instead. */
+.backcover__row--love .backcover__sep {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+/* ---- Closing furniture --------------------------------------------------- */
+.backcover__stamp {
+  position: absolute;
+  top: 4vh;
+  left: 3vw;
+  z-index: 5;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--mag);
+  padding: 8px 12px;
+  --cm-rot: -2deg;
+  transform: rotate(var(--cm-rot));
+}
+
+.backcover__next-issue {
+  position: absolute;
+  bottom: 5vh;
+  right: 3.5vw;
+  z-index: 5;
+  background: var(--ink);
+  color: var(--paper);
+  border: 3px solid var(--acid);
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.55);
+  padding: 12px 16px 10px;
+  text-align: center;
+  --cm-rot: 2deg;
+  transform: rotate(var(--cm-rot));
+}
+.backcover__ni-kicker {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--acid);
+}
+.backcover__ni-teaser {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 38px);
+  line-height: 1;
+  margin-top: 4px;
+  text-shadow: 3px 3px 0 var(--mag);
+}
+
+.backcover__barcode {
+  position: absolute;
+  bottom: 5vh;
+  left: 3.5vw;
+  z-index: 5;
+  width: 110px;
+  height: 56px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--paper) 0 2px, transparent 2px 4px,
+    var(--paper) 4px 7px, transparent 7px 9px,
+    var(--paper) 9px 10px, transparent 10px 14px
+  );
+  border: 3px solid var(--paper);
+  padding: 4px;
+  background-clip: content-box;
+  --cm-rot: -1.5deg;
+  transform: rotate(var(--cm-rot));
+}
+.backcover__barcode span {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  font-family: var(--font-utility);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.3em;
+  text-align: center;
+  color: var(--paper);
+}
+
+/* ---- The contact block --------------------------------------------------- */
+.backcover__contact {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.6vh;
+  width: min(92vw, 760px);
+}
+/* The pose carrier. Shrink-to-fit so it never changes what it wraps. */
+.backcover__slot {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.backcover__email {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  /* The panel holds no text of its own — the address and the subline both set
+     their own size — so its font-size exists only as the line box's invisible
+     strut, and on mobile that strut is what sets the panel's height. Tailwind's
+     preflight gives buttons `font: inherit` (16px here) where this mockup gets
+     the browser's default button font, so the panel came out 1px taller than
+     the approved one. Zeroing it removes the strut from the layout entirely,
+     which is both what the mockup renders and stable across browsers, where
+     inheriting a UA default is neither. */
+  font-size: 0;
+  border: 5px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--mag), 14px 14px 0 rgb(0 0 0 / 0.5);
+  padding: 2.4vh 3vw 2vh;
+  cursor: pointer;
+  text-align: center;
+  --cm-rot: -1deg;
+  transform: rotate(var(--cm-rot));
+  transition: transform 0.08s steps(1);
+}
+.backcover__email:hover {
+  transform: rotate(var(--cm-rot)) translate(-3px, -3px);
+  box-shadow: 13px 13px 0 var(--mag), 17px 17px 0 rgb(0 0 0 / 0.5);
+}
+.backcover__email-address {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2.6vw, 36px);
+  letter-spacing: 0.04em;
+  transform: skew(-6deg, -2deg);
+  text-shadow: 2px 2px 0 var(--cyn);
+  /* The address is one long token; on a narrow panel it has to break. */
+  word-break: break-all;
+}
+.backcover__email-sub {
+  display: block;
+  margin-top: 0.8vh;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+}
+.backcover__email-sub b { color: var(--mag); }
+
+/* The COPIED! starburst. Mounted only while it has something to say, so it
+   plays from its first frame on every press rather than restarting a
+   finished animation. */
+.backcover__burst {
+  position: absolute;
+  top: -4.6vh;
+  right: -3vw;
+  z-index: 8;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.9vw, 26px);
+  color: var(--ink);
+  background: var(--acid);
+  padding: 0.45em 0.8em;
+  opacity: 0;
+  transform: rotate(10deg) scale(0);
+  clip-path: polygon(
+    4% 18%, 20% 4%, 45% 12%, 66% 0%, 82% 16%, 100% 30%, 90% 58%,
+    100% 82%, 74% 88%, 52% 100%, 30% 86%, 8% 94%, 0 62%, 10% 40%
+  );
+  pointer-events: none;
+  animation: backcover-burst 1.3s steps(3) forwards;
+}
+@keyframes backcover-burst {
+  0% { opacity: 0; transform: rotate(10deg) scale(0.3); }
+  12% { opacity: 1; transform: rotate(10deg) scale(1.15); }
+  22% { opacity: 1; transform: rotate(8deg) scale(1); }
+  78% { opacity: 1; transform: rotate(8deg) scale(1); }
+  100% { opacity: 0; transform: rotate(8deg) scale(0.9); }
+}
+
+.backcover__actions {
+  display: flex;
+  gap: 1.4vw;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.backcover__resume {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 1.6vw, 22px);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--acid);
+  padding: 0.7em 1.1em;
+  text-decoration: none;
+  clip-path: polygon(
+    5% 16%, 18% 4%, 40% 10%, 60% 0%, 78% 12%, 95% 6%, 100% 34%, 92% 55%,
+    100% 78%, 80% 92%, 58% 100%, 38% 90%, 16% 98%, 0 72%, 6% 44%
+  );
+  --cm-rot: 3deg;
+  transform: rotate(var(--cm-rot));
+  transition: transform 0.08s steps(1);
+}
+.backcover__resume:hover {
+  transform: rotate(var(--cm-rot)) scale(1.06);
+}
+
+/* The cover's buttons at this page's size — fixed here, fluid there. Solid
+   ink behind them: the wall runs underneath and the icons need a field. */
+.backcover .backcover__gbtn {
+  width: 54px;
+  height: 54px;
+  background: var(--ink);
+}
+.backcover__gbtn--github { box-shadow: 5px 5px 0 var(--mag); }
+.backcover__gbtn--linkedin { box-shadow: 5px 5px 0 var(--cyn); }
+
+.backcover__blurb {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(10px, 1vw, 13px);
+  letter-spacing: 0.3em;
+  color: var(--paper);
+  text-align: center;
+  background: color-mix(in srgb, var(--ink) 75%, transparent);
+  padding: 8px 14px;
+  border: 2px solid var(--paper);
+}
+
+/* ---- Assembly poses -----------------------------------------------------
+   The scalar and opacity come from the shared poses in transition.css; each
+   element re-states its own resting rotation, which is why this rule exists
+   at all. With no attribute the page is at rest. */
+.backcover [data-assemble] {
+  transform: rotate(var(--cm-rot, 0deg)) scale(var(--cm-scale, 1));
+}
+/* The wall slides in from the right instead, three stepped positions, and its
+   printed opacity is 0.9 — the shared poses would land the rows at full. Same
+   specificity as the rule above, so these must stay below it. */
+.backcover__row[data-assemble="0"] { transform: translateX(6vw); }
+.backcover__row[data-assemble="1"] {
+  transform: translateX(3vw);
+  opacity: 0.9;
+}
+.backcover__row[data-assemble="2"] {
+  transform: none;
+  opacity: 0.9;
+}
+
+@media (max-width: 820px) {
+  .backcover .backcover__row-ink { font-size: 23vh; }
+  .backcover__wall { gap: 1vh; }
+  .backcover__contact { width: 92vw; }
+  .backcover__email { padding: 2vh 4vw 1.8vh; }
+  .backcover__next-issue { bottom: 14vh; }
+  .backcover__barcode { bottom: 15vh; }
+  .backcover__stamp { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* A static wall, printed back so the contact block reads over it. */
+  .backcover .backcover__row,
+  .backcover .backcover__row[data-assemble] { opacity: 0.5; }
+  /* The subline carries the whole message when the burst can't animate. */
+  .backcover__burst { opacity: 0; }
+}
