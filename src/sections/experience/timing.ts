@@ -17,10 +17,19 @@ import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
  * to clobber the resting stack (the §2 lesson, and how the camera works).
  */
 export const CASES_LEAF = {
-  /** Toss window per file, in scene progress. The last file never tosses. */
+  /**
+   * Toss window per file, in scene progress. The last file never tosses.
+   *
+   * **Amendment 2026-07-27 (Mitul's call — moving through the case files took
+   * too long):** the scene came down 360 → 280vh, and these windows moved with
+   * it so the READING HOLDS absorb the whole cut — each hold lost ~30%, while
+   * a toss still covers ~31vh of scroll (was 36) and the outbound boundary
+   * kept its absolute size (it was already the tightest in the book). The
+   * mockup's 28–38% / 60–70% described a 460vh scene that no longer exists.
+   */
   tosses: [
-    { a: 0.28, b: 0.38 },
-    { a: 0.6, b: 0.7 },
+    { a: 0.24, b: 0.35 },
+    { a: 0.55, b: 0.66 },
   ],
   /** Discrete poses per toss. Stepped, never a tween (CLAUDE.md rule 3). */
   steps: 3,
@@ -30,10 +39,10 @@ export const CASES_LEAF = {
   depth: { x: 10, y: 12, rotate: 1.2, scale: 0.015 },
   /**
    * Past this the polaroid pulses. The dive target has to be on screen and
-   * announcing itself before the About transition can begin (design-doc §7), and
-   * the last file has been the top of the stack since 70%.
+   * announcing itself before the About transition can begin (design-doc §7),
+   * and the last file has been the top of the stack since 66%.
    */
-  outroAt: 0.88,
+  outroAt: 0.84,
 } as const;
 
 /**
@@ -71,28 +80,30 @@ export const CASES_ASSEMBLE = {
  * the origin story through the oldest photo in the record, under "LET'S DO
  * THIS ONE LAST TIME...." (design-doc §7).
  *
- * THE TIGHT ONE. The polaroid announces itself from `outroAt` (0.88), so the
- * boundary owns only 0.88–1.0 — 43vh of a 360vh scene, against 63vh on each
- * camera-walk page and ~180vh on the cover. The pulse gets 0.88–0.895 plus
- * however long the reader rests at the top of the file (it's an infinite
- * loop; the gate is the zoom, not a window), and the caption hold comes out
- * at ~8vh — a fast flick can outrun it. Flagged rather than fixed: the honest
- * fix is more scene (one number in App.tsx's BOOK), and Mitul has cut these
- * lengths twice on purpose. Phases are fractions of the scene's scrub.
+ * THE TIGHT ONE. The polaroid announces itself from `outroAt` (0.84), so the
+ * boundary owns 0.84–1.0 — ~45vh of a 280vh scene, against 63vh on each
+ * camera-walk page and ~180vh on the cover. The pulse gets however long the
+ * reader rests at the top of the file (it's an infinite loop; the gate is
+ * the zoom, not a window), and the caption hold comes out at ~8vh — a fast
+ * flick can outrun it. Flagged rather than fixed: the honest fix is more
+ * scene (one number in App.tsx's BOOK), and Mitul has cut these lengths
+ * three times on purpose — the 2026-07-27 cut (360 → 280) re-mapped this
+ * table so the boundary kept its absolute scroll while the reading holds
+ * paid for the whole cut. Phases are fractions of the scene's scrub.
  */
 export const CASES_BOUNDARY: BoundaryTiming = {
   /** Only the title box — the docket IS the printed page; it exits with the
       world fade rather than vanishing from under the growing polaroid. */
-  fade: { at: 0.885, duration: 0.035 },
-  zoom: { at: 0.895, duration: 0.063 },
-  ink: { at: 0.919, duration: 0.024 },
-  worldFade: { at: 0.939, duration: 0.022 },
-  worldOff: 0.963,
-  captionIn: 0.966,
-  captionExit: { at: 0.988, duration: 0.008 },
-  gutterFade: { at: 0.985, duration: 0.015 },
-  /** ORIGIN STORY prints 7 targets in ~13vh — but the camera over there is
+  fade: { at: 0.845, duration: 0.047 },
+  zoom: { at: 0.858, duration: 0.085 },
+  ink: { at: 0.891, duration: 0.032 },
+  worldFade: { at: 0.918, duration: 0.03 },
+  worldOff: 0.95,
+  captionIn: 0.954,
+  captionExit: { at: 0.984, duration: 0.011 },
+  gutterFade: { at: 0.98, duration: 0.02 },
+  /** ORIGIN STORY prints 7 targets in ~14vh — but the camera over there is
       parked zoomed into C1, so only the paper, the title's corner and the
       greeting cell are ever in frame while it happens. */
-  assembleFrom: 0.962,
+  assembleFrom: 0.949,
 } as const;

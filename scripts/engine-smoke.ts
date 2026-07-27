@@ -23,7 +23,7 @@ const VH = 9; // viewport 1440×900 → 1vh = 9px
  * the engine's arithmetic against the config rather than against itself.
  * Update alongside BOOK — a scene length change lands here too.
  */
-const LENGTHS = { cover: 260, projects: 300, experience: 360, about: 300, backcover: 0 };
+const LENGTHS = { cover: 260, projects: 300, experience: 280, about: 300, backcover: 0 };
 const START = {
   projects: LENGTHS.cover,
   experience: LENGTHS.cover + LENGTHS.projects,

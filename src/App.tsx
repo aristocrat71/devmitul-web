@@ -40,6 +40,13 @@ const BackCoverScene = lazy(
  * originally, 400 each after the uniform cut). Leaving about at 400 would have
  * made the same walk read a third slower than the one that was just tightened
  * for reading a beat too long.
+ *
+ * Experience came down 360 → 280vh on 2026-07-27 (Mitul: moving through the
+ * case files took too long). Unlike the earlier cuts this one is NOT
+ * fraction-neutral: the leaf's windows and the outbound boundary were
+ * re-balanced with it so the reading holds absorb the whole cut while the
+ * tosses and the dive keep their absolute scroll (the boundary was already
+ * the tightest in the book) — see CASES_LEAF / CASES_BOUNDARY.
  */
 const BOOK: readonly SceneDef[] = [
   // Scene 0 is the entry point and always mounts first, so it is imported
@@ -47,7 +54,7 @@ const BOOK: readonly SceneDef[] = [
   // §3 onward should use `lazy()`.
   { label: "cover", lengthVh: 260, Component: CoverScene },
   { label: "projects", lengthVh: 300, Component: ProjectsScene },
-  { label: "experience", lengthVh: 360, Component: ExperienceScene },
+  { label: "experience", lengthVh: 280, Component: ExperienceScene },
   { label: "about", lengthVh: 300, Component: AboutScene },
   // The book ends here: a resting page with no scrub of its own. The boundary
   // INTO it lives in about's tail, and interaction flips to it 20vh early so
