@@ -84,6 +84,9 @@ function build(
   const el = {
     bg: q(".cm-bg"),
     slab: q(".cm-slab"),
+    // The ghosted lettering wall (§4's 2026-07-27 amendment) is page stock,
+    // so it dissolves with the stock — see the bgDissolve tween below.
+    wall: q(".cover__wall-bg"),
     mastheadSlam: q(".cover__masthead-slam"),
     masthead: q(".cover__masthead"),
     credit: q(".cover__credit"),
@@ -180,6 +183,12 @@ function build(
     el.githubZoom,
     el.bg,
     el.slab,
+    // Same argument as bg/slab, and the same lifetime: one viewport-sized
+    // surface whose opacity is tweened through the dissolve. Promoted on the
+    // wrapper, never on the three rows — backcover.css keeps those unpromoted
+    // on purpose (a permanent layer for a 1-frame tick every 5s), and this
+    // one is released again below 1% and on unmount.
+    el.wall,
     el.mastheadSlam,
     el.credit,
     el.tagRow,
@@ -283,8 +292,16 @@ function build(
     },
     T.octoFade.at,
   );
+  // The stock dissolves — halftone, speedline slab, and the ghosted lettering
+  // wall with them. The wall is in this group and not one of its own because
+  // it IS stock: left out, it was the one thing still printed between the
+  // dissolve finishing at 58% and `coverOff` at 64.5%, so the ghost type hung
+  // alone over the projects page assembling underneath and then snapped out
+  // when visibility flipped. Measured at 1440×900: ~150px of scroll where the
+  // background read 0 and the wall read 1. Caught on the §4 amendment's
+  // verification pass, 2026-07-27.
   timeline.fromTo(
-    [el.bg, el.slab],
+    [el.bg, el.slab, el.wall],
     { opacity: 1 },
     {
       opacity: 0,

@@ -43,6 +43,43 @@
   --cover-cutout-w: clamp(255px, 32vw, 475px);
 }
 
+/* ---- Back-cover lettering wall as the cover's backdrop -------------------
+   Design-doc §4, amended 2026-07-27 (Mitul). `<CoverWall>` mounts the back
+   cover's own wall here, so the issue opens on the poster it closes on.
+   Everything in this block is subtraction — the wall's own file is untouched,
+   which is what keeps the two pages from drifting apart:
+
+   - The wrapper carries `.backcover` (that page scopes its row type to its
+     root), which also drags in the back cover's opaque ink stock and its two
+     dot fields. Both are dropped: this page already prints its own stock, and
+     a second dot field over the halftone reads as a rendering fault.
+   - The rows print at 0.9 on the back cover, where they ARE the page. Here
+     they are a ghost under a cover that has to stay legible, so they drop to
+     a wash — LOVE furthest, because the one solid row sits exactly where the
+     masthead does.
+
+   z-index 1 is the whole layering decision: over the halftone and the
+   speedline slab (both auto), under the column (2), the cutout (3), the
+   speaker (4) and the furniture (5). */
+.cover__wall-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Decoration, never a target (rule 2) — belt and braces over the wall's
+     own declaration, since this box is the one that spans the viewport. */
+  pointer-events: none;
+}
+.cover .cover__wall-bg { background: transparent; }
+.cover .cover__wall-bg::before,
+.cover .cover__wall-bg::after { display: none; }
+
+/* Signed off on sight (Mitul, 2026-07-27) — treat these two numbers as the
+   approved paint, not as a starting point. Three-class selectors so they also
+   outrank the back cover's reduced-motion rule, which prints its own rows at
+   0.5: a ghost is already static, so there is nothing to calm down. */
+.cover .cover__wall-bg .backcover__row { opacity: 0.16; }
+.cover .cover__wall-bg .backcover__row--love { opacity: 0.11; }
+
 /* ---- Character cutout — front layer, centre at ~31vw -------------------- */
 .cover__cutout {
   position: absolute;

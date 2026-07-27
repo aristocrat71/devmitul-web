@@ -15,6 +15,7 @@ import characterCutout from "@/assets/cover/character.webp";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { useParallax } from "@/hooks/useParallax";
 import { useSceneProgress } from "@/hooks/useSceneScrub";
+import { CoverWall } from "./CoverWall";
 import { SpeakerSticker } from "./SpeakerSticker";
 import { useCoverTransition } from "./useCoverTransition";
 import {
@@ -46,6 +47,12 @@ const CHARACTER_DELAY: CSSVarStyle = {
  * Composition reads diagonally: cutout ↘ title ↘ tagline ↘ socials ↘ barcode,
  * with the character in FRONT of the masthead and the masthead pulled -8vw so
  * its opening letters run behind the shoulder.
+ *
+ * One thing on this page is not in that mockup: the ghosted BUILD | LOVE |
+ * BELIEVE wall behind it (`<CoverWall>`, §4 amended 2026-07-27). It is a
+ * backdrop only — it adds no layout, no interactivity and no entrance, and
+ * every foreground box above is where the mockup puts it, at both
+ * breakpoints. The rest of the page is still a straight port.
  */
 export function CoverScene() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -74,6 +81,11 @@ export function CoverScene() {
       <div ref={diveRef} className="cm-dive">
         <div ref={rootRef} className="cover">
       <HalftoneBackground register depth={COVER_DEPTH.background} />
+
+      {/* The back cover's lettering wall, ghosted in behind everything: the
+          issue opens on the poster it closes on (§4, amended 2026-07-27).
+          Over the halftone, under the column — see cover.css. */}
+      <CoverWall />
 
       {/* ---- Cover furniture, stamping in reverse-print order ---- */}
       <StampIn
