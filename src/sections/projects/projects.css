@@ -68,7 +68,9 @@
   pointer-events: none;
 }
 
-/* The stand-in screenshot slot, until the real captures land. */
+/* The screenshot slot. The diagonal weave is the mockup's, and it stays: the
+   slot's aspect ratio is the panel's rather than any capture's, so it shows as
+   the letterbox around a `contain`ed image. */
 .projects__shot {
   flex: 1;
   margin: 10px;
@@ -83,17 +85,20 @@
   position: relative;
   overflow: hidden;
 }
-.projects__shot span {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  color: var(--paper);
-  opacity: 0.85;
-  border: 2px dashed var(--paper);
-  padding: 4px 8px;
-  transform: rotate(-3deg);
-  background: color-mix(in srgb, var(--ink) 65%, transparent);
+/* Absolutely positioned, so the capture contributes nothing to layout and the
+   slot keeps exactly the size the approved mockup gives it. In flow, a portrait
+   screenshot's min-content height inflates this `flex: 1` slot and pushes the
+   panel open — OptiLife's phone screen made the slot 934px tall. */
+.projects__shot-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Decorative-only: the panel's title, hook and chips already say what this
+     is, and the <img> carries the description that isn't written anywhere
+     else (CLAUDE.md rule 2 — nothing here is interactive). */
+  pointer-events: none;
 }
 
 .projects__panel-title {

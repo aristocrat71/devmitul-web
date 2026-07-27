@@ -31,11 +31,18 @@ export function ProjectPanel({
     <MegaCell as="article" at={at} focus={index} className="projects__panel">
       <p className="projects__bubble">{project.hook}</p>
 
-      {/* Stand-in until the real screenshots land (design-doc §6, open
-          items). Announcing "SCREENSHOT SLOT" would be noise; when the asset
-          arrives this becomes an <img> with a real alt. */}
-      <div className="projects__shot" aria-hidden="true">
-        <span>SCREENSHOT SLOT</span>
+      {/* The slot's aspect ratio is the panel's, not the image's — 1.84:1 at
+          1440 wide, 0.55:1 on mobile — so the capture is `contain`ed and the
+          slot's own diagonal weave letterboxes it. `cover` would crop three
+          quarters off OptiLife, which is a portrait phone screen. */}
+      <div className="projects__shot">
+        <img
+          className="projects__shot-img"
+          src={project.shot.src}
+          alt={project.shot.alt}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <h3 className="projects__panel-title">{project.name}</h3>
