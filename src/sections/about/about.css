@@ -89,6 +89,11 @@
   );
   background-size: 12px 12px;
   pointer-events: none;
+  /* Lifted above the panel's photo. A pseudo-element is its parent's first
+     child, so at `z-index: auto` the halftone would paint *under* any
+     positioned sibling and the print texture would vanish behind the image
+     (CLAUDE.md rule 16 — the fix is to lift, never to sink the photo). */
+  z-index: 1;
 }
 /* Each panel is pressed at its own angle. */
 .about__frame--greeting { transform: rotate(-1deg); }
@@ -96,26 +101,17 @@
 
 /* ---- C1: the subject introduces himself --------------------------------- */
 
-/* Stand-in for the one required asset (design-doc §8). When the action photo
-   lands this becomes a <CutoutImage src=…> filling the frame, and this rule
-   goes with it. */
-.about__slot {
+/* The action photo, filling the ink frame (design-doc §8). The frame is
+   `overflow: visible` so its stamps can hang off the edges, so the photo is
+   sized to the padding box exactly rather than clipped to it. */
+.about__photo {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(-3deg);
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  color: var(--paper);
-  opacity: 0.85;
-  border: 2px dashed var(--paper);
-  padding: 5px 9px;
-  background: color-mix(in srgb, var(--ink) 65%, transparent);
-  text-align: center;
-  line-height: 1.7;
-  white-space: nowrap;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The frame's aspect runs 1.30:1 to 1.44:1 across viewports and the capture
+     is 1.35:1, so `cover` only ever trims a few percent off one axis. */
+  object-fit: cover;
   pointer-events: none;
 }
 
@@ -208,7 +204,15 @@
   opacity: 0;
   --cm-rot: -1.5deg;
   transform: rotate(var(--cm-rot));
-  text-shadow: 1px 1px 0 color-mix(in srgb, var(--ink) 80%, transparent);
+  /* The mockup's single offset shadow was enough against a flat ink panel.
+     With the action photo behind it the gag sits over a pale jacket, so the
+     offset becomes a full 1px ink outline — same colour, still one print pass,
+     legible over any part of any photo that ever lands here. */
+  text-shadow:
+    1px 1px 0 var(--ink),
+    -1px 1px 0 var(--ink),
+    1px -1px 0 var(--ink),
+    -1px -1px 0 var(--ink);
 }
 .cm-cell--on .about__scribble {
   animation: about-pop 0.22s steps(2) both var(--cm-delay, 0.7s);

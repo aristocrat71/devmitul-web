@@ -1,4 +1,5 @@
 import { MegaCell } from "@/components/comic";
+import actionPhoto from "@/assets/about/action.webp";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { GREETING, SCRIBBLE, TAGS } from "./content";
 import { ABOUT_FOCUS } from "./timing";
@@ -24,14 +25,18 @@ export function GreetingCell({ focus }: { focus: number }) {
   return (
     <MegaCell at="tl" focus={focus} className="about__greeting">
       <div className="about__frame about__frame--greeting">
-        {/* Stand-in until the action photo lands (design-doc §8, assets).
-            Announcing the slot to a screen reader would be noise; when the
-            asset arrives this becomes a <CutoutImage> with a real alt. */}
-        <span className="about__slot" aria-hidden="true">
-          ACTION PHOTO CUTOUT
-          <br />
-          (NEW ABOUT IMAGE — HALFTONE)
-        </span>
+        {/* The page's one required image (design-doc §8). It fills the ink
+            frame and the frame's own cyan halftone prints over it — the
+            treatment is the panel's, not baked into the file. Absolutely
+            positioned so it can't size the cell (CLAUDE.md: an asset dropped
+            into an approved slot must not size that slot). */}
+        <img
+          className="about__photo"
+          src={actionPhoto}
+          alt="Mitul leaning over a restaurant table, eyes down, taking a bite of a momo off a pair of chopsticks."
+          loading="lazy"
+          decoding="async"
+        />
 
         {TAGS.map((tag, i) => (
           <span
