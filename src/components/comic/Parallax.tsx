@@ -7,8 +7,8 @@ type ParallaxOwnProps = {
   /**
    * Depth in px — how far this layer travels across the full pointer sweep.
    * Negative moves against the pointer (background), positive moves with it
-   * (foreground). Cover depths: bg -8, masthead column -14, character +16,
-   * speaker +10 (design-doc §4).
+   * (foreground). Cover depths: bg -8, masthead column -14, character +16
+   * (design-doc §4; its speaker +10 went with the sticker on 2026-07-28).
    */
   depth?: number;
   /** Vertical depth, when it differs from the horizontal one. */

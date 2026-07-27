@@ -19,8 +19,9 @@
 
 /* ---- Parallax carrier ---------------------------------------------------
    Reads the --px/--py the shared rAF loop writes on <html>. Depths are px
-   multipliers per design-doc §4: bg -8, masthead column -14, character +16,
-   speaker +10. Owns nothing but the parallax. */
+   multipliers per design-doc §4: bg -8, masthead column -14, character +16.
+   (§4's fourth depth, the speaker's +10, went with the sticker on 2026-07-28.)
+   Owns nothing but the parallax. */
 .cm-parallax {
   transform: translate3d(
     calc(var(--px) * var(--cm-depth-x, 0px)),
@@ -376,7 +377,9 @@
   color: var(--cm-tone, var(--acid));
   border: 2px solid var(--cm-tone, var(--acid));
 }
-/* Solid chip — the speaker's AUDIO: ON tag. */
+/* Solid chip. Its only consumer was the speaker's AUDIO: ON tag, cut
+   2026-07-28 — kept because it is one of the label's three approved print
+   treatments (design-doc §4), not a one-off for that sticker. */
 .cm-label--solid {
   background: var(--cm-tone, var(--mag));
   color: var(--paper);

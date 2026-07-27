@@ -59,8 +59,10 @@
      masthead does.
 
    z-index 1 is the whole layering decision: over the halftone and the
-   speedline slab (both auto), under the column (2), the cutout (3), the
-   speaker (4) and the furniture (5). */
+   speedline slab (both auto), under the column (2), the cutout (3) and the
+   furniture (5). Layer 4 was the speaker sticker, cut 2026-07-28; the gap is
+   left rather than closed, because renumbering four layers to reclaim an
+   unused integer is how a stacking order acquires a bug. */
 .cover__wall-bg {
   position: absolute;
   inset: 0;
@@ -252,54 +254,11 @@
   color: var(--paper);
 }
 
-/* ---- Speaker sticker — the music signature ------------------------------ */
-.cover__speaker {
-  position: absolute;
-  bottom: 6vh;
-  left: 3vw;
-  /* Slapped over the cutout's edge. */
-  z-index: 4;
-  width: clamp(105px, 10.5vw, 150px);
-}
-.cover__speaker-inner { position: relative; }
-.cover__speaker svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-  display: block;
-  filter: drop-shadow(4px 4px 0 color-mix(in srgb, var(--cyn) 50%, transparent));
-}
-/* Woofer pumps through four discrete poses at ~5fps — "animated on twos". */
-.cover__speaker-cone {
-  transform-origin: 50px 62px;
-  animation: cover-pump 0.8s steps(1) infinite;
-}
-@keyframes cover-pump {
-  0% { transform: scale(1); }
-  25% { transform: scale(0.9); }
-  50% { transform: scale(1.06); }
-  75% { transform: scale(0.94); }
-  100% { transform: scale(1); }
-}
-.cover__speaker-ring {
-  transform-origin: 50px 62px;
-  opacity: 0;
-  animation: cover-ring 1.6s steps(4) infinite;
-}
-.cover__speaker-ring--second { animation-delay: 0.8s; }
-@keyframes cover-ring {
-  0% { opacity: 0.9; transform: scale(0.7); }
-  100% { opacity: 0; transform: scale(1.7); }
-}
-/* Centred in layout space so the tag's own rotation stays its own. */
-.cover__speaker-tag {
-  position: absolute;
-  bottom: -14px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-}
+/* The speaker sticker sat here — bottom-left over the cutout's edge, its woofer
+   pumping on twos, its AUDIO: ON tag beneath. Cut 2026-07-28 (Mitul — it didn't
+   suit the page), taking `cover-pump` and `cover-ring` with it. It was one of
+   the two ambient stepped loops the cover ran; the other is the scroll cue's
+   bob, which is now the only one. */
 
 /* ---- Scroll cue ---------------------------------------------------------
    Moved out of the page foot and into the column, under the socials (Mitul,
@@ -365,7 +324,6 @@
   .cover__socials { justify-content: center; margin-left: 0; }
   /* The column centres its inline content, so the cue centres with it. */
   .cover__cue { margin-left: 0; }
-  .cover__speaker { width: 80px; bottom: 4vh; z-index: 5; }
   .cover__barcode { width: 76px; height: 40px; }
   /* Collides with the centred masthead at this width. */
   .cover__location { display: none; }
@@ -411,12 +369,7 @@
   .cover__masthead-slam {
     opacity: 1;
   }
-  .cover__speaker-cone,
-  .cover__speaker-ring,
   .cover__cue-arrow {
     animation: none;
   }
-  /* The rings are expanding sound waves; frozen mid-expansion reads as a
-     rendering fault, so they simply aren't drawn. */
-  .cover__speaker-ring { opacity: 0; }
 }

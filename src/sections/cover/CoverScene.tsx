@@ -16,7 +16,6 @@ import type { CSSVarStyle } from "@/lib/css-vars";
 import { useParallax } from "@/hooks/useParallax";
 import { useSceneProgress } from "@/hooks/useSceneScrub";
 import { CoverWall } from "./CoverWall";
-import { SpeakerSticker } from "./SpeakerSticker";
 import { useCoverTransition } from "./useCoverTransition";
 import {
   beat,
@@ -203,26 +202,6 @@ export function CoverScene() {
             <span className="cover__cue-arrow">▼</span>
           </FadeUp>
         </div>
-      </Parallax>
-
-      {/* ---- Speaker sticker ---- */}
-      <Parallax
-        className="cover__speaker"
-        depth={COVER_DEPTH.speakerX}
-        depthY={COVER_DEPTH.speakerY}
-      >
-        <StampIn
-          className="cover__speaker-inner"
-          rotate={COVER_ROT.speaker}
-          delay={beat(COVER_LOAD_IN.speaker)}
-        >
-          <SpeakerSticker />
-          <div className="cover__speaker-tag">
-            <PaperLabel variant="solid" tone="mag" rotate={2}>
-              AUDIO: ON
-            </PaperLabel>
-          </div>
-        </StampIn>
       </Parallax>
 
         </div>

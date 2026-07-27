@@ -12,8 +12,8 @@
    WHERE THE STAMP SITS. The design calls for a corner button, and every
    viewport corner is already spoken for on at least one page: #01 ISSUE and
    the interior title boxes top-left, the cover's PUNE • INDIA stamp
-   top-right, the speaker and barcode bottom-left, the folio and NEXT ISSUE
-   bottom-right. Top-right is free on four of the five pages, so the stamp
+   top-right, the barcode bottom-left (the speaker sticker was there too until
+   2026-07-28), the folio and NEXT ISSUE bottom-right. Top-right is free on four of the five pages, so the stamp
    takes it and clears the fifth by dropping under the location stamp — which
    is 5vh + ~64px tall at every viewport, hence the `calc()`. On mobile the
    location stamp isn't printed at all, so the stamp takes the true corner.

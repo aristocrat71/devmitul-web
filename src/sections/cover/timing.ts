@@ -20,7 +20,10 @@ export const COVER_LOAD_IN = {
   credit: 1.05,
   barcode: 1.05,
   tagline: 1.15,
-  speaker: 1.15,
+  /* The speaker sticker and its AUDIO: ON tag were cut from the cover on
+     2026-07-28 (Mitul — it didn't suit the page). It held the 1.15 beat
+     alongside the tagline and a pop at 0.24 of the transition; nothing was
+     rescheduled, because nothing was keyed off either. */
   socials: 1.35,
   scrollCue: 1.6,
 } as const;
@@ -48,7 +51,6 @@ export const COVER_ROT = {
   issueBox: -2,
   locationStamp: 3,
   barcode: 1.5,
-  speaker: -7,
   scrollCue: 0,
 } as const;
 
@@ -68,7 +70,10 @@ export const COVER_TRANSITION = {
     { selector: ".cover__issue", rotate: COVER_ROT.issueBox, at: 0.12 },
     { selector: ".cover__location", rotate: COVER_ROT.locationStamp, at: 0.16 },
     { selector: ".cover__barcode-slot", rotate: COVER_ROT.barcode, at: 0.2 },
-    { selector: ".cover__speaker-inner", rotate: COVER_ROT.speaker, at: 0.24 },
+    /* The speaker's pop sat here at 0.24. Removed with the sticker rather than
+       left pointing at nothing: `useCoverTransition` resolves every selector up
+       front and feeds the results straight into the ownership set, so a dead
+       entry puts a `null` in a `gsap.set()` target list. */
   ],
   popWindow: 0.077,
   /** Printed elements (masthead, credit, tagline, LinkedIn, character). */
@@ -95,8 +100,6 @@ export const COVER_DEPTH = {
   columnY: -10,
   characterX: 16,
   characterY: 12,
-  speakerX: 10,
-  speakerY: 8,
 } as const;
 
 /**

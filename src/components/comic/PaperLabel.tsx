@@ -8,7 +8,9 @@ type PaperLabelOwnProps = {
   /**
    * `paper` — printed on paper stock with a hard offset shadow (#01 ISSUE).
    * `outline` — inked outline only, no fill (the location stamp).
-   * `solid` — filled chip in the tone, paper text (the AUDIO: ON tag).
+   * `solid` — filled chip in the tone, paper text. Unused since the speaker
+   *   sticker was cut (2026-07-28); kept as one of the three approved print
+   *   treatments rather than as that sticker's private variant.
    */
   variant?: "paper" | "outline" | "solid";
   /** Which print pass colours it: the shadow on `paper`, the ink otherwise. */
