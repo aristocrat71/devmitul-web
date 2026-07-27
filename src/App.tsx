@@ -1,4 +1,6 @@
 import { lazy } from "react";
+import { ReticleCursor } from "@/components/cursor/ReticleCursor";
+import { ContentsMenu } from "@/components/nav/ContentsMenu";
 import { SceneManager } from "@/components/scene/SceneManager";
 import type { SceneDef } from "@/lib/book";
 import { CoverScene } from "@/sections/cover/CoverScene";
@@ -63,5 +65,17 @@ const BOOK: readonly SceneDef[] = [
 ];
 
 export default function App() {
-  return <SceneManager scenes={BOOK} />;
+  return (
+    <>
+      <SceneManager scenes={BOOK} />
+      {/* Persistent UI, outside the stage on purpose: the stage is a sticky
+          stacking context whose scenes mount and unmount, and the index has to
+          survive all of that (design-doc §10/A2). */}
+      <ContentsMenu />
+      {/* Last, so it paints over the index too — it is the cursor. Mounts only
+          on a fine pointer with motion allowed; on touch it renders nothing
+          and the native cursor is never touched (design-doc §10/A3). */}
+      <ReticleCursor />
+    </>
+  );
 }

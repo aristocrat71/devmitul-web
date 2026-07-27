@@ -1,0 +1,308 @@
+/* ============================================================================
+   contents.css — "CONTENTS", the issue's chapter navigation (design-doc
+   §10/A2). Persistent UI, not a page: it lives outside the scene stage and is
+   the only thing on screen from the cover to the back cover.
+
+   Re-skinned from ReactBits' Staggered Menu. What survived is the structure —
+   coloured pre-layers arriving ahead of the panel, numbered entries staggering
+   in behind it, a toggle whose label rolls over. What did not: its palette
+   (tokens only, CLAUDE.md rule 5), its `power4.out` glides (every ease here is
+   `steps()`, rule 3) and its ~1.4s open (0.42s here — a stamp, not a reveal).
+
+   WHERE THE STAMP SITS. The design calls for a corner button, and every
+   viewport corner is already spoken for on at least one page: #01 ISSUE and
+   the interior title boxes top-left, the cover's PUNE • INDIA stamp
+   top-right, the speaker and barcode bottom-left, the folio and NEXT ISSUE
+   bottom-right. Top-right is free on four of the five pages, so the stamp
+   takes it and clears the fifth by dropping under the location stamp — which
+   is 5vh + ~64px tall at every viewport, hence the `calc()`. On mobile the
+   location stamp isn't printed at all, so the stamp takes the true corner.
+   ========================================================================= */
+
+.cm-contents {
+  position: fixed;
+  inset: 0;
+  /* Above every scene layer (the stage's own children top out at 6) and above
+     the transition gutter. The wrapper itself is a pass-through: only the
+     stamp and the panel take the pointer, so the whole page stays clickable
+     with the index closed (CLAUDE.md rule 2). */
+  z-index: 90;
+  pointer-events: none;
+  /* The panel parks at translateX(101%), i.e. outside the viewport. A fixed
+     box that overhangs the initial containing block is still overflow, so
+     without this the closed index adds a horizontal scrollbar to the site. */
+  overflow: clip;
+
+  /* The stamp's box, declared once. The panel opens underneath the stamp — it
+     is fixed to the viewport, not to the panel — so the panel's top padding is
+     derived from these rather than guessed, and the heading can't slide under
+     the stamp at some viewport height nobody screenshotted. */
+  --cm-stamp-top: calc(5vh + 82px);
+  --cm-stamp-height: 30px;
+  --cm-panel-width: min(460px, 86vw);
+}
+
+/* ---- The INDEX stamp ------------------------------------------------------
+   Paper stock with a hard offset shadow — the same stamp device as #01 ISSUE,
+   so the site's one persistent control reads as printed furniture rather than
+   as chrome bolted on top. */
+.cm-contents__stamp {
+  position: absolute;
+  top: var(--cm-stamp-top);
+  right: 4vw;
+  pointer-events: auto;
+  --cm-rot: -2deg;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--mag);
+  padding: 7px 12px 6px;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  /* This element owns the resting angle, so the hover lift has to re-state it
+     — `transform` replaces, it never merges (CLAUDE.md rule 10). */
+  transform: rotate(var(--cm-rot));
+  transition: transform 0.08s steps(2);
+}
+.cm-contents__stamp:hover {
+  transform: rotate(var(--cm-rot)) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--mag);
+}
+/* Open, the stamp is the acid pass — the one on-screen sign that something is
+   over the page. */
+.cm-contents[data-open] .cm-contents__stamp {
+  background: var(--acid);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.cm-contents[data-open] .cm-contents__stamp:hover {
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* INDEX / CLOSE roll. The clip is 1em tall and holds two stacked lines; the
+   inner element owns the only transform on this axis. */
+.cm-contents__stamp-clip {
+  display: block;
+  overflow: hidden;
+  height: 1em;
+}
+.cm-contents__stamp-roll {
+  display: block;
+  transform: translateY(0);
+  transition: transform 0.16s steps(2);
+}
+.cm-contents[data-open] .cm-contents__stamp-roll {
+  transform: translateY(-50%);
+}
+.cm-contents__stamp-line {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+/* ---- Pre-layers -----------------------------------------------------------
+   The two print passes that land before the paper does. Purely decorative;
+   they never take the pointer even while the panel is open. */
+.cm-contents__layers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cm-contents__layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--cm-panel-width);
+  transform: translateX(101%);
+  transition: transform 0.18s steps(2);
+}
+.cm-contents__layer--mag {
+  background: var(--mag);
+}
+.cm-contents__layer--cyn {
+  background: var(--cyn);
+}
+.cm-contents[data-open] .cm-contents__layer {
+  transform: translateX(0);
+  transition: transform 0.16s steps(2);
+}
+.cm-contents[data-open] .cm-contents__layer--cyn {
+  transition-delay: 0.05s;
+}
+
+/* ---- The panel ------------------------------------------------------------ */
+.cm-contents__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--cm-panel-width);
+  pointer-events: auto;
+  background: var(--paper);
+  border-left: 6px solid var(--ink);
+  /* Lengths, not percentages: percentage padding resolves against the
+     CONTAINING BLOCK's inline size, and this panel's containing block is the
+     full-viewport wrapper — `7%` measured 100px here, not the 32px it reads
+     as. */
+  padding: calc(var(--cm-stamp-top) + var(--cm-stamp-height) + 3.4vh) 34px 6vh;
+  /* The index is five entries; this only matters on a very short viewport. */
+  overflow-y: auto;
+  /* Three of the five pages are printed on paper, and paper on paper is
+     invisible — the panel needs to read as a sheet laid over the page. */
+  box-shadow: -12px 0 0 color-mix(in srgb, var(--ink) 30%, transparent);
+  transform: translateX(101%);
+  transition: transform 0.18s steps(2);
+}
+.cm-contents[data-open] .cm-contents__panel {
+  transform: translateX(0);
+  transition: transform 0.24s steps(3);
+  transition-delay: 0.1s;
+}
+/* Halftone over the paper, same print texture as every other paper object. */
+.cm-contents__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ink) 14%, transparent) 1.2px,
+    transparent 1.3px
+  );
+  background-size: 11px 11px;
+  pointer-events: none;
+}
+
+.cm-contents__kicker {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--ink);
+  opacity: 0.65;
+}
+.cm-contents__heading {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.6vw, 52px);
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  text-shadow: 3px 3px 0 var(--mag);
+  transform: skew(-6deg, -1deg);
+  margin-bottom: 3.4vh;
+}
+
+.cm-contents__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vh;
+  /* The panel's halftone is painted at the layer above `auto`; the entries sit
+     over it rather than under it (CLAUDE.md rule 16 — a negative z-index here
+     would escape the panel entirely). */
+  position: relative;
+  z-index: 1;
+}
+
+/* One entry. The stamp-in is an animation rather than a transition so that
+   re-opening replays it from the first frame; `both` fill is what makes it
+   land performed under reduced motion, where the duration collapses to
+   nothing (tokens.css). */
+.cm-contents__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+  width: 100%;
+  text-align: left;
+  padding: 0.55em 0.7em;
+  color: var(--ink);
+  opacity: 0;
+}
+.cm-contents[data-open] .cm-contents__item {
+  animation: cm-contents-item 0.16s steps(2) both var(--cm-delay, 0s);
+}
+@keyframes cm-contents-item {
+  0% {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hover and focus flip the row to ink. Deliberately not a transform: the
+   entrance above fills `both`, and a hover transform on the same element would
+   be outranked by it for the rest of the panel's life (CLAUDE.md rule 10 —
+   the bug family this project has hit three times). */
+.cm-contents__item:hover,
+.cm-contents__item:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+.cm-contents__item:focus-visible {
+  outline-offset: -3px;
+}
+
+.cm-contents__folio {
+  flex: none;
+  width: 2.4em;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--mag);
+}
+.cm-contents__item:hover .cm-contents__folio,
+.cm-contents__item:focus-visible .cm-contents__folio {
+  color: var(--acid);
+}
+.cm-contents__title {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.8vw, 25px);
+  letter-spacing: 0.03em;
+  /* Chapter titles are two words at most and set in a wide display face: a
+     wrapped entry reads as two chapters. The panel is sized to hold the
+     longest one (THE GOOD PART) at every width this clamp produces. */
+  white-space: nowrap;
+}
+
+/* The chapter the reader is actually in, marked in the margin. */
+.cm-contents__item[aria-current] .cm-contents__title {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--cyn);
+}
+
+/* ---- Reduced motion -------------------------------------------------------
+   tokens.css collapses every duration, but not `transition-delay` — and the
+   staggering here is expressed as delays. Left alone, the index would still
+   take 0.1s to arrive and 0.46s to finish listing itself, which is exactly the
+   choreography the setting asks us to drop. */
+@media (prefers-reduced-motion: reduce) {
+  .cm-contents__layer,
+  .cm-contents__panel,
+  .cm-contents__stamp,
+  .cm-contents__stamp-roll,
+  .cm-contents[data-open] .cm-contents__layer,
+  .cm-contents[data-open] .cm-contents__layer--cyn,
+  .cm-contents[data-open] .cm-contents__panel {
+    transition-delay: 0s;
+  }
+}
+
+/* ---- Mobile ---------------------------------------------------------------
+   The cover doesn't print its location stamp below 820px, so the stamp takes
+   the corner it was designed for. */
+@media (max-width: 820px) {
+  .cm-contents {
+    --cm-stamp-top: 3vh;
+  }
+  .cm-contents__stamp {
+    right: 3vw;
+  }
+  .cm-contents__panel {
+    padding-inline: 24px;
+  }
+}

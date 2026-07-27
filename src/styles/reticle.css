@@ -1,0 +1,141 @@
+/* ============================================================================
+   reticle.css — the lock-on cursor (design-doc §10/A3).
+
+   Two independent pieces, and keeping them independent is the whole design:
+
+   - the DOT tracks the pointer every frame, eased in JS, and never transitions
+     (a transition on a value that changes 60× a second is just a second, worse
+     lerp);
+   - the BOX only ever changes when a lock starts or ends, so it can carry the
+     `steps(2)` snap the design asks for without anything fighting it.
+
+   The four box variables are registered as <length> so the transition has
+   something typed to interpolate; the corners derive their own transforms from
+   them, which is why a lock is four property writes and no per-corner work.
+   ========================================================================= */
+
+@property --rt-x {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --rt-y {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --rt-bx {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --rt-by {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --rt-bw {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --rt-bh {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* The reticle only exists while the component is mounted, and it only mounts
+   on a fine pointer with motion allowed — so hiding the native cursor is safe
+   to do bluntly. Author styles beat the UA sheet, which is what takes the
+   pointer-hand off links. */
+html.cm-reticle-on,
+html.cm-reticle-on * {
+  cursor: none;
+}
+
+.cm-reticle {
+  position: fixed;
+  inset: 0;
+  /* Above the contents panel: the cursor is the topmost thing on the site. */
+  z-index: 95;
+  /* Never hit-tests. This is also what keeps text selection, focus and every
+     click working exactly as they did before it existed. */
+  pointer-events: none;
+  /* Invisible until the pointer is first seen, so it can't flash at 0,0. */
+  opacity: 0;
+  /* The two poses. Only the box is listed — the dot is eased in JS. */
+  transition:
+    --rt-bx 0.11s steps(2),
+    --rt-by 0.11s steps(2),
+    --rt-bw 0.11s steps(2),
+    --rt-bh 0.11s steps(2);
+}
+.cm-reticle[data-live] {
+  opacity: 1;
+}
+
+.cm-reticle__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--mag);
+  transform: translate3d(var(--rt-x), var(--rt-y), 0);
+}
+/* Locked on: the dot flips pass. The size is untouched on purpose — this
+   element's transform belongs to the pointer follow and nothing else
+   (CLAUDE.md rule 10). */
+.cm-reticle[data-lock] .cm-reticle__dot {
+  background: var(--cyn);
+}
+
+/* A zero-size box parked at the target's top-left corner; the brackets hang
+   off it. Sizing it with `width`/`height` would animate layout, so its extent
+   lives in --rt-bw/--rt-bh and only ever reaches the corners' transforms. */
+.cm-reticle__box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform: translate3d(var(--rt-bx), var(--rt-by), 0);
+  opacity: 0;
+  transition: opacity 0.11s steps(2);
+}
+.cm-reticle[data-lock] .cm-reticle__box {
+  opacity: 1;
+}
+
+.cm-reticle__corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--mag);
+}
+/* Percentages in `translate` resolve against the element's own box, so
+   `var(--rt-bw) - 100%` is "the far edge, minus one corner". */
+.cm-reticle__corner--tl {
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+.cm-reticle__corner--tr {
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  transform: translate(calc(var(--rt-bw) - 100%), 0);
+}
+.cm-reticle__corner--br {
+  border-left-color: transparent;
+  border-top-color: transparent;
+  transform: translate(calc(var(--rt-bw) - 100%), calc(var(--rt-bh) - 100%));
+}
+.cm-reticle__corner--bl {
+  border-right-color: transparent;
+  border-top-color: transparent;
+  transform: translate(0, calc(var(--rt-bh) - 100%));
+}

@@ -9,6 +9,8 @@
 @import "./styles/mega-page.css";
 @import "./styles/scene.css";
 @import "./styles/transition.css";
+@import "./styles/contents.css";
+@import "./styles/reticle.css";
 
 @custom-variant dark (&:is(.dark *));
 
