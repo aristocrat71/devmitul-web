@@ -12,6 +12,7 @@ import {
   SocialButton,
   StampIn,
 } from "@/components/comic";
+import characterCutout from "@/assets/cover/character.webp";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { useParallax } from "@/hooks/useParallax";
 import { useSceneProgress } from "@/hooks/useSceneScrub";
@@ -123,7 +124,10 @@ export function CoverScene() {
         depthY={COVER_DEPTH.characterY}
       >
         <div className="cover__cutout-pop" style={CHARACTER_DELAY}>
-          <CutoutImage placeholder="YOUR PHOTO CUTOUT HERE" />
+          <CutoutImage
+            src={characterCutout}
+            alt="Mitul, hands clasped under his chin, grinning at the camera."
+          />
         </div>
       </Parallax>
 

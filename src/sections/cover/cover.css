@@ -32,8 +32,15 @@
 
   /* Load-in tempo: mobile runs the same sequence at half the delays. */
   --cover-tempo: 1;
-  /* Declared once because the cutout's centring margin is derived from it. */
-  --cover-cutout-w: clamp(300px, 38vw, 560px);
+  /* Declared once because the cutout's centring margin is derived from it.
+
+     Desktop only — the mobile rule at the foot of this file replaces the whole
+     token with 72vw, so the approved mobile cover (CLAUDE.md rule 6) can't be
+     reached from here. Scaled to ~85% of the mockup's 38vw/560px: the mockup
+     sized this slot around a 300x340 stand-in silhouette (0.882 aspect), and
+     the real cutout is 0.821 — so at the mockup's width the figure stood ~47px
+     taller than the composition was drawn for and crowded the masthead. */
+  --cover-cutout-w: clamp(255px, 32vw, 475px);
 }
 
 /* ---- Character cutout — front layer, centre at ~31vw -------------------- */

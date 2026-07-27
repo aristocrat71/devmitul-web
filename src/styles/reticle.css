@@ -3,9 +3,9 @@
 
    Two independent pieces, and keeping them independent is the whole design:
 
-   - the DOT tracks the pointer every frame, eased in JS, and never transitions
-     (a transition on a value that changes 60× a second is just a second, worse
-     lerp);
+   - the ARROW tracks the pointer every frame, eased in JS, and never
+     transitions (a transition on a value that changes 60× a second is just a
+     second, worse lerp);
    - the BOX only ever changes when a lock starts or ends, so it can carry the
      `steps(2)` snap the design asks for without anything fighting it.
 
@@ -75,22 +75,64 @@ html.cm-reticle-on * {
   opacity: 1;
 }
 
-.cm-reticle__dot {
+/* The pointer itself. An arrow rather than a bare dot, because a dot gives the
+   reader no read on *where* the hotspot is — the tip does, and the tip is what
+   the site's hit-testing is actually keyed to. */
+.cm-reticle__arrow {
   position: absolute;
   top: 0;
   left: 0;
-  width: 7px;
-  height: 7px;
-  margin: -3.5px 0 0 -3.5px;
-  border-radius: 50%;
-  background: var(--mag);
+  width: 18px;
+  height: 24px;
+  /* Scale is 18/24 = 0.75 uniform, so the path's (2,2) tip lands 1.5px in from
+     the element's corner. Pull it back so the tip sits ON the pointer. */
+  margin: -1.5px 0 0 -1.5px;
+  fill: var(--mag);
+  stroke: var(--paper);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  /* Owned by the pointer follow and nothing else (CLAUDE.md rule 10) — the
+     glitch below rides `translate`, which composes rather than replacing. */
   transform: translate3d(var(--rt-x), var(--rt-y), 0);
+  animation: cm-reticle-glitch var(--reticle-period, 2s) steps(1) infinite;
 }
-/* Locked on: the dot flips pass. The size is untouched on purpose — this
-   element's transform belongs to the pointer follow and nothing else
-   (CLAUDE.md rule 10). */
-.cm-reticle[data-lock] .cm-reticle__dot {
-  background: var(--cyn);
+/* Locked on: the arrow flips pass, same as the dot it replaced. Geometry is
+   untouched on purpose — a cursor that resizes under the hand reads as drift. */
+.cm-reticle[data-lock] .cm-reticle__arrow {
+  fill: var(--cyn);
+}
+
+/* One tick per period, active window ~150ms of 2s. Same shape as the kit's
+   `cm-glitch-tick`: `translate` for the shove so it composes with the pointer
+   follow's `transform`, plus an RGB split across the two print passes. The
+   clipped frame keeps the tip — a cursor whose point vanishes, even for 50ms,
+   reads as a dropped frame rather than as interference. */
+@keyframes cm-reticle-glitch {
+  0%,
+  90% {
+    translate: 0;
+    clip-path: none;
+    filter: none;
+  }
+  91% {
+    translate: -3px 1px;
+    filter: drop-shadow(3px 0 var(--cyn)) drop-shadow(-3px 0 var(--mag));
+  }
+  93.5% {
+    translate: 3px -2px;
+    clip-path: polygon(0 0, 100% 0, 100% 46%, 0 46%);
+    filter: drop-shadow(-4px 0 var(--cyn)) drop-shadow(4px 0 var(--mag));
+  }
+  96% {
+    translate: -2px 0;
+    filter: drop-shadow(2px 0 var(--mag));
+  }
+  97.5%,
+  100% {
+    translate: 0;
+    clip-path: none;
+    filter: none;
+  }
 }
 
 /* A zero-size box parked at the target's top-left corner; the brackets hang

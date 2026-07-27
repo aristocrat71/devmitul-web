@@ -59,6 +59,11 @@
 
   /* ---- Motion constants ---- */
   --glitch-period: 5s;   /* one tick per loop, active window <= 3% */
+  /* The cursor ticks faster than the page does, and deliberately: it is the
+     one element the reader's eye is already tracking, so it can carry the
+     motif at a rate that would be noise anywhere else. */
+  --reticle-period: 2s;
+  --glitch-hover: 0.28s; /* one-shot burst on contact with an interactive target */
   --parallax-ease: 0.08; /* documented here; the lerp itself lives in lib/parallax.ts */
 
   /* Layout breakpoint mirror — 820px (CLAUDE.md conventions). Media queries

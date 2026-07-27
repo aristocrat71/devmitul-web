@@ -151,6 +151,115 @@
   animation: none;
 }
 
+/* ---- Contact glitch: the one-shot burst on hover ------------------------
+   Ported from the bracket buttons on tablo-website (`.bkt:hover`), which fire
+   a 0.28s stepped RGB split and then settle. Two things changed on the way
+   over: the split uses this site's own print passes (magenta/cyan) instead of
+   tablo's coral/sage, and the shove rides `translate` so it composes with the
+   2px hover lift every button here already owns (CLAUDE.md rule 10).
+
+   This does NOT contradict "touch stabilizes the signal" above: the idle tick
+   is interference that hover *stops*, and this is a single burst at the moment
+   of contact that then resolves to nothing. Idle noise off, contact spike on.
+
+   `:where()` keeps the whole thing at zero specificity, so it can never
+   outrank a target's own hover styling. The selector list is deliberately the
+   same one ReticleCursor uses for TARGETS — one definition of "interactive",
+   so the cursor's lock and this burst always fire on the same set. */
+:where(a[href], button:not(:disabled), [role="button"], .cm-cursor-target):hover {
+  animation: cm-glitch-hover var(--glitch-hover, 0.28s) steps(1) 1;
+}
+
+@keyframes cm-glitch-hover {
+  0% {
+    translate: -2px 0;
+    text-shadow: 3px 0 var(--cyn), -3px 0 var(--mag);
+  }
+  35% {
+    translate: 3px -1px;
+    text-shadow: -3px 0 var(--cyn), 3px 0 var(--mag);
+  }
+  65% {
+    translate: -2px 1px;
+    text-shadow: 2px 0 var(--mag), -2px 0 var(--cyn);
+  }
+  85% {
+    translate: 1px 0;
+    text-shadow: 1px 0 var(--acid);
+  }
+  100% {
+    translate: 0;
+    text-shadow: none;
+  }
+}
+
+/* Icon-only buttons have no text for the split to land on, so the split moves
+   to `filter`, which reaches the border and the glyph alike.
+
+   A `clip-path` slice was the first attempt and is the wrong tool here: it
+   clips the element's box-shadow too, so the magenta print offset that
+   `.cover__gbtn--github` hangs off the button vanishes for the length of the
+   burst and the button reads as broken rather than as glitching. drop-shadow
+   duplicates the silhouette instead of cutting it, which is exactly the
+   misregistered-print look the rest of the page is built from.
+
+   The split rides the glyph, not the button. `drop-shadow` ghosts an element's
+   alpha silhouette, and the button's silhouette is a filled opaque square — so
+   on the button the ghosts land behind it and all that escapes is a hairline
+   at two edges. The `<svg>` is transparent except for the mark itself, so the
+   same filter there ghosts the mark and reads from across the page. The button
+   keeps the shove; the two compose. */
+.cm-gbtn:hover {
+  animation: cm-glitch-hover-shove var(--glitch-hover, 0.28s) steps(1) 1;
+}
+.cm-gbtn:hover svg {
+  animation: cm-glitch-hover-split var(--glitch-hover, 0.28s) steps(1) 1;
+}
+@keyframes cm-glitch-hover-shove {
+  0% {
+    translate: -3px 0;
+  }
+  35% {
+    translate: 4px -1px;
+  }
+  65% {
+    translate: -2px 1px;
+  }
+  85% {
+    translate: 2px 0;
+  }
+  100% {
+    translate: 0;
+  }
+}
+@keyframes cm-glitch-hover-split {
+  0% {
+    filter: drop-shadow(4px 0 var(--cyn)) drop-shadow(-4px 0 var(--mag));
+  }
+  35% {
+    filter: drop-shadow(-5px 0 var(--cyn)) drop-shadow(5px 0 var(--mag));
+  }
+  65% {
+    filter: drop-shadow(3px 0 var(--mag)) drop-shadow(-3px 0 var(--cyn));
+  }
+  85% {
+    filter: drop-shadow(2px 0 var(--acid));
+  }
+  100% {
+    filter: none;
+  }
+}
+
+/* The contents rows already run an entrance animation, and `animation` is a
+   shorthand — a rule on the row itself would lose to
+   `.cm-contents[data-open] .cm-contents__item` on specificity (0,3,0 beats the
+   0,1,0 above), so the burst would silently never fire. Putting it on the
+   row's own spans, which own no animation, is what makes it land; re-stating
+   the entrance here instead would restart the slide-in on every hover. */
+.cm-contents__item:hover > * {
+  animation: cm-glitch-hover var(--glitch-hover, 0.28s) steps(1) 1;
+}
+
 /* ---- CutoutImage: halftone photo with a die-cut paper edge --------------
    Container stays pointer-events:none forever (CLAUDE.md rule 2). A1 will
    later re-enable hit-testing on the silhouette *path* only — never here. */
@@ -441,6 +550,16 @@
     clip-path: none;
   }
   .cm-glitch {
+    animation: none;
+  }
+  /* The global rule in tokens.css crushes every animation to 0.001s, which
+     leaves these as a 1ms strobe of a fully split, fully shoved button on
+     every hover. Compressed is the wrong answer for a burst; absent is the
+     right one. */
+  :where(a[href], button:not(:disabled), [role="button"], .cm-cursor-target):hover,
+  .cm-gbtn:hover,
+  .cm-gbtn:hover svg,
+  .cm-contents__item:hover > * {
     animation: none;
   }
   .cm-parallax {

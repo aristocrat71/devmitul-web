@@ -38,7 +38,9 @@ interface Box {
  *
  * 1. **The spin is gone.** Nothing on this site moves continuously except
  *    cameras (CLAUDE.md conventions) — a perpetually rotating cursor is the
- *    single most conspicuous violation of that rule the site could ship.
+ *    single most conspicuous violation of that rule the site could ship. The
+ *    arrow's 2s glitch tick is the one exception, and it is the same idiom as
+ *    `<GlitchTick>`: a signal that drops for ~150ms and is otherwise still.
  * 2. **The snap is stepped.** `steps(2)` on the brackets is the "touch
  *    stabilizes the signal" beat the design asks for: two discrete poses, not
  *    a glide.
@@ -46,7 +48,7 @@ interface Box {
  *    keeps four GSAP tweens and a ticker alive re-deriving corner positions
  *    from the cursor's own coordinates. Here the brackets are a box of their
  *    own, so a lock is four custom-property writes and the browser does the
- *    rest on the compositor; the only rAF running is the one easing the dot,
+ *    rest on the compositor; the only rAF running is the one easing the arrow,
  *    and it parks the moment the pointer stops.
  *
  * Desktop `pointer: fine` only, off under `prefers-reduced-motion`, and both
@@ -81,7 +83,7 @@ export function ReticleCursor() {
     // to draw one is unusable.
     document.documentElement.classList.add("cm-reticle-on");
 
-    /** Where the pointer is, and where the eased dot has got to. */
+    /** Where the pointer is, and where the eased arrow has got to. */
     let px = 0;
     let py = 0;
     let cx = 0;
@@ -193,7 +195,7 @@ export function ReticleCursor() {
       px = event.clientX;
       py = event.clientY;
       if (!live) {
-        // First sighting: put the dot where the pointer already is instead of
+        // First sighting: put the arrow where the pointer already is instead of
         // flying it in from the top-left corner. The box is only parked here
         // if nothing is locked — the browser fires `mouseover` *before* the
         // `mousemove` that caused it, so a pointer whose very first move lands
@@ -273,7 +275,12 @@ export function ReticleCursor() {
 
   return (
     <div className="cm-reticle" ref={rootRef} aria-hidden="true">
-      <span className="cm-reticle__dot" />
+      {/* Tip at (2,2) in the viewBox, which reticle.css pulls back onto the
+          pointer's own coordinate with a negative margin — a cursor whose
+          hotspot is its centre points at the wrong thing. */}
+      <svg className="cm-reticle__arrow" viewBox="0 0 24 32">
+        <path d="M2 2 L2 25.2 L7.6 19.8 L11.3 28.7 L15.5 26.9 L11.7 18.2 L19.6 17.7 Z" />
+      </svg>
       <span className="cm-reticle__box">
         <span className="cm-reticle__corner cm-reticle__corner--tl" />
         <span className="cm-reticle__corner cm-reticle__corner--tr" />
