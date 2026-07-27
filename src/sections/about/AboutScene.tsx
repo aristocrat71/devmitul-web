@@ -1,15 +1,40 @@
 import { useCallback, useRef, type RefObject } from "react";
-import { TitleBox } from "@/components/comic";
+import { GutterCaption, TitleBox } from "@/components/comic";
 import { CameraWalkScene } from "@/components/scene/CameraWalkScene";
-import { useInterimExit } from "@/hooks/useInterimExit";
+import {
+  megaPageFade,
+  useBoundaryZoom,
+  type BoundaryConfig,
+} from "@/hooks/useBoundaryZoom";
 import { useMegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 import { useSceneProgress } from "@/hooks/useSceneScrub";
 import { FinaleCell } from "./FinaleCell";
 import { GreetingCell } from "./GreetingCell";
 import { OriginCell } from "./OriginCell";
 import { PowersCell } from "./PowersCell";
-import { ABOUT_ASSEMBLE, ABOUT_SETTLED_AT, ABOUT_WALK } from "./timing";
+import {
+  ABOUT_ASSEMBLE,
+  ABOUT_BOUNDARY,
+  ABOUT_SETTLED_AT,
+  ABOUT_WALK,
+} from "./timing";
 import "./about.css";
+
+/**
+ * The outbound boundary: the target zoom into the finale speech bubble —
+ * entering the bubble IS starting the conversation ("SAY HELLOOO...") — into
+ * the back cover. The bubble's settled pulse is gated off the moment the zoom
+ * owns the shot.
+ */
+const ABOUT_DIVE: BoundaryConfig = {
+  next: "backcover",
+  timing: ABOUT_BOUNDARY,
+  fade: megaPageFade,
+  pulse: (root) => {
+    const box = root.querySelector<HTMLElement>(".about__bubble-box");
+    return box ? [box] : [];
+  },
+};
 
 /**
  * Page 03 — ORIGIN STORY.
@@ -22,39 +47,49 @@ import "./about.css";
  *
  * The void behind the page is this scene's own backdrop, not the stage's: the
  * design requires the void to stay visible around the page's edges at every
- * camera position, and the layer beneath is the next scene.
+ * camera position, and the layer beneath is the next scene. The gutter sits
+ * under that backdrop — invisible until the outbound boundary dissolves the
+ * page into it.
  */
 export function AboutScene() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const gutterRef = useRef<HTMLDivElement>(null);
 
   // The experience boundary drives this over its final 79–100%. Registration
   // stays page-owned; the ref is shared with the camera, no property on it is.
   useMegaPageAssemble(pageRef, ABOUT_ASSEMBLE);
   useSettled(pageRef, ABOUT_SETTLED_AT);
-  // TEMPORARY — remove with the about → contact transition. See the hook.
-  useInterimExit(pageRef);
+  // The scene's own tail is the boundary out — dive, caption, and
+  // driveAssemble("backcover") over the closing hold (a no-op until §6
+  // registers the back cover's entrance).
+  useBoundaryZoom({ root: rootRef, gutter: gutterRef }, ABOUT_DIVE);
 
   return (
-    <CameraWalkScene
-      walk={ABOUT_WALK}
-      folio="PAGE 03"
-      className="about"
-      pageClassName="about__page"
-      pageRef={pageRef}
-    >
-      <TitleBox className="about__page-title" kicker="PAGE 03 — SUBJECT PROFILE">
-        ORIGIN STORY
-      </TitleBox>
+    <>
+      <GutterCaption ref={gutterRef} kicker="BACK COVER" text="SAY HELLOOO..." />
+      <CameraWalkScene
+        walk={ABOUT_WALK}
+        folio="PAGE 03"
+        className="about"
+        pageClassName="about__page"
+        pageRef={pageRef}
+        rootRef={rootRef}
+      >
+        <TitleBox className="about__page-title" kicker="PAGE 03 — SUBJECT PROFILE">
+          ORIGIN STORY
+        </TitleBox>
 
-      {/* Reading order is camera order: the walk's keyframes are the cells
-          carrying a focus number, sorted by it. */}
-      <GreetingCell focus={0} />
-      <OriginCell focus={1} />
-      <PowersCell focus={2} />
+        {/* Reading order is camera order: the walk's keyframes are the cells
+            carrying a focus number, sorted by it. */}
+        <GreetingCell focus={0} />
+        <OriginCell focus={1} />
+        <PowersCell focus={2} />
 
-      {/* No focus number — the pull-back reveals this one. */}
-      <FinaleCell />
-    </CameraWalkScene>
+        {/* No focus number — the pull-back reveals this one. */}
+        <FinaleCell />
+      </CameraWalkScene>
+    </>
   );
 }
 

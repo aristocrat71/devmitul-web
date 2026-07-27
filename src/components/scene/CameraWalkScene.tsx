@@ -107,6 +107,7 @@ export function CameraWalkScene({
   className,
   pageClassName,
   pageRef,
+  rootRef,
   children,
 }: {
   walk: CameraWalk;
@@ -121,6 +122,13 @@ export function CameraWalkScene({
    * share the element; they must never share a property on it.
    */
   pageRef?: RefObject<HTMLDivElement | null>;
+  /**
+   * The section's handle on the walk's wrapper — the void-backed layer its
+   * outbound boundary fades into the gutter (`useBoundaryZoom`). Same sharing
+   * contract as `pageRef`: the boundary owns the wrapper's opacity and
+   * visibility, the engine owns nothing on it.
+   */
+  rootRef?: RefObject<HTMLDivElement | null>;
   children: ReactNode;
 }) {
   const cameraRef = useRef<HTMLDivElement | null>(null);
@@ -132,7 +140,7 @@ export function CameraWalkScene({
   useCameraWalk(cameraRef, walk);
 
   return (
-    <div className={className}>
+    <div className={className} ref={rootRef}>
       <MegaPage ref={setPage} className={pageClassName} folio={folio}>
         {children}
       </MegaPage>

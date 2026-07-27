@@ -6,6 +6,7 @@
  * variables are the evidence stagger and the status stamp. Beats identical for
  * every file live in `experience.css`, in the one place they're used.
  */
+import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
 
 /**
  * The leaf-through: two toss windows, each quantized to three discrete poses,
@@ -63,4 +64,35 @@ export const CASES_ASSEMBLE = {
   window: 0.5,
   head: 0,
   stack: 0.5,
+} as const;
+
+/**
+ * Experience → About: the target zoom into the CASE 001 polaroid — entering
+ * the origin story through the oldest photo in the record, under "LET'S DO
+ * THIS ONE LAST TIME...." (design-doc §7).
+ *
+ * THE TIGHT ONE. The polaroid announces itself from `outroAt` (0.88), so the
+ * boundary owns only 0.88–1.0 — 43vh of a 360vh scene, against 63vh on each
+ * camera-walk page and ~180vh on the cover. The pulse gets 0.88–0.895 plus
+ * however long the reader rests at the top of the file (it's an infinite
+ * loop; the gate is the zoom, not a window), and the caption hold comes out
+ * at ~8vh — a fast flick can outrun it. Flagged rather than fixed: the honest
+ * fix is more scene (one number in App.tsx's BOOK), and Mitul has cut these
+ * lengths twice on purpose. Phases are fractions of the scene's scrub.
+ */
+export const CASES_BOUNDARY: BoundaryTiming = {
+  /** Only the title box — the docket IS the printed page; it exits with the
+      world fade rather than vanishing from under the growing polaroid. */
+  fade: { at: 0.885, duration: 0.035 },
+  zoom: { at: 0.895, duration: 0.063 },
+  ink: { at: 0.919, duration: 0.024 },
+  worldFade: { at: 0.939, duration: 0.022 },
+  worldOff: 0.963,
+  captionIn: 0.966,
+  captionExit: { at: 0.988, duration: 0.008 },
+  gutterFade: { at: 0.985, duration: 0.015 },
+  /** ORIGIN STORY prints 7 targets in ~13vh — but the camera over there is
+      parked zoomed into C1, so only the paper, the title's corner and the
+      greeting cell are ever in frame while it happens. */
+  assembleFrom: 0.962,
 } as const;

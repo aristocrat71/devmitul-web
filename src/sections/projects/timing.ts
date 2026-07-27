@@ -9,6 +9,7 @@
  * used, `projects.css`, rather than being mirrored here and drifting.
  */
 import type { CameraWalk } from "@/components/scene/CameraWalkScene";
+import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
 import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
@@ -87,4 +88,29 @@ export const PROJECTS_ASSEMBLE: MegaPageAssemble = {
   title: 0.08,
   cells: [0.18, 0.42, 0.52, 0.62],
   folio: 0.7,
+} as const;
+
+/**
+ * Projects → Experience: the target zoom into the CREW PASS ("you enter
+ * employment through the employee card", design-doc §6), scrubbed over the
+ * closing hold — the camera is parked at the fit pose from 0.79, so the page
+ * holds a beat (0.79–0.81, ~6vh) and then empties around the badge.
+ *
+ * The whole boundary lives in 21% of a 300vh scene (63vh of scroll) where the
+ * cover's got 70% of 260vh, so every phase is proportionally tighter; the
+ * caption hold (0.91–0.955, ~13.5vh) is the widest slice left after the zoom
+ * reads cleanly. Phases are fractions of the scene's scrub (see
+ * `useBoundaryZoom` for what each one does).
+ */
+export const PROJECTS_BOUNDARY: BoundaryTiming = {
+  fade: { at: 0.81, duration: 0.05 },
+  zoom: { at: 0.82, duration: 0.079 },
+  ink: { at: 0.85, duration: 0.03 },
+  worldFade: { at: 0.875, duration: 0.028 },
+  worldOff: 0.905,
+  captionIn: 0.91,
+  captionExit: { at: 0.955, duration: 0.02 },
+  gutterFade: { at: 0.958, duration: 0.03 },
+  /** CASE FILES has 2 pose targets (head, docket) — 18vh is enough. */
+  assembleFrom: 0.94,
 } as const;

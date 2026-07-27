@@ -145,6 +145,36 @@
   background: var(--ink);
 }
 
+/* ---- Target-zoom hooks (the interior boundaries) -------------------------
+   Every join after the cover zooms a `[data-dive-target]` about its own
+   centre until its ink interior fills the frame (design-doc §5, amended).
+   The interior is this ::after flood: the boundary scrub drives
+   `--cm-dive-ink` 0 → 1 mid-zoom, so the target's printed face dissolves
+   under solid ink exactly like the cover button's octocat — one shared
+   mechanism, no per-target ink styling. z-index lifts it above the target's
+   children (the pulse child creates its own stacking context); the slight
+   negative inset covers the box's own subpixel edges at high magnification. */
+[data-dive-target] {
+  position: relative;
+}
+[data-dive-target]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: 1;
+  background: var(--ink);
+  opacity: var(--cm-dive-ink, 0);
+  pointer-events: none;
+}
+
+/* Once the zoom starts the outgoing page is scenery, not UI — invisible
+   links must not stay hit-testable while it is still the active layer
+   (CLAUDE.md rule 2). The boundary scrub toggles this and removes it on
+   scroll-up; the cover's own boundary has `.cover--diving` for the same job. */
+.cm-boundary-gone {
+  pointer-events: none;
+}
+
 /* Once the printed elements start fading the cover is scenery, not UI —
    invisible buttons must not stay hit-testable (CLAUDE.md rule 2). The scrub
    toggles this at 30% and removes it on scroll-up. */

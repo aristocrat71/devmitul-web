@@ -9,6 +9,7 @@
  * mirrored here and drifting.
  */
 import type { CameraWalk } from "@/components/scene/CameraWalkScene";
+import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
 import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
@@ -97,4 +98,30 @@ export const ABOUT_ASSEMBLE: MegaPageAssemble = {
   title: 0.08,
   cells: [0.18, 0.42, 0.52, 0.62],
   folio: 0.7,
+} as const;
+
+/**
+ * About → Contact: the target zoom into the finale speech bubble — entering
+ * the bubble IS starting the conversation, under "SAY HELLOOO..."
+ * (design-doc §8). The same table as `PROJECTS_BOUNDARY` for the same reason
+ * the walks match: the two pages are structural twins with identical closing
+ * holds, and this one stays a per-section constant so their boundaries stay
+ * free to diverge. Phases are fractions of the scene's scrub.
+ *
+ * The bubble pulses from `ABOUT_SETTLED_AT` (0.79) and keeps pulsing through
+ * the early fade — the gate is the zoom's start, so the page invites right up
+ * until the reader commits.
+ */
+export const ABOUT_BOUNDARY: BoundaryTiming = {
+  fade: { at: 0.81, duration: 0.05 },
+  zoom: { at: 0.82, duration: 0.079 },
+  ink: { at: 0.85, duration: 0.03 },
+  worldFade: { at: 0.875, duration: 0.028 },
+  worldOff: 0.905,
+  captionIn: 0.91,
+  captionExit: { at: 0.955, duration: 0.02 },
+  gutterFade: { at: 0.958, duration: 0.03 },
+  /** Drives `driveAssemble("backcover")` — a no-op until §6 registers its
+      entrance; the window (0.94–1.0, 18vh) is the back cover's to spend. */
+  assembleFrom: 0.94,
 } as const;
