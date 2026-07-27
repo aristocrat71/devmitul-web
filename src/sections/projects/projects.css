@@ -206,6 +206,19 @@
 .projects__abtn-label {
   position: relative;
   z-index: 1;
+  /* An explicit line box, shared by the icon button and the text one: the mark
+     is sized in the same em so both actions are exactly the same height
+     whatever each contains. */
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+}
+.projects__abtn-icon {
+  display: block;
+  width: 1.2em;
+  height: 1.2em;
+  /* Takes the label's ink, so the halftone sweep flips the mark with it. */
+  fill: currentColor;
 }
 .projects__abtn:hover { color: var(--ink); }
 .projects__abtn:hover::before { transform: translateX(0); }

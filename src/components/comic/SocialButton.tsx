@@ -23,6 +23,26 @@ const NETWORKS = {
 export type SocialNetwork = keyof typeof NETWORKS;
 
 /**
+ * Just the mark, for places that aren't one of these buttons — THE GOOD PART's
+ * repo action, for one. Always decorative: whatever it sits inside owns the
+ * accessible name, so the icon is never the only thing saying where a link
+ * goes.
+ */
+export function SocialIcon({
+  network,
+  className,
+}: {
+  network: SocialNetwork;
+  className?: string;
+}) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <path d={NETWORKS[network].path} />
+    </svg>
+  );
+}
+
+/**
  * A social icon button: paper-outlined square, halftone sweep on hover, 2px
  * stepped lift. Owns its own `transform` on hover, so anything animating it —
  * the cover's glitch tick, an assembly pose — goes on a wrapper around it
@@ -38,7 +58,7 @@ export function SocialButton({
 }: {
   network: SocialNetwork;
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "aria-label">) {
-  const { label, href, path } = NETWORKS[network];
+  const { label, href } = NETWORKS[network];
   return (
     <a
       className={cn("cm-gbtn", className)}
@@ -48,9 +68,7 @@ export function SocialButton({
       aria-label={label}
       {...rest}
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d={path} />
-      </svg>
+      <SocialIcon network={network} />
     </a>
   );
 }

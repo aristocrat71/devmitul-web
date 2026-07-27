@@ -108,7 +108,7 @@
   display: inline-block;
 }
 /* LOVE's offset is frozen — client-approved, never adjust it (design-doc §9).
-   BUILD and RISE are placed by measurement and carry no offset here. */
+   BUILD and BELIEVE are placed by measurement and carry no offset here. */
 .backcover__row--love .backcover__track {
   transform: translateX(-9vw);
 }
@@ -121,7 +121,7 @@
   color: var(--acid);
   text-shadow: 6px 6px 0 var(--mag);
 }
-.backcover__row--rise .backcover__row-ink {
+.backcover__row--believe .backcover__row-ink {
   color: transparent;
   -webkit-text-stroke: 3px var(--cyn);
 }

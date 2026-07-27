@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef, type RefObject } from "react";
 import {
   Banner,
   CutoutImage,
@@ -14,6 +14,7 @@ import {
 } from "@/components/comic";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { useParallax } from "@/hooks/useParallax";
+import { useSceneProgress } from "@/hooks/useSceneScrub";
 import { SpeakerSticker } from "./SpeakerSticker";
 import { useCoverTransition } from "./useCoverTransition";
 import {
@@ -22,6 +23,7 @@ import {
   COVER_GLITCH,
   COVER_LOAD_IN,
   COVER_ROT,
+  COVER_TRANSITION,
 } from "./timing";
 import "./cover.css";
 
@@ -53,6 +55,9 @@ export function CoverScene() {
   // Idle pointer parallax — desktop fine-pointers only, and the loop is shared
   // and refcounted, so mounting this scene simply joins it.
   useParallax();
+
+  // The load-in plays once per visit, not once per return to the top.
+  useLoadInOnce(rootRef);
 
   // §2 — the perspective dive into the GitHub button, the gutter caption, and
   // the handoff to the projects page. Owns the cover root's transform and
@@ -156,7 +161,7 @@ export function CoverScene() {
             wipe
             delay={beat(COVER_LOAD_IN.tagline)}
           >
-            SOFTWARE DEVELOPER&nbsp;//&nbsp;DATA SCIENCE
+            SOFTWARE DEVELOPER&nbsp;//&nbsp;CHAOTIC
           </Banner>
         </div>
 
@@ -177,6 +182,19 @@ export function CoverScene() {
             />
           </GlitchTick>
         </FadeUp>
+
+        {/* Last in, and the diagonal's final beat: the cue now sits under the
+            socials rather than centred at the foot of the page, so the whole
+            read runs cutout ↘ title ↘ tagline ↘ socials ↘ cue. */}
+        <div className="cover__cue">
+          <FadeUp
+            className="cover__cue-text"
+            delay={beat(COVER_LOAD_IN.scrollCue)}
+          >
+            SCROLL TO EXPLORE MORE
+            <span className="cover__cue-arrow">▼</span>
+          </FadeUp>
+        </div>
       </Parallax>
 
       {/* ---- Speaker sticker ---- */}
@@ -199,20 +217,36 @@ export function CoverScene() {
         </StampIn>
       </Parallax>
 
-      {/* ---- Scroll cue, last in ---- */}
-      <div className="cover__cue">
-        <FadeUp
-          className="cover__cue-text"
-          delay={beat(COVER_LOAD_IN.scrollCue)}
-        >
-          TURN THE PAGE
-          <span className="cover__cue-arrow">▼</span>
-        </FadeUp>
-      </div>
         </div>
       </div>
     </>
   );
+}
+
+/**
+ * Marks the cover `--loaded` the first time the boundary scrub takes ownership
+ * of the entrance elements, which is the moment the load-in stops being what
+ * the reader is watching. From then on cover.css holds those elements at their
+ * landed poses with no animation to restart, so scrolling back to the top
+ * shows the cover it left rather than replaying the whole opening.
+ *
+ * Keyed off the same threshold as the handoff itself (`COVER_TRANSITION`), so
+ * the two can't drift: below it the scrub never touched the entrances and
+ * there is nothing to replay anyway.
+ */
+function useLoadInOnce(rootRef: RefObject<HTMLElement | null>): void {
+  const done = useRef(false);
+
+  const onProgress = useCallback(
+    (progress: number) => {
+      if (done.current || progress <= COVER_TRANSITION.handoff) return;
+      done.current = true;
+      rootRef.current?.classList.add("cover--loaded");
+    },
+    [rootRef],
+  );
+
+  useSceneProgress(onProgress);
 }
 
 export default CoverScene;

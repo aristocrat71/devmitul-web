@@ -1,4 +1,4 @@
-import { MegaCell, type CellSlot } from "@/components/comic";
+import { MegaCell, SocialIcon, type CellSlot } from "@/components/comic";
 import type { CSSVarStyle } from "@/lib/css-vars";
 import { PROJECTS_FOCUS } from "./timing";
 import type { Project } from "./content";
@@ -57,8 +57,12 @@ export function ProjectPanel({
           aria-label={`${project.name} source on GitHub`}
         >
           {/* The sweep fills the button from behind the label, so the label
-              needs to be an element that can sit above it. */}
-          <span className="projects__abtn-label">GITHUB</span>
+              needs to be an element that can sit above it. The mark replaces
+              the word (Mitul, 2026-07-27); the link's `aria-label` above is
+              what still says GitHub, so nothing is lost when the icon is. */}
+          <span className="projects__abtn-label">
+            <SocialIcon network="github" className="projects__abtn-icon" />
+          </span>
         </a>
         <a
           className="projects__abtn projects__abtn--live"

@@ -17,7 +17,7 @@ import "./backcover.css";
  * The BACK COVER — the last page of Issue #01.
  *
  * A port of the approved `backcover-mockup.html`: the maximalist BUILD | LOVE |
- * RISE lettering wall with the contact block printed on top of it as back-cover
+ * BELIEVE lettering wall with the contact block printed on top of it as back-cover
  * furniture (design-doc §9). The book ends the way it began, as a printed
  * object.
  *

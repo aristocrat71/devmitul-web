@@ -1,6 +1,6 @@
 /**
- * Wall composition (design-doc §9): a full BUILD sits centred and a full RISE
- * sits at the left edge, at any viewport, with the track always covering the
+ * Wall composition (design-doc §9): a full BUILD sits centred and a full
+ * BELIEVE sits at the left edge, at any viewport, with the track always covering the
  * left edge so no row ever starts mid-frame. LOVE is not here — its −9vw is a
  * frozen, client-approved constant and lives in CSS.
  *
@@ -18,8 +18,8 @@ export const WALL_SEP_CLASS = "backcover__sep";
 /** `.backcover__wall`'s side inset, as a fraction of the viewport (−8vw). */
 const WALL_SIDE_INSET = 0.08;
 
-/** Where a full RISE starts, as a fraction of the viewport. */
-const RISE_LEFT = 0.03;
+/** Where the left-edge row's full word starts, as a fraction of the viewport. */
+const LEFT_ROW_START = 0.03;
 
 export type WallPlace = "center" | "left" | "frozen";
 
@@ -76,7 +76,7 @@ export function placeWall(tracks: readonly WallTrack[]): void {
     if (!measured || !measured.unit) continue;
 
     const targetLeft =
-      place === "center" ? (vw - measured.word) / 2 : vw * RISE_LEFT;
+      place === "center" ? (vw - measured.word) / 2 : vw * LEFT_ROW_START;
     const offset = ((pad + targetLeft) % measured.unit) - measured.unit;
     el.style.transform = `translateX(${offset}px)`;
   }

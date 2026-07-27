@@ -7,7 +7,10 @@ import { placeWall, WALL_SEP_CLASS, type WallTrack } from "./place-wall";
 import { WALL_GLITCH, WALL_SHOVE } from "./timing";
 
 /**
- * BUILD | LOVE | RISE — the loudest page in the issue (design-doc §9). Three
+ * BUILD | LOVE | BELIEVE — the loudest page in the issue (design-doc §9). The
+ * third row reads BELIEVE where the approved mockup read RISE (Mitul,
+ * 2026-07-27) — a word swap only: same hollow cyan treatment, same left-edge
+ * placement, and the placer measures whatever word it is given. Three
  * viewport-spanning rows of display type, the whole wall tilted −3° with the
  * letterforms cropping off every edge.
  *

@@ -38,7 +38,7 @@ export const WALL_SHOVE = 14;
  */
 export const BACKCOVER_ASSEMBLE = {
   window: 0.3,
-  /** BUILD, LOVE, RISE — the wall arrives before anything printed on it. */
+  /** BUILD, LOVE, BELIEVE — the wall arrives before anything printed on it. */
   rows: [0, 0.08, 0.16],
   stamp: 0.24,
   email: 0.32,

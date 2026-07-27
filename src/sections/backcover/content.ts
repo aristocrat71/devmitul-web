@@ -44,7 +44,7 @@ export const CTA = {
 export const WALL_ROWS = [
   { word: "BUILD", place: "center" },
   { word: "LOVE", place: "frozen" },
-  { word: "RISE", place: "left" },
+  { word: "BELIEVE", place: "left" },
 ] as const;
 
 export const WALL_REPEATS = 8;

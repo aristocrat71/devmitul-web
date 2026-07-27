@@ -264,16 +264,18 @@
   justify-content: center;
 }
 
-/* ---- Scroll cue --------------------------------------------------------- */
+/* ---- Scroll cue ---------------------------------------------------------
+   Moved out of the page foot and into the column, under the socials (Mitul,
+   2026-07-27) — so it ends the diagonal instead of floating at the bottom
+   centre, and rides the column's parallax with everything else it reads with.
+   Shrink-to-fit and centred inside itself, so the arrow sits under the middle
+   of its own line rather than under the column. */
 .cover__cue {
-  position: absolute;
-  bottom: 3.5vh;
-  left: 0;
-  right: 0;
-  z-index: 6;
+  display: inline-block;
+  margin-left: 12vw;
+  margin-top: 3.4vh;
   text-align: center;
-  /* Decorative + non-interactive: it spans the full width and would otherwise
-     sit over the barcode and speaker's bounding boxes. */
+  /* Decorative + non-interactive (rule 2). */
   pointer-events: none;
 }
 .cover__cue-text {
@@ -324,10 +326,44 @@
   .cover .cover__tagline { font-size: 15px; white-space: nowrap; }
   .cover__tag-row { margin-left: 0; }
   .cover__socials { justify-content: center; margin-left: 0; }
+  /* The column centres its inline content, so the cue centres with it. */
+  .cover__cue { margin-left: 0; }
   .cover__speaker { width: 80px; bottom: 4vh; z-index: 5; }
   .cover__barcode { width: 76px; height: 40px; }
   /* Collides with the centred masthead at this width. */
   .cover__location { display: none; }
+}
+
+/* ---- The load-in is a once-per-visit event ------------------------------
+   (Mitul, 2026-07-27.) The boundary scrub takes ownership of the entrance
+   elements at 6% and hands it back below that by clearing the inline
+   `animation: none` — and re-adding a CSS animation restarts it, so scrolling
+   down a little and back replayed the whole load-in. §2 called that "the cover
+   re-assembles with its own choreography"; it reads as the page reloading.
+
+   The cover marks itself `--loaded` the first time the scrub takes over (see
+   `CoverScene`), and from then on these elements simply have no animation to
+   restart. Each one therefore has to state the pose its keyframes used to
+   fill, exactly as the reduced-motion block below does for the same reason —
+   they are the same problem: an entrance whose resting state is invisible.
+
+   Nothing here fights the scrub: while it owns these elements it writes
+   inline styles, which outrank all of this. */
+.cover--loaded .cm-stamp-in,
+.cover--loaded .cm-fade-up,
+.cover--loaded .cover__cutout-pop,
+.cover--loaded .cover__masthead-slam {
+  animation: none;
+  opacity: 1;
+}
+/* The stamps keep their resting angle; the other three land untransformed. */
+.cover--loaded .cm-stamp-in {
+  transform: rotate(var(--cm-rot, 0deg));
+}
+.cover--loaded .cm-fade-up,
+.cover--loaded .cover__cutout-pop,
+.cover--loaded .cover__masthead-slam {
+  transform: none;
 }
 
 /* ---- Reduced motion -----------------------------------------------------
