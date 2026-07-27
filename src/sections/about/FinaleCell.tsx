@@ -1,16 +1,22 @@
-import { CutoutImage, MegaCell } from "@/components/comic";
+import { MegaCell, SocialButton } from "@/components/comic";
 import type { CSSVarStyle } from "@/lib/css-vars";
-import { FINALE } from "./content";
+import { EmailCTA } from "./EmailCTA";
+import { FINALE, RESUME_LABEL, RESUME_URL } from "./content";
 import { ABOUT_OUTRO } from "./timing";
 
-const FIGURE_STAMP: CSSVarStyle = {
-  "--cm-rot": "-2deg",
-  "--cm-delay": `${ABOUT_OUTRO.figure}s`,
-};
 const BUBBLE_STAMP: CSSVarStyle = {
   "--cm-rot": "1deg",
   "--cm-delay": `${ABOUT_OUTRO.bubble}s`,
 };
+const CONTACT_STAMP: CSSVarStyle = {
+  "--cm-rot": "-0.6deg",
+  "--cm-delay": `${ABOUT_OUTRO.contact}s`,
+};
+/** Each action prints on its own beat; the rotation is the element's own. */
+const actionStamp = (index: number, rotate: string): CSSVarStyle => ({
+  "--cm-rot": rotate,
+  "--cm-delay": `${ABOUT_OUTRO.actions[index]}s`,
+});
 
 /**
  * C4 — YOUR TURN: the finale, unvisited until the pull-back reveals it
@@ -26,16 +32,15 @@ const BUBBLE_STAMP: CSSVarStyle = {
  * want to move this bubble: the pull-back stamp, the boundary's zoom, and the
  * settled pulse. Stacking them on one element is what makes the mockup have to
  * re-declare `opacity: 1` to survive its own pulse (see about.css).
+ *
+ * The contact block under it replaced the placeholder cutout figure that used
+ * to stand to the bubble's left (Mitul, 2026-07-27). The cell asks the reader
+ * to say something; it now also shows them how, instead of spending its only
+ * furniture on a stand-in silhouette and leaving the rest of the cell blank.
  */
 export function FinaleCell() {
   return (
     <MegaCell at="bl" className="about__finale">
-      <div className="about__outro-el about__figure" style={FIGURE_STAMP}>
-        {/* Printed directly on paper stock, so the die cut is inked — a paper
-            edge would be invisible against the page. */}
-        <CutoutImage edgeTone="ink" shadow={{ x: 5, y: 5, alpha: 0.45 }} />
-      </div>
-
       <div
         className="about__outro-el about__finale-bubble"
         style={BUBBLE_STAMP}
@@ -47,6 +52,47 @@ export function FinaleCell() {
               NEXT: <b>{FINALE.next}</b>
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="about__outro-el about__contact" style={CONTACT_STAMP}>
+        <EmailCTA />
+      </div>
+
+      <div className="about__actions">
+        {/* Each action is its own stamp owner, so the hover transform each one
+            carries stays its own (CLAUDE.md rule 10). */}
+        <div
+          className="about__outro-el about__action"
+          style={actionStamp(0, "3deg")}
+        >
+          <a
+            className="about__resume"
+            href={RESUME_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {RESUME_LABEL}
+          </a>
+        </div>
+        {/* The cover's buttons, reprised. */}
+        <div
+          className="about__outro-el about__action"
+          style={actionStamp(1, "-2deg")}
+        >
+          <SocialButton
+            network="github"
+            className="about__gbtn about__gbtn--github"
+          />
+        </div>
+        <div
+          className="about__outro-el about__action"
+          style={actionStamp(2, "2deg")}
+        >
+          <SocialButton
+            network="linkedin"
+            className="about__gbtn about__gbtn--linkedin"
+          />
         </div>
       </div>
     </MegaCell>

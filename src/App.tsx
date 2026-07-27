@@ -59,8 +59,8 @@ const BOOK: readonly SceneDef[] = [
   { label: "experience", lengthVh: 280, Component: ExperienceScene },
   { label: "about", lengthVh: 300, Component: AboutScene },
   // The book ends here: a resting page with no scrub of its own. The boundary
-  // INTO it lives in about's tail, and interaction flips to it 20vh early so
-  // the email CTA is clickable without scrolling to the last pixel.
+  // INTO it lives in about's tail. Nothing on it is interactive any more — the
+  // contact block moved to ORIGIN STORY's C4 (Mitul, 2026-07-27).
   { label: "backcover", lengthVh: 0, Component: BackCoverScene },
 ];
 

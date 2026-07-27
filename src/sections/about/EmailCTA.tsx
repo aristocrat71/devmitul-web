@@ -38,8 +38,13 @@ async function copyEmail(): Promise<boolean> {
 }
 
 /**
- * The email hero CTA (design-doc §9) — a paper panel with the address skewed
- * across it, and the site's conversion moment.
+ * The email hero CTA — a paper panel with the address skewed across it, and the
+ * site's conversion moment.
+ *
+ * Lived on the back cover through §6 (design-doc §9); moved here with the rest
+ * of the contact block (Mitul, 2026-07-27) so the invitation and the means to
+ * answer it sit in the same cell, rather than the reader being asked to say
+ * something on ORIGIN STORY and then having to dive a page to find out how.
  *
  * **Copy to clipboard, never mailto.** A mailto gambles the visitor's next
  * action on whatever mail client the OS decides to open; copying leaves them
@@ -72,14 +77,14 @@ export function EmailCTA() {
   return (
     <button
       type="button"
-      className="backcover__email"
+      className="about__email"
       onClick={onCopy}
       aria-label={`Copy email address: ${EMAIL}`}
     >
-      <span className="backcover__email-address">{EMAIL.toUpperCase()}</span>
+      <span className="about__email-address">{EMAIL.toUpperCase()}</span>
 
       {/* Announced as well as shown — the whole feedback is in this line. */}
-      <span className="backcover__email-sub" aria-live="polite">
+      <span className="about__email-sub" aria-live="polite">
         {state === "idle" ? (
           <>
             <b>{CTA.idleLead}</b>
@@ -93,7 +98,7 @@ export function EmailCTA() {
       </span>
 
       {state === "idle" ? null : (
-        <span key={press} className="backcover__burst" aria-hidden="true">
+        <span key={press} className="about__burst" aria-hidden="true">
           {state === "copied" ? CTA.copiedBurst : CTA.manualBurst}
         </span>
       )}

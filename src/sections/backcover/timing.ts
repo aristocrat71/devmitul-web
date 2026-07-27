@@ -41,18 +41,11 @@ export const BACKCOVER_ASSEMBLE = {
   /** BUILD, LOVE, BELIEVE — the wall arrives before anything printed on it. */
   rows: [0, 0.08, 0.16],
   stamp: 0.24,
-  email: 0.32,
-  resume: 0.4,
-  github: 0.46,
-  linkedin: 0.51,
+  /* The email, résumé and bookend-button beats went to ORIGIN STORY with the
+     contact block (Mitul, 2026-07-27). The blurb keeps its own slot rather
+     than being pulled earlier — the wall still has to finish arriving before
+     anything printed on it lands. */
   blurb: 0.57,
   nextIssue: 0.65,
   barcode: 0.7,
 } as const;
-
-/**
- * How long the copied state holds before the subline restores itself
- * (mockup: 3s). The burst's own animation is shorter and runs independently —
- * it finishes while the subline is still reading IN YOUR CLIPBOARD.
- */
-export const COPY_FEEDBACK_MS = 3000;

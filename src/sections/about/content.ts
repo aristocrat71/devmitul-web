@@ -63,3 +63,29 @@ export const FINALE = {
   line: "YOUR TURN. SAY SOMETHING ▸",
   next: "DIVE ▸ BACK COVER",
 } as const;
+
+/* ---- C4's contact block --------------------------------------------------
+   Moved here from the back cover (Mitul, 2026-07-27). design-doc §9 printed the
+   address, the résumé link and the two bookend buttons as back-cover furniture;
+   they now answer the finale bubble in the same cell, and the back cover keeps
+   only its blurb. The strings are unchanged. */
+
+/** The conversion moment. Copied to the clipboard, never opened as a mailto. */
+export const EMAIL = "sheth.mitul.71@gmail.com";
+
+export const RESUME_URL =
+  "https://drive.google.com/file/d/1eUYpN-34oYDib99id6B1CtPAyxouc4Es/view?usp=sharing";
+
+/** Framing: the site is the real résumé, so the formal one is the boring one. */
+export const RESUME_LABEL = "WANT A (BORING) FORMAL RESUME?";
+
+/** The email CTA's subline, in its three states. */
+export const CTA = {
+  /** At rest: the bold word is the instruction. */
+  idleLead: "CLICK",
+  idleRest: " TO COPY",
+  copied: "IN YOUR CLIPBOARD ▸",
+  /** Both copy paths refused (no clipboard API, no execCommand): show it. */
+  manualBurst: "SELECT & COPY!",
+  copiedBurst: "COPIED!",
+} as const;

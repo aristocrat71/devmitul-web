@@ -33,7 +33,7 @@ export function GreetingCell({ focus }: { focus: number }) {
         <img
           className="about__photo"
           src={actionPhoto}
-          alt="Mitul leaning over a restaurant table, eyes down, taking a bite of a momo off a pair of chopsticks."
+          alt="Mitul leaning over a restaurant table, eyes down, taking a bite of a momo off a pair of chopsticks, with the rest of the plate and a dish of sauce in front of him."
           loading="lazy"
           decoding="async"
         />

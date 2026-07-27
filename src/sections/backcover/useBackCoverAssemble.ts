@@ -4,19 +4,16 @@ import { useSceneAssemble } from "@/hooks/useSceneAssemble";
 import { BACKCOVER_ASSEMBLE as A } from "./timing";
 
 /**
- * Selector → its start fraction in the assembly window, in print order. The
- * hover-lifting elements (the CTA, the résumé burst, the two bookend buttons)
- * are posed through their `__slot` wrappers rather than directly: each of them
- * owns a `transform` on `:hover` with an 80ms stepped transition, and a pose
- * written onto the same element would fight it in both directions (CLAUDE.md
- * rule 10). The wrapper scales, the button lifts, and the two compose.
+ * Selector → its start fraction in the assembly window, in print order.
+ *
+ * Every element left on this page is inert, so each is posed directly. The
+ * `__slot` wrappers this table used to go through existed because the CTA, the
+ * résumé burst and the two bookend buttons each own a `transform` on `:hover`
+ * that a pose on the same element would fight (CLAUDE.md rule 10) — those moved
+ * to ORIGIN STORY's C4 (Mitul, 2026-07-27) and took the problem with them.
  */
 const TARGETS: readonly (readonly [string, number])[] = [
   [".backcover__stamp", A.stamp],
-  [".backcover__slot--email", A.email],
-  [".backcover__slot--resume", A.resume],
-  [".backcover__slot--github", A.github],
-  [".backcover__slot--linkedin", A.linkedin],
   [".backcover__blurb", A.blurb],
   [".backcover__next-issue", A.nextIssue],
   [".backcover__barcode", A.barcode],

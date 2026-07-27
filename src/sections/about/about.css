@@ -109,9 +109,22 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  /* The frame's aspect runs 1.30:1 to 1.44:1 across viewports and the capture
-     is 1.35:1, so `cover` only ever trims a few percent off one axis. */
-  object-fit: cover;
+  /* `contain`, not the mockup's `cover` (Mitul, 2026-07-27 — "still too zoomed
+     in", twice).
+
+     The capture is a PORTRAIT 2250x4000 and this frame is landscape ~1.32:1,
+     and that mismatch is the whole story: under `cover` the visible field is
+     pinned to the source's full width no matter what the file contains — a
+     2250x1667 crop and the entire 2250x4000 frame both show exactly 1703px of
+     scene. Widening the crop hit that ceiling on the first pass, so the only
+     way to show more is to stop cropping to the frame and letterbox instead.
+
+     The bars are the price, and they cost little here: `--ink-panel` plus the
+     halftone `::before` already covers them, so they read as the same printed
+     panel as C2 rather than as empty space, and the tags that used to sit on
+     top of the photo now hang over the panel where they belong. Same idiom as
+     the project panels (projects.css), which letterbox `contain` on purpose. */
+  object-fit: contain;
   pointer-events: none;
 }
 
@@ -326,11 +339,17 @@
 }
 
 /* ---- C4: the finale — revealed by the pull-back -------------------------- */
+/* A column, not the mockup's figure-beside-bubble row: the placeholder cutout
+   that used to hold the left third is gone, and the contact block that replaced
+   it needs the cell's full width for the address (Mitul, 2026-07-27). Centred
+   rather than bottom-aligned for the same reason — with three stacked items
+   there is no shared baseline left to align to. */
 .about__finale {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 1.4vw;
+  gap: 2.6vh;
   padding: 3vh 1vw;
 }
 
@@ -346,11 +365,8 @@
   animation-delay: var(--cm-delay, 0s);
 }
 
-.about__figure {
-  flex: 0 0 32%;
-}
 .about__finale-bubble {
-  flex: 1;
+  flex: 0 0 auto;
 }
 /* Exists to be zoomed: the About → Contact boundary scales its dive target
    about its own centre until the ink fills the frame (design-doc §5), and every
@@ -370,14 +386,17 @@
   padding: 3vh 1.6vw;
   text-align: center;
 }
-/* The tail, pointing back at the figure. */
+/* The tail. It pointed left at the cutout figure; with the figure gone and the
+   cell stacked, it points DOWN at the contact block instead — the bubble asks
+   for a reply and the tail indicates what to reply with. Left at 22% so it sits
+   under the line's opening words rather than dead centre. */
 .about__bubble-box::after {
   content: "";
   position: absolute;
-  bottom: 22%;
-  left: -24px;
+  bottom: -28px;
+  left: 22%;
   border: 14px solid transparent;
-  border-right-color: var(--ink);
+  border-top-color: var(--ink);
 }
 .about__bb-line {
   font-family: var(--font-display);
@@ -409,6 +428,139 @@
   50% { transform: scale(1.03) rotate(-0.6deg); }
 }
 
+/* ---- C4's contact block -------------------------------------------------
+   Moved off the back cover (Mitul, 2026-07-27). The geometry is the back
+   cover's, re-tuned twice over: the type steps down because this sits in a
+   46vw cell rather than across a full viewport, and the print treatment flips
+   because the page underneath is paper, not ink. Anything that read as
+   "light object on a dark wall" there has to read as "printed ON the page"
+   here — hence ink borders, `--paper-doc` panels and the page's own soft ink
+   offset instead of the wall's hard black one. */
+.about__contact {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.about__email {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  background: var(--paper-doc);
+  color: var(--ink);
+  font-family: var(--font-body);
+  /* The panel holds no text of its own — the address and the subline both set
+     their own size — so its font-size exists only as the line box's invisible
+     strut. Zeroing it keeps the panel's height the sum of its children. */
+  font-size: 0;
+  border: 4px solid var(--ink);
+  box-shadow:
+    6px 6px 0 var(--mag),
+    10px 10px 0 color-mix(in srgb, var(--ink) 25%, transparent);
+  padding: 2.1vh 2.7vw;
+  cursor: pointer;
+  text-align: center;
+  --cm-rot: -1deg;
+  transform: rotate(var(--cm-rot));
+  transition: transform 0.08s steps(1);
+}
+.about__email:hover {
+  transform: rotate(var(--cm-rot)) translate(-3px, -3px);
+  box-shadow:
+    9px 9px 0 var(--mag),
+    13px 13px 0 color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.about__email-address {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 2.05vw, 29px);
+  letter-spacing: 0.04em;
+  transform: skew(-6deg, -2deg);
+  text-shadow: 2px 2px 0 var(--cyn);
+  /* The address is one long token; on a narrow panel it has to break. */
+  word-break: break-all;
+}
+.about__email-sub {
+  display: block;
+  margin-top: 0.6vh;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+}
+.about__email-sub b { color: var(--mag); }
+
+/* The COPIED! starburst. Mounted only while it has something to say, so it
+   plays from its first frame on every press rather than restarting a
+   finished animation. */
+.about__burst {
+  position: absolute;
+  top: -3.4vh;
+  right: -2vw;
+  z-index: 8;
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.4vw, 20px);
+  color: var(--ink);
+  background: var(--acid);
+  padding: 0.45em 0.8em;
+  opacity: 0;
+  transform: rotate(10deg) scale(0);
+  clip-path: polygon(
+    4% 18%, 20% 4%, 45% 12%, 66% 0%, 82% 16%, 100% 30%, 90% 58%,
+    100% 82%, 74% 88%, 52% 100%, 30% 86%, 8% 94%, 0 62%, 10% 40%
+  );
+  pointer-events: none;
+  animation: about-burst 1.3s steps(3) forwards;
+}
+@keyframes about-burst {
+  0% { opacity: 0; transform: rotate(10deg) scale(0.3); }
+  12% { opacity: 1; transform: rotate(10deg) scale(1.15); }
+  22% { opacity: 1; transform: rotate(8deg) scale(1); }
+  78% { opacity: 1; transform: rotate(8deg) scale(1); }
+  100% { opacity: 0; transform: rotate(8deg) scale(0.9); }
+}
+
+.about__actions {
+  display: flex;
+  gap: 1.2vw;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+/* The stamp owner for each action, so the hover transform on the thing inside
+   stays that element's own (CLAUDE.md rule 10). */
+.about__action {
+  display: inline-flex;
+}
+
+.about__resume {
+  font-family: var(--font-display);
+  font-size: clamp(12px, 1.4vw, 19px);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--acid);
+  padding: 0.75em 1.2em;
+  text-decoration: none;
+  clip-path: polygon(
+    5% 16%, 18% 4%, 40% 10%, 60% 0%, 78% 12%, 95% 6%, 100% 34%, 92% 55%,
+    100% 78%, 80% 92%, 58% 100%, 38% 90%, 16% 98%, 0 72%, 6% 44%
+  );
+  transition: transform 0.08s steps(1);
+}
+.about__resume:hover {
+  transform: scale(1.06);
+}
+
+/* Ink-filled with an ink rim: the kit's paper rim is invisible on paper stock,
+   and the glyph stays `--paper` so it reads out of the fill. */
+.about .about__gbtn {
+  width: clamp(42px, 3.7vw, 54px);
+  height: clamp(42px, 3.7vw, 54px);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.about__gbtn--github { box-shadow: 4px 4px 0 var(--mag); }
+.about__gbtn--linkedin { box-shadow: 4px 4px 0 var(--cyn); }
+
 /* ---- Mobile -------------------------------------------------------------- */
 @media (max-width: 820px) {
   .about__greet { font-size: 13px; }
@@ -432,4 +584,6 @@
   .about__page--settled .about__bubble-box {
     animation: none;
   }
+  /* The subline carries the whole message when the burst can't animate. */
+  .about__burst { opacity: 0; }
 }

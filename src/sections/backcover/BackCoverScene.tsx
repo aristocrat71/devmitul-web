@@ -1,16 +1,7 @@
 import { useRef } from "react";
-import { SocialButton } from "@/components/comic";
-import { EmailCTA } from "./EmailCTA";
 import { LetteringWall } from "./LetteringWall";
 import { useBackCoverAssemble } from "./useBackCoverAssemble";
-import {
-  BARCODE,
-  BLURB,
-  NEXT_ISSUE,
-  RESUME_LABEL,
-  RESUME_URL,
-  STAMP,
-} from "./content";
+import { BARCODE, BLURB, NEXT_ISSUE, STAMP } from "./content";
 import "./backcover.css";
 
 /**
@@ -28,8 +19,9 @@ import "./backcover.css";
  * the reader falls through the finale speech bubble under "SAY HELLOOO...".
  * The page never repeats that setup line itself.
  *
- * Interaction flips to this scene 20vh before it starts (`ACTIVATION_LEAD_VH`),
- * so the email CTA is clickable without scrolling to the last pixel.
+ * As of 2026-07-27 the page is decorative: the contact block it was built
+ * around now lives in ORIGIN STORY's C4, and what remains is the lettering
+ * wall, the blurb and the closing furniture. Nothing here is interactive.
  */
 export function BackCoverScene() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -44,39 +36,11 @@ export function BackCoverScene() {
       {/* The page's own name, and — with the wall decorative — its heading. */}
       <h2 className="backcover__stamp">{STAMP}</h2>
 
-      <div className="backcover__contact">
-        <div className="backcover__slot backcover__slot--email">
-          <EmailCTA />
-        </div>
-
-        <div className="backcover__actions">
-          <div className="backcover__slot backcover__slot--resume">
-            <a
-              className="backcover__resume"
-              href={RESUME_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {RESUME_LABEL}
-            </a>
-          </div>
-          {/* The cover's buttons, reprised — the issue's bookends. */}
-          <div className="backcover__slot backcover__slot--github">
-            <SocialButton
-              network="github"
-              className="backcover__gbtn backcover__gbtn--github"
-            />
-          </div>
-          <div className="backcover__slot backcover__slot--linkedin">
-            <SocialButton
-              network="linkedin"
-              className="backcover__gbtn backcover__gbtn--linkedin"
-            />
-          </div>
-        </div>
-
-        <p className="backcover__blurb">{BLURB}</p>
-      </div>
+      {/* All that's left of the contact block: the address, the résumé link and
+          the two bookend buttons moved to ORIGIN STORY's finale cell (Mitul,
+          2026-07-27), so the blurb now stands alone in the middle of the wall
+          rather than as the last line under a stack. */}
+      <p className="backcover__blurb">{BLURB}</p>
 
       <div className="backcover__next-issue">
         <div className="backcover__ni-kicker">{NEXT_ISSUE.kicker}</div>

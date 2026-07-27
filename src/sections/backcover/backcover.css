@@ -216,151 +216,41 @@
   color: var(--paper);
 }
 
-/* ---- The contact block --------------------------------------------------- */
-.backcover__contact {
+/* ---- The blurb ----------------------------------------------------------
+   All that survives of the contact block: the address, the resume link and the
+   two bookend buttons moved to ORIGIN STORY's C4 (Mitul, 2026-07-27). It takes
+   over the centring the `.backcover__contact` column used to do, so it sits in
+   the middle of the wall on its own rather than trailing a stack.
+
+   `width: max-content` with a max: the blurb is one line of tracked-out
+   utility type and should stay one line, but it must not run past the frame on
+   a narrow window. */
+.backcover__blurb {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
   z-index: 6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.6vh;
-  width: min(92vw, 760px);
-}
-/* The pose carrier. Shrink-to-fit so it never changes what it wraps. */
-.backcover__slot {
-  display: inline-flex;
-  max-width: 100%;
-}
-
-.backcover__email {
-  position: relative;
-  display: block;
-  max-width: 100%;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body);
-  /* The panel holds no text of its own — the address and the subline both set
-     their own size — so its font-size exists only as the line box's invisible
-     strut, and on mobile that strut is what sets the panel's height. Tailwind's
-     preflight gives buttons `font: inherit` (16px here) where this mockup gets
-     the browser's default button font, so the panel came out 1px taller than
-     the approved one. Zeroing it removes the strut from the layout entirely,
-     which is both what the mockup renders and stable across browsers, where
-     inheriting a UA default is neither. */
-  font-size: 0;
-  border: 5px solid var(--ink);
-  box-shadow: 10px 10px 0 var(--mag), 14px 14px 0 rgb(0 0 0 / 0.5);
-  padding: 2.4vh 3vw 2vh;
-  cursor: pointer;
-  text-align: center;
-  --cm-rot: -1deg;
-  transform: rotate(var(--cm-rot));
-  transition: transform 0.08s steps(1);
-}
-.backcover__email:hover {
-  transform: rotate(var(--cm-rot)) translate(-3px, -3px);
-  box-shadow: 13px 13px 0 var(--mag), 17px 17px 0 rgb(0 0 0 / 0.5);
-}
-.backcover__email-address {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: clamp(17px, 2.6vw, 36px);
-  letter-spacing: 0.04em;
-  transform: skew(-6deg, -2deg);
-  text-shadow: 2px 2px 0 var(--cyn);
-  /* The address is one long token; on a narrow panel it has to break. */
-  word-break: break-all;
-}
-.backcover__email-sub {
-  display: block;
-  margin-top: 0.8vh;
+  width: max-content;
+  max-width: min(92vw, 760px);
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 11px;
-  letter-spacing: 0.35em;
-}
-.backcover__email-sub b { color: var(--mag); }
-
-/* The COPIED! starburst. Mounted only while it has something to say, so it
-   plays from its first frame on every press rather than restarting a
-   finished animation. */
-.backcover__burst {
-  position: absolute;
-  top: -4.6vh;
-  right: -3vw;
-  z-index: 8;
-  font-family: var(--font-display);
-  font-size: clamp(16px, 1.9vw, 26px);
-  color: var(--ink);
-  background: var(--acid);
-  padding: 0.45em 0.8em;
-  opacity: 0;
-  transform: rotate(10deg) scale(0);
-  clip-path: polygon(
-    4% 18%, 20% 4%, 45% 12%, 66% 0%, 82% 16%, 100% 30%, 90% 58%,
-    100% 82%, 74% 88%, 52% 100%, 30% 86%, 8% 94%, 0 62%, 10% 40%
-  );
-  pointer-events: none;
-  animation: backcover-burst 1.3s steps(3) forwards;
-}
-@keyframes backcover-burst {
-  0% { opacity: 0; transform: rotate(10deg) scale(0.3); }
-  12% { opacity: 1; transform: rotate(10deg) scale(1.15); }
-  22% { opacity: 1; transform: rotate(8deg) scale(1); }
-  78% { opacity: 1; transform: rotate(8deg) scale(1); }
-  100% { opacity: 0; transform: rotate(8deg) scale(0.9); }
-}
-
-.backcover__actions {
-  display: flex;
-  gap: 1.4vw;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.backcover__resume {
-  font-family: var(--font-display);
-  font-size: clamp(14px, 1.6vw, 22px);
-  letter-spacing: 0.06em;
-  color: var(--ink);
-  background: var(--acid);
-  padding: 0.7em 1.1em;
-  text-decoration: none;
-  clip-path: polygon(
-    5% 16%, 18% 4%, 40% 10%, 60% 0%, 78% 12%, 95% 6%, 100% 34%, 92% 55%,
-    100% 78%, 80% 92%, 58% 100%, 38% 90%, 16% 98%, 0 72%, 6% 44%
-  );
-  --cm-rot: 3deg;
-  transform: rotate(var(--cm-rot));
-  transition: transform 0.08s steps(1);
-}
-.backcover__resume:hover {
-  transform: rotate(var(--cm-rot)) scale(1.06);
-}
-
-/* The cover's buttons at this page's size — fixed here, fluid there. Solid
-   ink behind them: the wall runs underneath and the icons need a field. */
-.backcover .backcover__gbtn {
-  width: 54px;
-  height: 54px;
-  background: var(--ink);
-}
-.backcover__gbtn--github { box-shadow: 5px 5px 0 var(--mag); }
-.backcover__gbtn--linkedin { box-shadow: 5px 5px 0 var(--cyn); }
-
-.backcover__blurb {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: clamp(10px, 1vw, 13px);
+  font-size: clamp(11px, 1.45vw, 19px);
   letter-spacing: 0.3em;
   color: var(--paper);
   text-align: center;
-  background: color-mix(in srgb, var(--ink) 75%, transparent);
-  padding: 8px 14px;
-  border: 2px solid var(--paper);
+  /* Opaque, not the 75% wash it carried as a footnote under the contact stack:
+     it is the only thing printed on the wall now, and the lettering showing
+     through it undercut the one line the page has left to say. */
+  background: var(--ink);
+  padding: 18px 26px;
+  border: 3px solid var(--paper);
+  box-shadow: 7px 7px 0 var(--mag);
+  --cm-rot: -1deg;
+  transform: rotate(var(--cm-rot));
+  /* Centring rides `translate`, not `transform`: the assembly pose below owns
+     this element's `transform` (CLAUDE.md rule 10), and merging the two would
+     drop the centring the moment a pose lands. */
+  translate: -50% -50%;
 }
 
 /* ---- Assembly poses -----------------------------------------------------
@@ -386,17 +276,14 @@
 @media (max-width: 820px) {
   .backcover .backcover__row-ink { font-size: 23vh; }
   .backcover__wall { gap: 1vh; }
-  .backcover__contact { width: 92vw; }
-  .backcover__email { padding: 2vh 4vw 1.8vh; }
+  .backcover__blurb { max-width: 84vw; letter-spacing: 0.22em; }
   .backcover__next-issue { bottom: 14vh; }
   .backcover__barcode { bottom: 15vh; }
   .backcover__stamp { font-size: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* A static wall, printed back so the contact block reads over it. */
+  /* A static wall, printed back so the blurb reads over it. */
   .backcover .backcover__row,
   .backcover .backcover__row[data-assemble] { opacity: 0.5; }
-  /* The subline carries the whole message when the burst can't animate. */
-  .backcover__burst { opacity: 0; }
 }

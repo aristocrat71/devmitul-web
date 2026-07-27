@@ -49,9 +49,12 @@ interface Book {
  * scene, in vh. By design, the tail of every scene is transition territory —
  * furniture gone, gutter caption, next page assembling (design-doc §5:
  * assembly runs 79–100%) — so nothing interactive lives there, while the
- * incoming page is nearly complete and must be clickable (the back cover's
- * email CTA is the site's conversion moment; it can't wait for the last
- * scrolled pixel).
+ * incoming page is nearly complete and must be clickable.
+ *
+ * The lead was sized for the back cover's email CTA. That block moved to
+ * ORIGIN STORY's C4 (Mitul, 2026-07-27) and the back cover is now inert, but
+ * the lead stays: it is a property of every boundary, not of that one page, and
+ * ORIGIN STORY's own contact block is the conversion moment it now protects.
  */
 const ACTIVATION_LEAD_VH = 20;
 

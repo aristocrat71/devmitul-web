@@ -79,9 +79,19 @@ export const ABOUT_FOCUS = {
 
 /** C4's furniture, stamped in as the pull-back reveals it. */
 export const ABOUT_OUTRO = {
-  figure: 0.05,
-  bubble: 0.2,
+  bubble: 0.05,
+  /** The contact block answers the bubble, so it lands after it. */
+  contact: 0.2,
+  /** Résumé, then the two bookend buttons — print order, 90ms apart. */
+  actions: [0.3, 0.39, 0.48],
 } as const;
+
+/**
+ * How long the copied state holds before the subline restores itself
+ * (mockup: 3s). The burst's own animation is shorter and runs independently —
+ * it finishes while the subline is still reading IN YOUR CLIPBOARD.
+ */
+export const COPY_FEEDBACK_MS = 3000;
 
 /**
  * The page's entrance, driven by the *previous* boundary's scrub over its final
