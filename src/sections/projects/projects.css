@@ -13,9 +13,11 @@
       `z-index:-1` while the button creates no stacking context, so the sweep
       is painted in the mega page's negative-z layer — underneath the panel's
       own opaque background. Hovering therefore only flips the label to ink on
-      an unchanged dark panel, which reads as the label going out. Here the
-      sweep paints normally and the label is an element that can sit above it
-      (the same pattern as the cover's social buttons).
+      an unchanged dark panel, which reads as the label going out. The port
+      fixed that; **the 2026-07-27 amendment then removed the sweep entirely**
+      (Mitul's call, site wide — the glitch burst is a button's only hover
+      signal now), so the repair survives only as this note and in the kit,
+      where `.cm-gbtn` lost the same layer on the same day.
    2. The BROWSE THE BACK ISSUES hover lift is dead in the mockup: the outro
       `stampIn` fills `forwards`, and a filling animation outranks `:hover`
       for the rest of the page's life, so the box never moves. The stamp and
@@ -184,6 +186,13 @@
   gap: 10px;
   padding: 9px 16px 15px;
 }
+/* **Amended 2026-07-27 (Mitul's call):** the acid halftone sweep that wiped
+   across these on hover is gone, along with the `position`/`overflow` that
+   placed and clipped it, the label's `z-index` lift that rode above it, and
+   the `color: var(--ink)` flip that let the label read out of the acid. The
+   kit's glitch burst is now the whole hover signal on every button in the
+   issue — including the GitHub mark inside REPO, which the kit splits for
+   free (see comic.css). */
 .projects__abtn {
   font-family: var(--font-display);
   font-size: 14px;
@@ -192,25 +201,8 @@
   text-decoration: none;
   border: 3px solid var(--paper);
   color: var(--paper);
-  position: relative;
-  overflow: hidden;
-}
-/* Halftone sweep, wiped in over three steps. No negative z-index: the button
-   creates no stacking context, so a negative layer lands behind the panel
-   (see the header). The label rides above it instead. */
-.projects__abtn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, var(--ink) 1.3px, transparent 1.4px);
-  background-size: 8px 8px;
-  background-color: var(--acid);
-  transform: translateX(-101%);
-  transition: transform 0.15s steps(3);
 }
 .projects__abtn-label {
-  position: relative;
-  z-index: 1;
   /* An explicit line box, shared by the icon button and the text one: the mark
      is sized in the same em so both actions are exactly the same height
      whatever each contains. */
@@ -222,20 +214,19 @@
   display: block;
   width: 1.2em;
   height: 1.2em;
-  /* Takes the label's ink, so the halftone sweep flips the mark with it. */
+  /* Takes the label's ink, so the mark reads in whatever colour the button is. */
   fill: currentColor;
 }
-.projects__abtn:hover { color: var(--ink); }
-.projects__abtn:hover::before { transform: translateX(0); }
 
-/* LIVE is the dominant action (design-doc §6). */
+/* LIVE is the dominant action (design-doc §6). The acid fill is its RESTING
+   state, not a hover one — it is what marks it as dominant, so the 2026-07-27
+   amendment left it alone. */
 .projects__abtn--live {
   background: var(--acid);
   color: var(--ink);
   border-color: var(--acid);
   box-shadow: 4px 4px 0 var(--mag);
 }
-.projects__abtn--live::before { background-color: var(--paper); }
 /* The one paint-property loop in the issue: a 5px ring on a ~90×30px button,
    quantized to two frames per 1.2s, only while its panel is focused. Cheap
    enough to keep the approved look rather than rebuild it as a wrapper +
@@ -243,8 +234,14 @@
 .cm-cell--on .projects__abtn--live {
   animation: projects-live-pulse 1.2s steps(2) infinite 0.5s;
 }
-/* Interacting stills it — same rule as the glitch ticks. */
-.cm-cell--on .projects__abtn--live:hover { animation: none; }
+/* Interacting stills it — same rule as the glitch ticks. It has to hand over
+   to the burst explicitly rather than to `animation: none`: `animation` is a
+   shorthand and this selector outranks the kit's zero-specificity hover rule,
+   so stilling the pulse the obvious way silently left LIVE the one button in
+   the issue that did not glitch. */
+.cm-cell--on .projects__abtn--live:hover {
+  animation: cm-glitch-hover var(--glitch-hover, 0.28s) steps(1) 1;
+}
 @keyframes projects-live-pulse {
   0%, 100% { box-shadow: 4px 4px 0 var(--mag); }
   50% {
@@ -355,5 +352,8 @@
   .projects__outro-el {
     opacity: 1;
   }
-  .cm-cell--on .projects__abtn--live { animation: none; }
+  /* Both the pulse and the hover burst. The `:hover` rule above outranks the
+     kit's own reduced-motion opt-out, so it has to be named here too. */
+  .cm-cell--on .projects__abtn--live,
+  .cm-cell--on .projects__abtn--live:hover { animation: none; }
 }

@@ -453,6 +453,14 @@
   /* The address is one long token; on a narrow panel it has to break. */
   word-break: break-all;
 }
+/* The kit's burst reaches a button's text by inheriting `text-shadow` onto it,
+   and this line declares its own — so the biggest type on the panel was the
+   one thing that didn't split. It gets its own copy of the burst instead. The
+   shove rides `translate`, so the skew above survives it (rule 10), and with
+   no fill mode the cyan print offset comes straight back when it ends. */
+.about__email:hover .about__email-address {
+  animation: cm-glitch-hover var(--glitch-hover, 0.28s) steps(1) 1;
+}
 .about__email-sub {
   display: block;
   margin-top: 0.6vh;
@@ -554,7 +562,10 @@
   .about__outro-el {
     opacity: 1;
   }
-  .about__page--settled .about__bubble-box {
+  .about__page--settled .about__bubble-box,
+  /* The address's own copy of the hover burst, for the reason the kit gives
+     for all of them: compressed to 0.001s a burst is a strobe, not a glitch. */
+  .about__email:hover .about__email-address {
     animation: none;
   }
   /* The subline carries the whole message when the burst can't animate. */

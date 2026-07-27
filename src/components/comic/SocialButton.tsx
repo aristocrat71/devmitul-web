@@ -43,10 +43,12 @@ export function SocialIcon({
 }
 
 /**
- * A social icon button: paper-outlined square, halftone sweep on hover, 2px
- * stepped lift. Owns its own `transform` on hover, so anything animating it —
- * the cover's glitch tick, an assembly pose — goes on a wrapper around it
- * (see the ownership note at the top of comic.css).
+ * A social icon button: paper-outlined square, 2px stepped lift, and the kit's
+ * glitch burst on hover — the mark RGB-splits and the box shoves (the acid
+ * halftone sweep this used to wipe in was removed site wide on 2026-07-27).
+ * Owns its own `transform` on hover, so anything animating it — the cover's
+ * glitch tick, an assembly pose — goes on a wrapper around it (see the
+ * ownership note at the top of comic.css).
  *
  * Size and drop shadow come from the consumer's class; the two mockups differ
  * there and nowhere else.

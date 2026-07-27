@@ -63,10 +63,11 @@ export function ProjectPanel({
           rel="noopener noreferrer"
           aria-label={`${project.name} source on GitHub`}
         >
-          {/* The sweep fills the button from behind the label, so the label
-              needs to be an element that can sit above it. The mark replaces
-              the word (Mitul, 2026-07-27); the link's `aria-label` above is
-              what still says GitHub, so nothing is lost when the icon is. */}
+          {/* The label element survives the sweep it used to sit above (removed
+              2026-07-27): it is the shared line box that keeps this button and
+              the text one exactly the same height. The mark replaces the word
+              (Mitul, 2026-07-27); the link's `aria-label` above is what still
+              says GitHub, so nothing is lost when the icon is. */}
           <span className="projects__abtn-label">
             <SocialIcon network="github" className="projects__abtn-icon" />
           </span>

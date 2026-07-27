@@ -148,10 +148,11 @@
 
 /* ---- Social glitch icon buttons ----------------------------------------
    The button itself is the kit's `<SocialButton>` / `.cm-gbtn` — the box, the
-   halftone sweep and the hover lift are shared with the back cover, which
-   reprises these as its bookends (design-doc §9). What stays here is only what
-   the two mockups genuinely disagree on: this page's fluid size (the back
-   cover's are a fixed 54px) and the two-colour drop shadow.
+   hover lift and the hover glitch are shared with ORIGIN STORY, which reprises
+   these under its finale (design-doc §9's bookend symmetry, relocated when the
+   contact block moved off the back cover). What stays here is only what the
+   mockups genuinely disagree on: this page's fluid size (the other's are a
+   clamped ~54px) and the two-colour drop shadow.
 
    `background: transparent` is the cover's alone, and load-bearing: the
    boundary's `.cover__gbtn--dive` swaps it for solid ink so the camera has ink
