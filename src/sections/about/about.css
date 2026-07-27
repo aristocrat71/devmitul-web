@@ -312,7 +312,7 @@
   animation: cm-tag-in 0.16s steps(2) both var(--cm-delay, 0s);
 }
 
-/* ---- C4: the finale — revealed by the pull-back -------------------------- */
+/* ---- C4: the finale — the camera's last stop before the pull-back -------- */
 /* A column, not the mockup's figure-beside-bubble row: the placeholder cutout
    that used to hold the left third is gone, and the contact block that replaced
    it needs the cell's full width for the address (Mitul, 2026-07-27). Centred

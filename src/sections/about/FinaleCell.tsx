@@ -19,8 +19,9 @@ const actionStamp = (index: number, rotate: string): CSSVarStyle => ({
 });
 
 /**
- * C4 — YOUR TURN: the finale, unvisited until the pull-back reveals it
- * (design-doc §8).
+ * C4 — YOUR TURN: the finale, the camera's last stop before the pull-back
+ * (design-doc §8, amended 2026-07-27 — it used to be met only in the
+ * zoomed-out reveal).
  *
  * The bubble is the dive target into the back cover — entering the speech
  * bubble IS starting the conversation, and the next gutter reads
@@ -38,9 +39,9 @@ const actionStamp = (index: number, rotate: string): CSSVarStyle => ({
  * to say something; it now also shows them how, instead of spending its only
  * furniture on a stand-in silhouette and leaving the rest of the cell blank.
  */
-export function FinaleCell() {
+export function FinaleCell({ focus }: { focus: number }) {
   return (
-    <MegaCell at="bl" className="about__finale">
+    <MegaCell at="bl" focus={focus} className="about__finale">
       <div
         className="about__outro-el about__finale-bubble"
         style={BUBBLE_STAMP}

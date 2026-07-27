@@ -86,8 +86,11 @@ export function AboutScene() {
         <OriginCell focus={1} />
         <PowersCell focus={2} />
 
-        {/* No focus number — the pull-back reveals this one. */}
-        <FinaleCell />
+        {/* The camera's last stop before the pull-back (amended 2026-07-27,
+            like THE GOOD PART's catalogue cell). Its furniture still stamps on
+            the megapage-outro gate, which now fires as the camera turns toward
+            the cell. */}
+        <FinaleCell focus={3} />
       </CameraWalkScene>
     </>
   );

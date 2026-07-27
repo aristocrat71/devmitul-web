@@ -14,52 +14,60 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
  * The camera's reading path (design-doc §8): hold C1 WASSUPPP → pan → hold C2
- * THE ORIGIN → pan ↓ → hold C3 POWERS → pull-back reveal → hold the full page,
- * with C4's finale bubble stamped in as the page lifts away.
+ * THE ORIGIN → pan ↓ → hold C3 POWERS → pan ← → hold C4 YOUR TURN → pull-back
+ * reveal → hold the full page.
  *
- * This began as deliberately the same table as `PROJECTS_WALK`: §8 specifies
- * ORIGIN STORY as the structural twin of THE GOOD PART — same page
- * dimensions, same 2×2 coordinates, same reading path — so an identical walk
- * was the spec, not a copy-paste. Keeping it per-section paid off on
- * 2026-07-27, when THE GOOD PART gained a fourth camera stop (its catalogue
- * cell) and this page deliberately did NOT: C4's finale bubble is the dive
- * target, and its invitation needs the pull-back reveal to land first —
- * visiting it up close and then zooming out of it would deflate the dive.
+ * This is deliberately the same table as `PROJECTS_WALK`: §8 specifies ORIGIN
+ * STORY as the structural twin of THE GOOD PART — same page dimensions, same
+ * 2×2 coordinates, same reading path — so an identical walk is the spec, not
+ * a copy-paste. It stays per-section so the two remain free to diverge.
+ *
+ * **Amendment 2026-07-27 (Mitul's call):** C4 is now a real camera stop, the
+ * same amendment THE GOOD PART got earlier the same day — the walk visits the
+ * finale bubble before pulling back, instead of leaving it to be met only in
+ * the zoomed-out reveal. This reverses the earlier call that the dive's
+ * invitation needed the reveal to land first. Same scroll math as the twin
+ * (both scenes are 300vh): every beat gives up a little to pay for the new
+ * stop, the closing hold keeps 0.79–1.0 untouched because the boundary's
+ * table owns it, and `outroAt` sits at the pan's START so the cell prints in
+ * while the camera is still travelling toward it — arriving at blank paper
+ * would break the never-reveal-empty rule in spirit.
  *
  * **Inherited amendment (2026-07-26):** the opening hold is 5%, not the
  * mockup's 20%, for the reason THE GOOD PART was amended — in the book the
  * camera is already parked on the first cell through the whole of the previous
  * boundary's assembly window while the page prints in around it, so the
  * mockup's own opening hold double-counts and the first panel ends up held
- * nearly twice as long as the others. Every later segment keeps its exact
- * duration; the 15% that frees up goes to the closing hold, which is where the
- * About → Contact dive will live.
+ * nearly twice as long as the others.
  */
 export const ABOUT_WALK: CameraWalk = {
   focus: { w: 0.6, h: 0.72 },
   fitMargin: 0.92,
   segments: [
     { a: 0, b: 0.05, from: 0, to: 0 },
-    { a: 0.05, b: 0.17, from: 0, to: 1 },
-    { a: 0.17, b: 0.35, from: 1, to: 1 },
-    { a: 0.35, b: 0.47, from: 1, to: 2 },
-    { a: 0.47, b: 0.65, from: 2, to: 2 },
-    { a: 0.65, b: 0.79, from: 2, to: 3 },
-    { a: 0.79, b: 1, from: 3, to: 3 },
+    { a: 0.05, b: 0.14, from: 0, to: 1 },
+    { a: 0.14, b: 0.27, from: 1, to: 1 },
+    { a: 0.27, b: 0.36, from: 1, to: 2 },
+    { a: 0.36, b: 0.49, from: 2, to: 2 },
+    { a: 0.49, b: 0.58, from: 2, to: 3 },
+    { a: 0.58, b: 0.68, from: 3, to: 3 },
+    { a: 0.68, b: 0.79, from: 3, to: 4 },
+    { a: 0.79, b: 1, from: 4, to: 4 },
   ],
   // Focus hands over at each pan's midpoint; past the last window the
   // pull-back has begun and every cell performs (design-doc §8's global rule).
-  focusUntil: [0.11, 0.41, 0.67],
-  outroAt: 0.67,
+  focusUntil: [0.095, 0.315, 0.535, 0.68],
+  outroAt: 0.49,
 } as const;
 
 /**
  * Where the pull-back ends and the camera comes to rest on the whole page —
  * "pulsing once the camera settles" (design-doc §8, C4). It is the last
- * segment's start on purpose: the finale bubble stamps in during the pull-back
- * so it's never revealed empty, and only starts pulsing once the camera has
- * actually stopped, so the pulse reads as the page inviting a reply rather than
- * as one more thing moving while the camera is still travelling.
+ * segment's start on purpose: the finale bubble stamps in as the camera turns
+ * toward it (the walk's `outroAt`) and is visited up close, but it only starts
+ * pulsing once the camera has actually stopped, so the pulse reads as the page
+ * inviting a reply rather than as one more thing moving while the camera is
+ * still travelling.
  */
 export const ABOUT_SETTLED_AT = 0.79;
 
@@ -75,7 +83,11 @@ export const ABOUT_FOCUS = {
   powerStagger: 0.06,
 } as const;
 
-/** C4's furniture, stamped in as the pull-back reveals it. */
+/**
+ * C4's furniture, stamped in as the camera turns toward it (`outroAt` = the
+ * pan's start since the 2026-07-27 amendment) — printed and settled by the
+ * time the camera arrives.
+ */
 export const ABOUT_OUTRO = {
   bubble: 0.05,
   /** The contact block answers the bubble, so it lands after it. */
