@@ -67,8 +67,6 @@ export const ABOUT_SETTLED_AT = 0.79;
 export const ABOUT_FOCUS = {
   /** C1: the greeting pops first, then the three stamps slam around the frame. */
   tagDelays: [0.35, 0.47, 0.59],
-  /** C1: the margin scribble lands last, after the stamps. */
-  scribbleDelay: 0.7,
   /** C2: narration captions, one after another down the panel. */
   capStagger: 0.18,
   /** C2: the optional gag inset, after the captions. */

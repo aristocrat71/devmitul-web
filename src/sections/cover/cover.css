@@ -126,14 +126,6 @@
   text-shadow: 3px 3px 0 var(--mag), -3px -2px 0 rgb(0 0 0 / 0.6);
 }
 
-/* Hugs the masthead's top-right corner, behind the letters. */
-.cover .cover__thwak {
-  position: absolute;
-  top: -1.35em;
-  right: -0.7em;
-  z-index: -1;
-}
-
 .cover__credit {
   margin-top: 2.4vh;
   font-family: var(--font-utility);

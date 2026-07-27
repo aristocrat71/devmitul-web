@@ -8,13 +8,9 @@
 export const GREETING =
   "WASSUPPP! I AM MITUL SHETH — SLEEPYHEAD ENGINEER, READY TO SPEND SLEEPLESS NIGHTS WHEN COMMITTED TO A PROJECT!";
 
-/**
- * The photography gag, scribbled inside C1. This is the ONE place in the whole
- * site where the handwritten face is permitted (CLAUDE.md conventions), which
- * is also why it is lowercase — it's a margin note, not printed copy.
- */
-export const SCRIBBLE =
-  "yeah... is it just me or do I need to work on my photography skills?";
+/* The handwritten photography gag that used to sit in C1's margin was cut
+   (Mitul, 2026-07-27). It was the only sanctioned use of `--font-hand` on the
+   site, so nothing renders in the handwritten face any more. */
 
 /**
  * Personality stamps, slammed around C1's frame. Order is stamp order; each

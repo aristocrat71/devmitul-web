@@ -53,8 +53,10 @@
   --font-display: "Bangers", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   --font-utility: "Courier New", Courier, monospace;
   --font-body: Arial, Helvetica, sans-serif;
-  /* Permitted in exactly one place: the photography scribble in ORIGIN
-     STORY's C1 panel (CLAUDE.md conventions). Nowhere else. */
+  /* Its one sanctioned use — the photography scribble in ORIGIN STORY's C1
+     panel — was cut on 2026-07-27, so nothing references this today. Kept as
+     the declared face for the handwritten voice: if a margin note ever comes
+     back it uses this and only this (CLAUDE.md conventions). */
   --font-hand: "Comic Sans MS", "Segoe Print", cursive;
 
   /* ---- Motion constants ---- */

@@ -4,16 +4,16 @@
  * conventions) — nothing here is duplicated inline in the JSX.
  *
  * Reading order of the load-in:
- *   misprint flash → masthead slam (+THWAK) → character pop →
- *   furniture stamps (~80ms apart) → banner wipe → interactive → cue last.
+ *   misprint flash → masthead slam → character pop → furniture stamps
+ *   (~80ms apart) → banner wipe → interactive → cue last.
  */
 
 /** Load-in delays, in seconds. Desktop total ≈ 1.6s. */
 export const COVER_LOAD_IN = {
   mastheadSlam: 0.35,
-  thwak: 0.55,
-  /** How long after the pop the THWAK settles to its ghost. */
-  thwakGhost: 1.6,
+  /* The THWAK burst that sat at 0.55 (and ghosted at 1.6) was cut from the
+     masthead on 2026-07-27. No other beat was rescheduled — the slam and the
+     character pop were never keyed off it. */
   character: 0.6,
   issueBox: 0.85,
   locationStamp: 0.95,

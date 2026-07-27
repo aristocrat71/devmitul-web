@@ -6,7 +6,6 @@ import {
   GlitchTick,
   GutterCaption,
   HalftoneBackground,
-  Onomatopoeia,
   PaperLabel,
   Parallax,
   SocialButton,
@@ -145,13 +144,6 @@ export function CoverScene() {
             offset={COVER_GLITCH.masthead}
           >
             dev<span className="cover__slash">/</span>Mitul
-            <Onomatopoeia
-              className="cover__thwak"
-              delay={beat(COVER_LOAD_IN.thwak)}
-              ghostDelay={beat(COVER_LOAD_IN.thwakGhost)}
-            >
-              THWAK!
-            </Onomatopoeia>
           </GlitchTick>
         </div>
 
