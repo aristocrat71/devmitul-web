@@ -5,6 +5,27 @@
    The only interior page that isn't a camera walk: the reader stays put and the
    documents move, so there is no mega page here — the stack is the subject.
 
+   AMENDMENT 2026-07-27 (Mitul — the folders read too small): the desktop file
+   is a quarter bigger and every glyph on the page scales with it, through
+   `--case-type` below. Three things this pass had to work around, all measured
+   rather than guessed:
+
+   a. **Only the width takes the full 25%.** The folder is centred at a fixed
+      `top`, its tab sticks up above it, and `<TitleBox>` sits at the page's
+      top-left — the tab already cleared that box by 8px at 1440×900 before this
+      change. Growing the height 25% about the same centre drives the tab
+      straight through the title. So the width and the type take 1.25× flat, the
+      height's *cap* takes it (tall screens get the whole increase), and the vh
+      term grows only as far as the header clearance allows — with `top` moved
+      down to spend the slack that was under the stack rather than over it.
+   b. **The strip is two rows now** — evidence tickets beside the exhibit, the
+      witness slip across the base — and the evidence list is capped at four
+      tickets so its row can't wrap (see `content.ts`).
+   c. **Mobile takes the type scale and nothing else.** Same `--case-type`, same
+      88vw folder, and the dossier row is dropped entirely: at a quarter more
+      type the phone folder overflowed its own base by 41px, and the tickets and
+      the empty exhibit slot are what a phone can afford to lose.
+
    Five things differ from the mockup, all deliberate:
 
    1. **The witness statements are a temporary placeholder** (lorem text, an
@@ -51,6 +72,15 @@
   color: var(--paper);
   font-family: var(--font-body);
   overflow: hidden;
+
+  /* The 2026-07-27 type pass, one number. Every font size on the folder is the
+     mockup's value times this, so the ratios between them are still the
+     approved ones and there is a single knob to re-dial. It applies on mobile
+     too — the phone was the half of the request that was only ever about
+     legibility. Sizes that are *boxes* rather than type (the stack, the
+     polaroid) scale at their own declarations, because only the desktop box
+     grows. */
+  --case-type: 1.25;
 }
 /* Two offset dot fields — the CMYK misregistration read as print texture. */
 .experience::before,
@@ -84,9 +114,18 @@
 .experience__stack {
   position: absolute;
   left: 50%;
-  top: 54%;
-  width: min(58vw, 700px);
-  height: min(72vh, 660px);
+  /* Was 54%. The folder grows about its own centre, so the extra height would
+     be split evenly above and below — but all the spare room is *below*
+     (`<TitleBox>` owns the top-left, and the tab pokes up into it). Moving the
+     centre down spends the slack where it exists; see note (a) in the header. */
+  top: 59%;
+  /* 58vw/700px × 1.25. Width is unconstrained — even at 875px the folder clears
+     the title box horizontally at every breakpoint. */
+  width: min(72.5vw, 875px);
+  /* 660px × 1.25, but the vh term only 72 → 76: past that the tab crosses the
+     title box's baseline on a 800px-tall laptop. Tall viewports are cap-bound
+     and take the full quarter; short ones take what clears the header. */
+  height: min(76vh, 825px);
   transform: translate(-50%, -50%);
 }
 .experience__stack[data-assemble] {
@@ -101,7 +140,8 @@
   color: var(--ink);
   border: 4px solid var(--ink);
   box-shadow: 10px 12px 0 color-mix(in srgb, var(--ink) 50%, transparent);
-  padding: 4.2vh 2.2vw 2vh;
+  /* 4.2vh 2.2vw 2vh × 1.25 — the margins grow with the type they frame. */
+  padding: 5.25vh 2.75vw 2.5vh;
   display: flex;
   flex-direction: column;
 }
@@ -119,16 +159,18 @@
   pointer-events: none;
 }
 
-/* Tabs sit at three different offsets so all three read in the resting fan. */
+/* Tabs sit at three different offsets so all three read in the resting fan.
+   Height and offset are stated in `em` so the tab is sized by its own type and
+   the scale below carries it — the mockup's 30px is exactly 2em of its 15px. */
 .experience__tab {
   position: absolute;
-  top: -30px;
-  height: 30px;
+  top: -2em;
+  height: 2em;
   background: var(--paper);
   border: 4px solid var(--ink);
   border-bottom: none;
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: calc(15px * var(--case-type));
   letter-spacing: 0.06em;
   padding: 4px 16px 0;
   color: var(--ink);
@@ -139,11 +181,11 @@
 
 .experience__case-no {
   position: absolute;
-  top: 2vh;
-  right: 1.6vw;
+  top: 2.5vh;
+  right: 2vw;
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 11px;
+  font-size: calc(11px * var(--case-type));
   letter-spacing: 0.25em;
   color: var(--ink);
   border: 2px solid var(--ink);
@@ -155,10 +197,10 @@
 /* The STATUS stamp slams in when the file reaches the top of the stack. */
 .experience__status {
   position: absolute;
-  top: 8.5vh;
-  right: 2vw;
+  top: 10.5vh;
+  right: 2.5vw;
   font-family: var(--font-display);
-  font-size: clamp(16px, 1.6vw, 24px);
+  font-size: calc(clamp(16px, 1.6vw, 24px) * var(--case-type));
   letter-spacing: 0.12em;
   padding: 0.2em 0.6em;
   border: 3px solid currentColor;
@@ -176,7 +218,7 @@
 /* ---- File contents ------------------------------------------------------ */
 .experience__org {
   font-family: var(--font-display);
-  font-size: clamp(26px, 3vw, 44px);
+  font-size: calc(clamp(26px, 3vw, 44px) * var(--case-type));
   letter-spacing: 0.03em;
   transform: skew(-6deg, -2deg);
   text-shadow: 2px 2px 0 color-mix(in srgb, var(--mag) 50%, transparent);
@@ -184,16 +226,16 @@
 .experience__role {
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: clamp(11px, 1vw, 14px);
+  font-size: calc(clamp(11px, 1vw, 14px) * var(--case-type));
   letter-spacing: 0.2em;
-  margin-top: 0.8vh;
+  margin-top: 1vh;
   opacity: 0.9;
 }
 /* Highlighter treatment — acid marker over the printed line. */
 .experience__brief {
-  margin-top: 1.6vh;
+  margin-top: 2vh;
   font-family: var(--font-display);
-  font-size: clamp(15px, 1.4vw, 21px);
+  font-size: calc(clamp(15px, 1.4vw, 21px) * var(--case-type));
   letter-spacing: 0.03em;
   background: color-mix(in srgb, var(--acid) 55%, transparent);
   display: inline-block;
@@ -202,17 +244,18 @@
 }
 
 .experience__ops {
-  margin-top: 1.8vh;
+  margin-top: 2.25vh;
   list-style: none;
 }
 .experience__ops li {
   position: relative;
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: clamp(11px, 1.05vw, 14px);
+  font-size: calc(clamp(11px, 1.05vw, 14px) * var(--case-type));
   line-height: 1.55;
-  padding-left: 22px;
-  margin-bottom: 0.9vh;
+  /* 22px at the mockup's size — stated in em so the ▸ gutter tracks the type. */
+  padding-left: 1.57em;
+  margin-bottom: 1.1vh;
 }
 .experience__ops li::before {
   content: "▸";
@@ -227,10 +270,9 @@
 }
 
 .experience__ev-label {
-  margin-top: 1.6vh;
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 10px;
+  font-size: calc(10px * var(--case-type));
   letter-spacing: 0.3em;
   opacity: 0.7;
 }
@@ -238,13 +280,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
-  margin-top: 0.8vh;
+  margin-top: 1vh;
 }
 /* This mockup sets the shared punched ticket one step smaller than ORIGIN
-   STORY's appendix does. */
+   STORY's appendix does. Only the size is the page's — the ticket's own notch
+   and punch geometry stay the kit's (`comic.css`). */
 .experience .cm-tag {
-  font-size: 10px;
-  padding: 4px 9px 4px 16px;
+  font-size: calc(10px * var(--case-type));
+  padding: 5px 11px 5px 20px;
 }
 /* Reaching the top of the stack is what stamps the evidence in; the ticket is
    the shared primitive, whose gate is always the page's. */
@@ -252,43 +295,88 @@
   animation: cm-tag-in 0.18s steps(2) both var(--cm-delay, 0.35s);
 }
 
-/* ---- Attachments strip, pinned to the file's base ----------------------- */
+/* ---- Attachments strip, pinned to the file's base -----------------------
+   Two rows since 2026-07-27 (Mitul): the dossier row — evidence tickets beside
+   the exhibit — then the witness slip across the base. The clearance for the
+   polaroid is stated once, on the container, so both rows stop short of it. */
+/* `flex: 1`, not `margin-top: auto` (Mitul 2026-07-27). Pinned to the base the
+   strip left a dead band between the last op and EVIDENCE — up to ~127px on
+   the two-op files, since the folder is one height and the records aren't. The
+   strip now *grows* into that slack and hands it to the dossier row, so the
+   photo fills whatever the ops didn't use and the shortest record gets the
+   biggest exhibit. Both still end level with the folder's base. */
 .experience__attachments {
-  margin-top: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vh;
+  padding-top: 2vh;
+}
+/* The oldest file carries the polaroid in its bottom-right corner; the strip
+   stops short of it. Both rows, not just the lower one — the polaroid runs the
+   full height of the strip. Kept at ~1.11× the polaroid's own width so it
+   tracks any resize of it: at 1.00 the photo prints over the exhibit, and
+   every pixel above ~1.11 is width the exhibit loses for nothing. */
+.experience__attachments--clear-dive {
+  padding-right: clamp(105px, 10vw, 144px);
+}
+
+/* Row 1, and the row that takes the strip's growth — the witness slip below it
+   stays sized to its quote. The tickets take what the exhibit leaves;
+   `min-width: 0` so a long ticket shrinks the block rather than pushing the
+   exhibit out of the row. */
+.experience__dossier {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   gap: 1.2vw;
   align-items: stretch;
-  padding-top: 1.6vh;
 }
-/* The oldest file carries the polaroid in its bottom-right corner; the strip
-   stops short of it. */
-.experience__attachments--clear-dive {
-  padding-right: clamp(110px, 10.5vw, 155px);
+/* The tickets don't stretch with the row — they stay at its top edge, under
+   their label, however tall the photo beside them grows. */
+.experience__ev {
+  flex: 1 1 auto;
+  align-self: flex-start;
+  min-width: 0;
 }
 
+/* Half the folder's width (Mitul 2026-07-27 — the work photos that land here
+   are about that wide). The tickets take what's left and wrap to two lines
+   inside it, which is why the four-ticket cap matters: a fifth makes it three.
+   `min-height` sets the slot's shape, not the picture — an image dropped in
+   here is positioned absolutely so it can't size its own box (CLAUDE.md). */
 .experience__exhibit {
-  flex: 0 0 34%;
+  flex: 0 0 50%;
   border: 3px dashed var(--ink);
   display: grid;
   place-items: center;
-  min-height: 11vh;
+  min-height: 13vh;
   transform: rotate(-1.5deg);
   background: color-mix(in srgb, var(--ink) 5%, transparent);
 }
-/* The dive file's strip gives up ~150px to the polaroid, so its exhibit takes a
-   bigger share of what's left to stay the same size as the other two. */
+/* The dive file's strip still gives up ~144px to the polaroid, so its exhibit
+   takes a bigger share of what's left — landing within ~20px of the other two
+   in absolute width. The ceiling is the tickets: SCIKIT-LEARN + PANDAS need
+   ~231px to stay two-to-a-line, and past ~60% they break to one each. */
 .experience__attachments--clear-dive .experience__exhibit {
-  flex: 0 0 44%;
+  flex: 0 0 58%;
 }
-/* No witness slip on this file, so the exhibit takes the whole strip. Wins over
-   the rule above by source order, at equal specificity. */
-.experience__exhibit--wide {
-  flex: 1;
+/* No witness slip on this file, so the strip has no bottom row at all and the
+   exhibit widens into the dossier row instead — to the same ceiling the dive
+   file uses, which is as far as it can go before the tickets stop fitting two
+   to a line. Scoped to the strip so it outranks the clear-dive rule above,
+   matching that rule's specificity and following it in source order. Written
+   flat it would *lose* to it, and the dive file — the one whose row is already
+   short — would be exactly the one that failed to widen. Unreachable today:
+   all three files carry the placeholder witness (`content.ts`). */
+.experience__attachments .experience__exhibit--wide {
+  flex: 0 0 55%;
 }
 .experience__exhibit span {
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 9px;
+  font-size: calc(9px * var(--case-type));
   letter-spacing: 0.2em;
   text-align: center;
   line-height: 1.7;
@@ -296,37 +384,75 @@
   padding: 6px;
 }
 
-/* Styled and waiting: rendered only for files with a real supplied quote. */
+/* ---- The exhibit with a real photo in it --------------------------------
+   A filled slot stops being an instruction and becomes a print: solid rule,
+   ink behind the letterboxing, and the exhibit letter captioned on it. */
+.experience__exhibit--filled {
+  border-style: solid;
+  background: var(--ink-panel);
+  overflow: hidden;
+  position: relative;
+}
+/* Absolute so the photo contributes nothing to layout — in flow its
+   min-content height inflates the slot and bursts the folder open (CLAUDE.md).
+   `cover`, unlike the projects page's shot slots: those swing from 1.84:1 at
+   1440 to 0.55:1 on mobile, so any crop is wrong at some width and they have
+   to letterbox. This slot holds 2.6–3.1:1 across every desktop breakpoint and
+   is hidden below 820px, so a crop is stable — and `contain` here printed the
+   supplied photos (1.6–2.4:1) at ~40% of the frame between two slabs of ink,
+   which reads as a broken image rather than a letterbox. */
+.experience__ex-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+.experience__ex-caption {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background: var(--ink);
+  color: var(--paper);
+  /* Overrides the empty slot's centred rule above, which is a plain element
+     selector — this is a class, so it wins without source-order luck. */
+  opacity: 1;
+  padding: 3px 9px;
+}
+
+/* Row 2. Styled and waiting: rendered only for files with a real supplied
+   quote — a file without one has no bottom row and its exhibit widens. */
 .experience__witness {
-  flex: 1;
   position: relative;
   background: var(--paper-doc);
   border: 3px solid var(--ink);
   box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 25%, transparent);
-  padding: 1vh 1vw 1vh 1.2vw;
+  padding: 1.25vh 1.25vw 1.25vh 1.5vw;
   transform: rotate(0.6deg);
 }
 .experience__w-label {
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 9px;
+  font-size: calc(9px * var(--case-type));
   letter-spacing: 0.3em;
   color: var(--mag);
 }
 .experience__w-quote {
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: clamp(10px, 0.95vw, 13px);
+  font-size: calc(clamp(10px, 0.95vw, 13px) * var(--case-type));
   line-height: 1.5;
-  margin-top: 0.5vh;
+  margin-top: 0.6vh;
   font-style: italic;
 }
 .experience__w-attrib {
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 9px;
+  font-size: calc(9px * var(--case-type));
   letter-spacing: 0.15em;
-  margin-top: 0.5vh;
+  margin-top: 0.6vh;
   opacity: 0.7;
   text-align: right;
 }
@@ -336,7 +462,13 @@
   position: absolute;
   bottom: 3vh;
   right: 2vw;
-  width: clamp(100px, 9.5vw, 140px);
+  /* Took the folder's ×1.25 at first and was then cut back below its original
+     size (Mitul 2026-07-27): it is the only thing standing between the exhibit
+     and the rest of the strip, and every pixel it gives up the photo takes —
+     the clearance below tracks it. The boundary zoom measures the target's
+     rendered size at scrub time rather than assuming one, so resizing it
+     re-fits the dive automatically (`useBoundaryZoom`, ZOOM MEASUREMENT). */
+  width: clamp(95px, 9vw, 130px);
   transform: rotate(6deg);
 }
 .experience__polaroid svg {
@@ -351,7 +483,7 @@
   text-align: center;
   font-family: var(--font-utility);
   font-weight: bold;
-  font-size: 9px;
+  font-size: calc(9px * var(--case-type));
   letter-spacing: 0.2em;
   color: var(--ink);
 }
@@ -359,6 +491,10 @@
   background: var(--mag);
   color: var(--paper);
   padding: 2px 5px;
+  /* The card is narrower than the label since the 2026-07-27 cut, so the line
+     wraps. Break before the chip, never inside it — split across two lines its
+     magenta fill runs behind "NEXT:" and the cue reads as two broken words. */
+  white-space: nowrap;
 }
 /* Once the last file is settled the dive target announces itself. The
    counter-rotation composes with the wrapper's resting angle to reach the
@@ -371,7 +507,10 @@
   50% { transform: scale(1.05) rotate(-2deg); }
 }
 
-/* ---- Mobile -------------------------------------------------------------- */
+/* ---- Mobile --------------------------------------------------------------
+   The phone takes the type scale and nothing else: same 88vw folder, same
+   centre, `--case-type` inherited from `.experience`. What pays for the bigger
+   glyphs is the dossier row, dropped entirely below. */
 @media (max-width: 820px) {
   .experience__head {
     left: 4vw;
@@ -379,40 +518,142 @@
   }
   .experience .cm-title-box__title { font-size: 9vw; }
 
+  /* 76vh/55% before the real testimonials landed — those run 2–3× the
+     placeholder's length, and CASE 001 (which also carries the polaroid) ran
+     54px past its own base. The folder takes every pixel the viewport still
+     has: `top` moves down because all the spare room is below — the tab has
+     only ~20px over the title box at 844 and ~10px at 740. */
   .experience__stack {
     width: 88vw;
-    height: min(76vh, 700px);
-    top: 55%;
+    height: min(80vh, 700px);
+    top: 58%;
   }
-  .experience__file { padding: 4.2vh 4vw 2vh; }
+  /* The vertical trims below (here, on the strip, on the ops, on the polaroid)
+     are what pays for the in-flow stamp on CASE 001 — the one file with no
+     slack between its ops and its strip. Together they buy ~46px against the
+     stamp's ~37; without them that folder overflows its own base. */
+  /* The folders stay one height (`inset: 0`), and that is not a stylistic
+     choice — a stack occludes. Letting each folder end where its own record
+     ends was tried and reverted: CASE 001's record is the longest, so while it
+     sat buried its tail hung below whichever shorter folder was on top and
+     printed Dr. Biswal's attribution line under CASE 002. Every deeper folder
+     also sits 12px lower in the fan, so it must be *shorter* than the one
+     above it to stay hidden — an ordering the records don't happen to have.
+
+     So the slack can be moved but not deleted, and it goes to the bottom
+     (Mitul 2026-07-27): the strip follows the ops, and what's left is blank
+     paper under the witness slip, which reads as a document's bottom margin
+     rather than a hole punched through the middle of the record. */
+  .experience__file { padding: 4.2vh 4vw 2.5vh; }
+  /* The case number keeps its old clearance over the org heading: both grew a
+     quarter, and on a 343px folder the org wraps under the box's corner. */
+  .experience__case-no { top: 1.5vh; }
+  .experience__ops li { margin-bottom: 0.8vh; }
+  /* The dossier row is gone here, so there is nothing to hand the slack to —
+     growing the strip would only stretch the witness slip into a tall empty
+     box, and pinning it to the base left a dead band between the ops and the
+     slip (Mitul 2026-07-27). So neither: the strip just follows the ops, and
+     the folder shortens to suit (see `--file` below). */
+  .experience__attachments {
+    flex: 0 0 auto;
+    margin-top: 0;
+    padding-top: 1.6vh;
+  }
+  .experience__witness { padding: 1vh 1.25vw 1vh 1.5vw; }
+  /* The one place the phone takes a smaller step than 1.25×. Every other
+     string on the folder has a length the design controls; a testimonial does
+     not, and in a 300px column each 1px of quote costs a whole line of folder.
+     11px keeps it a step up from the mockup's 10 without that. */
+  .experience__w-quote { font-size: 11px; }
+  /* Height and offset are `em` in the base rule, so the phone's smaller tab
+     type resizes the tab with it — only the size and side padding are here. */
   .experience__tab {
-    font-size: 13px;
+    font-size: calc(13px * var(--case-type));
     padding: 5px 10px 0;
-    top: -28px;
-    height: 28px;
   }
   .experience__file--pos1 .experience__tab { left: 2%; }
   .experience__file--pos2 .experience__tab { left: 34%; }
   .experience__file--pos3 .experience__tab { left: 66%; }
 
-  /* The strip stacks, so nothing needs to clear the polaroid — which flows
-     into the column instead of floating in the corner. This rule follows the
-     clearance rule in source order, so it wins without `!important`. */
-  .experience__attachments {
-    flex-direction: column;
-    gap: 1.6vh;
-    padding-right: 0;
+  /* The stamp comes off the corner and into the flow, below the ops (Mitul
+     2026-07-27 — at the desktop offset it sat straight on top of the role line,
+     which is where the dates live).
+
+     In flow rather than at a lower `top`, because no fixed offset works: the
+     folder is 343px wide here, so the org wraps to two lines on CASE 001 and
+     one on the others, and every absolute offset that clears the role on one
+     file lands on the brief or the ops of another. As a flex item it simply
+     cannot collide with anything — and the free space the strip's `margin-top:
+     auto` opens up sits *below* it, so on the two files that have slack it
+     costs no height at all. */
+  .experience__status {
+    position: static;
+    order: 1;
+    align-self: flex-end;
+    /* The 8° tilt throws the top-right corner past the box the flex layout
+       gave it; this keeps it inside the folder's border. */
+    margin-right: 2vw;
   }
-  .experience__exhibit {
-    flex: 0 0 auto;
-    min-height: 9vh;
+  .experience__attachments { order: 2; }
+
+  /* The dossier row goes: the tickets and the empty exhibit slot are what a
+     phone can afford to lose, and the witness slip is what it can't. The
+     polaroid then flows into the column instead of floating in the corner, so
+     nothing is left needing the clearance. This rule follows the clearance rule
+     in source order, so it wins without `!important`. */
+  .experience__dossier { display: none; }
+  .experience__attachments { padding-right: 0; }
+  /* The dive cue doesn't exist until its own file performs (Mitul's call to
+     keep it, 2026-07-27). It found its way in as a fix — the polaroid flows in
+     the column here, so a buried CASE 001 hung a live DIVE ▸ ABOUT badge below
+     whichever folder was on top — and stayed as the behaviour: the reader is
+     offered the way out of the docket only once they've reached the bottom of
+     it.
+
+     Safe against the boundary: `useBoundaryZoom` throws if `[data-dive-target]`
+     is missing, but `display: none` hides the element without removing it, and
+     the zoom's fill scale is a function-based GSAP value evaluated when the
+     tween first renders — at 86% of the scene, twenty percent after CASE 001
+     took the top of the stack and un-hid this. */
+  .experience__file:not(.experience__file--on) .experience__polaroid {
+    display: none;
   }
   .experience__polaroid {
     position: static;
+    /* Last in the column. The stamp above took `order`, and an ordered flex
+       item jumps ahead of every unordered one — left at the default the dive
+       target printed itself above the witness slip. */
+    order: 3;
     transform: rotate(3deg);
-    margin: 1.5vh auto 0;
-    width: 30vw;
+    margin: 0.5vh auto 0;
+    /* 30vw before this pass. The dive target is the one element on the phone
+       folder big enough to pay for the bigger type, the in-flow stamp and the
+       real testimonials — and it is a photo, so it loses nothing by being read
+       smaller. It still has to *announce* itself, which is the floor here. */
+    width: 21vw;
   }
+}
+
+/* ---- Small phones --------------------------------------------------------
+   Keyed on height, because height is what runs out: an SE-class 375×667 has
+   the same 300px column as a 390×844 and 180px less folder to print it in.
+   At 844 the folder holds the whole record with the type a quarter up; at 740
+   and below it does not, and the shortfall is ~50px whatever else is trimmed —
+   the stack is already within ~15px of both the title box and the viewport
+   edge, so there is no room left to take it from.
+
+   So the type takes a smaller step here rather than the full quarter. Still
+   above the size that shipped before this pass (1.05 vs 1.0), which is what
+   was actually asked for; it just isn't the same step a big phone gets. */
+@media (max-width: 820px) and (max-height: 780px) {
+  .experience { --case-type: 1.05; }
+}
+/* SE-class, 667px tall — 180px less folder than a 390×844 for the same
+   record. Here even the smaller step doesn't fit, so the type sits at the size
+   that shipped before this pass. Nothing is lost that wasn't already the
+   phone's, and every word of every file still prints inside its folder. */
+@media (max-width: 820px) and (max-height: 700px) {
+  .experience { --case-type: 1; }
 }
 
 /* ---- Reduced motion -----------------------------------------------------

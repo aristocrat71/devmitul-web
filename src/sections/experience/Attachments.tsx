@@ -2,31 +2,58 @@ import { cn } from "@/lib/utils";
 import type { Witness } from "./content";
 
 /**
- * The dashed attachment slot at the base of a case file — an image that hasn't
- * been supplied yet (design-doc §7 open items). When the file has no witness
- * statement it takes the whole strip, which is the design's own instruction for
- * that case rather than a fallback.
+ * The evidence photo in a case file's dossier row, beside the tickets. With a
+ * supplied image it prints as a pinned photograph, captioned with its exhibit
+ * letter; without one it falls back to the dashed "attach…" slot the page
+ * shipped with (design-doc §7 assets).
+ *
+ * The photo is positioned absolutely inside the slot so it contributes nothing
+ * to layout — an `<img>` in flow hands the slot its own min-content height and
+ * bursts the folder open (CLAUDE.md conventions; it cost the projects page a
+ * 934px panel once). `object-fit: contain` then letterboxes it, because the
+ * slot's shape is the layout's and no single crop suits every breakpoint.
+ *
+ * When the file has no witness statement the strip loses its bottom row, so the
+ * exhibit widens into the space instead, which is the design's own instruction
+ * for that case rather than a fallback.
  */
 export function Exhibit({
   label,
+  src,
+  alt,
   note,
   wide,
 }: {
   label: string;
-  note: string;
+  src?: string;
+  alt?: string;
+  note?: string;
   /** No witness slip on this file, so the exhibit widens to take its place. */
   wide?: boolean;
 }) {
   return (
     <div
-      className={cn("experience__exhibit", wide && "experience__exhibit--wide")}
-      aria-hidden="true"
+      className={cn(
+        "experience__exhibit",
+        src && "experience__exhibit--filled",
+        wide && "experience__exhibit--wide",
+      )}
+      // Empty, the slot is an instruction to the author and says nothing to a
+      // reader; filled, the photo carries its own description.
+      aria-hidden={src ? undefined : "true"}
     >
-      <span>
-        {label}
-        <br />
-        {note}
-      </span>
+      {src ? (
+        <>
+          <img className="experience__ex-img" src={src} alt={alt ?? ""} />
+          <span className="experience__ex-caption">{label}</span>
+        </>
+      ) : (
+        <span>
+          {label}
+          <br />
+          {note}
+        </span>
+      )}
     </div>
   );
 }

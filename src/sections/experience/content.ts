@@ -3,6 +3,9 @@
  * and `experience-page-mockup.html`. Reading order is reverse-chronological:
  * CASE 003 → 002 → 001, leafing backward through time.
  */
+import canspiritEvidence from "@/assets/experience/canspirit.webp";
+import isroEvidence from "@/assets/experience/isro.webp";
+import unravelEvidence from "@/assets/experience/unravel.webp";
 
 /** One KEY OPS bullet. */
 export interface Op {
@@ -29,22 +32,13 @@ export interface Witness {
 }
 
 /**
- * ========================= TEMPORARY PLACEHOLDER =========================
- * Added at Mitul's request (2026-07-27) so the attachments strip can be
- * reviewed with both slots filled. REPLACE with the real supplied quote per
- * file, or delete the three `witness:` lines below to return to the
- * design-doc §7 behaviour (slot omitted, exhibit widened).
- * =========================================================================
- *
- * Deliberately unmistakable — lorem text and an obviously fake name — so it
- * cannot be read as a real recommendation or ship unnoticed. It lives in one
- * constant on purpose: one place to delete, and one grep to prove the site has
- * no invented testimony left in it.
+ * CASE 003's slip. Unravel is the ACTIVE file and no statement has been taken
+ * yet, so it prints as unknown rather than absent — Mitul's call (2026-07-27),
+ * and the same device the polaroid uses for its own date ("EST. ???"). Not a
+ * fabricated quote: it is the file saying it doesn't have one, which on a page
+ * about evidence is the honest reading of a pending witness.
  */
-const PLACEHOLDER_WITNESS: Witness = {
-  quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  attribution: "John Doe",
-};
+const WITNESS_PENDING: Witness = { quote: "???", attribution: "???" };
 
 export interface CaseFile {
   /** Folder tab — the short name, read while the file is still buried. */
@@ -58,9 +52,24 @@ export interface CaseFile {
   /** One line, highlighter-treated. */
   brief: string;
   ops: readonly Op[];
-  evidence: readonly string[];
-  /** Dashed attachment slot until the real image lands (design-doc §7 assets). */
-  exhibit: { label: string; note: string };
+  /**
+   * The four headline technologies, no more (Mitul 2026-07-27). The tickets
+   * share the dossier row with the exhibit now, so a fifth or sixth wraps the
+   * row onto a second line and pushes the strip off the folder's base. Order is
+   * prominence — the trimmed entries were the tail of each list.
+   */
+  evidence: readonly [string, string, string, string];
+  /**
+   * The evidence photo pinned into the strip. `src` + `alt` are the supplied
+   * image; a file with neither falls back to the dashed "attach…" slot the
+   * page shipped with, which is why `note` survives (design-doc §7 assets).
+   */
+  exhibit: {
+    label: string;
+    src?: string;
+    alt?: string;
+    note?: string;
+  };
   witness?: Witness;
 }
 
@@ -78,9 +87,13 @@ export const CASES: readonly CaseFile[] = [
       { text: "RL-for-LLMs strategy research guiding AI investment decisions" },
       { text: "FURTHER OPS: ████████████████ (PENDING CLEARANCE)", redacted: true },
     ],
-    evidence: ["TAURI", "REACT", "TYPESCRIPT", "SQLITE", "AWS / RAILWAY", "PYTHON"],
-    exhibit: { label: "EXHIBIT A", note: "ATTACH WORK PHOTO / SCREENSHOT" },
-    witness: PLACEHOLDER_WITNESS,
+    evidence: ["TAURI", "AWS / RAILWAY", "FASTAPI", "TYPESCRIPT"],
+    exhibit: {
+      label: "EXHIBIT A",
+      src: unravelEvidence,
+      alt: "The Unravel Tech team around a restaurant table, mid-lunch.",
+    },
+    witness: WITNESS_PENDING,
   },
   {
     tab: "CANSPIRIT.AI",
@@ -93,9 +106,17 @@ export const CASES: readonly CaseFile[] = [
       { text: "Shipped a Docx-crafter, a wine-commerce website, and a chatbot" },
       { text: "Owned features across frontend, API, and data layers" },
     ],
-    evidence: ["REACT", "TYPESCRIPT", "EXPRESS", "MONGODB", "LINUX"],
-    exhibit: { label: "EXHIBIT B", note: "ATTACH PRODUCT SCREENSHOT" },
-    witness: PLACEHOLDER_WITNESS,
+    evidence: ["REACT", "TYPESCRIPT", "EXPRESS", "MONGODB"],
+    exhibit: {
+      label: "EXHIBIT B",
+      src: canspiritEvidence,
+      alt: "A property-listings web app built at Canspirit: search filters over a city skyline, with a grid of housing-development cards beneath.",
+    },
+    witness: {
+      quote:
+        "Mitul is a quick learner with a strong sense of ownership, consistently delivering quality work while collaborating effectively and maintaining a professional attitude.",
+      attribution: "Arun Kumar Nair, Technical Head",
+    },
   },
   {
     tab: "NRSC @ ISRO",
@@ -108,9 +129,17 @@ export const CASES: readonly CaseFile[] = [
       { text: "API development for satellite-data crop pipelines" },
       { text: "Model development for crop-mapping & yield prediction" },
     ],
-    evidence: ["SCIKIT-LEARN", "PANDAS", "NUMPY", "MATPLOTLIB", "SEABORN"],
-    exhibit: { label: "EXHIBIT C", note: "ATTACH SATELLITE / FIELD VISUAL" },
-    witness: PLACEHOLDER_WITNESS,
+    evidence: ["SCIKIT-LEARN", "PANDAS", "NUMPY", "MATPLOTLIB"],
+    exhibit: {
+      label: "EXHIBIT C",
+      src: isroEvidence,
+      alt: "Work from the NRSC @ ISRO crop-mapping internship.",
+    },
+    witness: {
+      quote:
+        "Mitul demonstrated strong analytical skills and the ability to quickly grasp complex concepts while approaching every task with dedication.",
+      attribution: "Dr. Anima Biswal, Lead Scientist",
+    },
   },
 ] as const;
 

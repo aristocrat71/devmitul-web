@@ -27,8 +27,8 @@ function OpText({ op }: { op: Op }) {
 
 /**
  * One paper case folder (design-doc §7): tab, case number, STATUS stamp, org and
- * role, highlighted brief, KEY OPS, evidence tickets, and the attachments strip
- * pinned to its base.
+ * role, highlighted brief, KEY OPS, and the attachments strip pinned to its
+ * base — evidence tickets beside the exhibit, witness slip across the bottom.
  *
  * Everything invisible at rest waits for the file to reach the top of the stack,
  * when the leaf scrub adds `experience__file--on`: the status stamp slams, then
@@ -76,28 +76,39 @@ export function CaseFile({
         ))}
       </ul>
 
-      <p className="experience__ev-label">EVIDENCE</p>
-      <div className="experience__evidence">
-        {file.evidence.map((item, i) => (
-          <EvidenceTag
-            key={item}
-            delay={CASES_FOCUS.evidence + i * CASES_FOCUS.evidenceStagger}
-          >
-            {item}
-          </EvidenceTag>
-        ))}
-      </div>
-
+      {/* The strip at the folder's base, two rows (Mitul 2026-07-27): the
+          evidence tickets beside the exhibit, then the witness slip across the
+          bottom. Both rows share one container so the dive file's clearance for
+          the polaroid is stated once. */}
       <div
         className={cn(
           "experience__attachments",
           dive && "experience__attachments--clear-dive",
         )}
       >
-        {/* A file with no `witness` omits the slot and widens the exhibit, per
-            design-doc §7. All three currently carry the temporary placeholder
-            marked in `content.ts`. */}
-        <Exhibit {...file.exhibit} wide={!file.witness} />
+        <div className="experience__dossier">
+          <div className="experience__ev">
+            <p className="experience__ev-label">EVIDENCE</p>
+            <div className="experience__evidence">
+              {file.evidence.map((item, i) => (
+                <EvidenceTag
+                  key={item}
+                  delay={CASES_FOCUS.evidence + i * CASES_FOCUS.evidenceStagger}
+                >
+                  {item}
+                </EvidenceTag>
+              ))}
+            </div>
+          </div>
+
+          {/* A file with no `witness` loses the bottom row entirely, so the
+              exhibit widens into the dossier row instead, per design-doc §7.
+              All three currently carry the temporary placeholder marked in
+              `content.ts`. */}
+          <Exhibit {...file.exhibit} wide={!file.witness} />
+
+        </div>
+
         {file.witness ? <WitnessStatement {...file.witness} /> : null}
       </div>
 
