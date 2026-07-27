@@ -13,41 +13,47 @@ import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
 import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
- * The camera's reading path over the scene's 520vh (design-doc §6): hold Tablo
- * → pan → hold OptiLife → pan ↓ → hold DogVision → pull-back reveal → hold the
- * full page. Focus zoom ≈ 60% viewport width / 72% height; fit leaves 8% of
- * void all around. Do not retune without a design amendment.
+ * The camera's reading path (design-doc §6): hold Tablo → pan → hold OptiLife
+ * → pan ↓ → hold DogVision → pan ← → hold the catalogue cell → pull-back
+ * reveal → hold the full page. Focus zoom ≈ 60% viewport width / 72% height;
+ * fit leaves 8% of void all around. Do not retune without a design amendment.
  *
  * **Amendment 2026-07-26:** the opening hold is 5%, not the mockup's 20%. The
  * mockup was a standalone page whose camera started the moment you did; here
  * the camera is already parked on Tablo for the whole of the previous scene's
- * assembly window — 21% of the cover's 330vh, ~69vh — while the page prints
- * in around it. Adding the mockup's own 20% on top double-counted, and Tablo
- * ended up holding 173vh against 94vh for each of the other panels: the
- * reader finished Tablo and then scrolled most of a screen with nothing
- * moving. 5% restores the balance (~95vh total, in line with the others).
+ * assembly window while the page prints in around it, so the mockup's own
+ * opening hold double-counted and Tablo held nearly twice as long as the
+ * other panels.
  *
- * Every later segment keeps its exact duration; the 15% that frees up goes to
- * the closing hold, which is where the Projects → Experience dive will live
- * (a scene's length includes its outbound transition — see `book.ts`).
+ * **Amendment 2026-07-27 (Mitul's call):** the fourth cell is now a real
+ * camera stop — the walk visits BROWSE THE BACK ISSUES + the CREW PASS
+ * before pulling back, instead of leaving them to be met only in the
+ * zoomed-out reveal. Every beat gives up a little scroll to pay for the new
+ * stop inside the same 300vh (panel holds 54 → 39vh, pans 36 → 27vh,
+ * pull-back 42 → 33vh); the closing hold keeps 0.79–1.0 untouched because
+ * the boundary's table owns it. `outroAt` moved to the pan's START so the
+ * cell prints in while the camera is still travelling toward it — arriving
+ * at blank paper would break the never-reveal-empty rule in spirit.
  */
 export const PROJECTS_WALK: CameraWalk = {
   focus: { w: 0.6, h: 0.72 },
   fitMargin: 0.92,
   segments: [
     { a: 0, b: 0.05, from: 0, to: 0 },
-    { a: 0.05, b: 0.17, from: 0, to: 1 },
-    { a: 0.17, b: 0.35, from: 1, to: 1 },
-    { a: 0.35, b: 0.47, from: 1, to: 2 },
-    { a: 0.47, b: 0.65, from: 2, to: 2 },
-    { a: 0.65, b: 0.79, from: 2, to: 3 },
-    { a: 0.79, b: 1, from: 3, to: 3 },
+    { a: 0.05, b: 0.14, from: 0, to: 1 },
+    { a: 0.14, b: 0.27, from: 1, to: 1 },
+    { a: 0.27, b: 0.36, from: 1, to: 2 },
+    { a: 0.36, b: 0.49, from: 2, to: 2 },
+    { a: 0.49, b: 0.58, from: 2, to: 3 },
+    { a: 0.58, b: 0.68, from: 3, to: 3 },
+    { a: 0.68, b: 0.79, from: 3, to: 4 },
+    { a: 0.79, b: 1, from: 4, to: 4 },
   ],
   // Focus hands over at each pan's midpoint, and everything performs once the
   // pull-back starts — the same relationships the mockup had, moved with the
   // segments rather than re-derived.
-  focusUntil: [0.11, 0.41, 0.67],
-  outroAt: 0.67,
+  focusUntil: [0.095, 0.315, 0.535, 0.68],
+  outroAt: 0.49,
 } as const;
 
 /** Camera arrival → the panel performs (design-doc §6, "Focus beats"). */
@@ -58,7 +64,11 @@ export const PROJECTS_FOCUS = {
   chipStagger: 0.06,
 } as const;
 
-/** The fourth cell stamps in when the pull-back reveals it (past ~82%). */
+/**
+ * The fourth cell stamps in as the camera turns toward it (`outroAt` = the
+ * pan's start since the 2026-07-27 amendment) — printed and settled by the
+ * time the camera arrives.
+ */
 export const PROJECTS_OUTRO = {
   backIssues: 0.05,
   crewPass: 0.2,

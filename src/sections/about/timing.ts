@@ -17,12 +17,14 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
  * THE ORIGIN → pan ↓ → hold C3 POWERS → pull-back reveal → hold the full page,
  * with C4's finale bubble stamped in as the page lifts away.
  *
- * This is deliberately the same table as `PROJECTS_WALK`: §8 specifies ORIGIN
- * STORY as the structural twin of THE GOOD PART — same page dimensions, same
- * 2×2 coordinates, same reading path — so an identical walk is the spec, not a
- * copy-paste. It stays a per-section constant rather than a shared one because
- * the two pages' pacing is free to diverge (their closing holds host different
- * dives), and a shared table would couple them silently.
+ * This began as deliberately the same table as `PROJECTS_WALK`: §8 specifies
+ * ORIGIN STORY as the structural twin of THE GOOD PART — same page
+ * dimensions, same 2×2 coordinates, same reading path — so an identical walk
+ * was the spec, not a copy-paste. Keeping it per-section paid off on
+ * 2026-07-27, when THE GOOD PART gained a fourth camera stop (its catalogue
+ * cell) and this page deliberately did NOT: C4's finale bubble is the dive
+ * target, and its invitation needs the pull-back reveal to land first —
+ * visiting it up close and then zooming out of it would deflate the dive.
  *
  * **Inherited amendment (2026-07-26):** the opening hold is 5%, not the
  * mockup's 20%, for the reason THE GOOD PART was amended — in the book the

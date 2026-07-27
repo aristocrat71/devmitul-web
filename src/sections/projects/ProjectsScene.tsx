@@ -93,8 +93,11 @@ export function ProjectsScene() {
           />
         ))}
 
-        {/* Fourth cell — unvisited until the pull-back reveals it. */}
-        <MegaCell at="bl" className="projects__extra">
+        {/* Fourth cell — the camera's last stop before the pull-back (amended
+            2026-07-27; it used to be met only in the zoomed-out reveal). Its
+            furniture still stamps on the megapage-outro gate, which now fires
+            as the camera turns toward the cell. */}
+        <MegaCell at="bl" className="projects__extra" focus={3}>
           <div className="projects__outro-el" style={BACK_ISSUES_STAMP}>
             {/* The stamp owns the rotation on the wrapper so this anchor keeps
                 its own transform for the hover lift. Stacking both on one
