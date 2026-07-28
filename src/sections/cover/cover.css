@@ -39,8 +39,19 @@
      reached from here. Scaled to ~85% of the mockup's 38vw/560px: the mockup
      sized this slot around a 300x340 stand-in silhouette (0.882 aspect), and
      the real cutout is 0.821 — so at the mockup's width the figure stood ~47px
-     taller than the composition was drawn for and crowded the masthead. */
-  --cover-cutout-w: clamp(255px, 32vw, 475px);
+     taller than the composition was drawn for and crowded the masthead.
+
+     The vh term caps the figure on wide-and-short viewports (2026-07-28,
+     found on a 1366×768 / 1536×864 Windows laptop): the cutout is bottom-
+     anchored and ~1.22× as tall as it is wide, while the masthead column
+     hangs from 17vh — at 16:9 the vw-sized figure climbed 51px into the
+     title and hid the byline. 51.2vh equals 32vw at the approved 1440×900
+     aspect (1.6), so at that ratio and taller this line renders exactly as
+     signed off; only wider aspects shrink the figure, just enough to keep
+     its top below the byline (the same few-px transparent-corner graze the
+     approved viewport has). Large 16:9 screens never get here — the 475px
+     cap wins first. */
+  --cover-cutout-w: clamp(255px, min(32vw, 51.2vh), 475px);
 }
 
 /* ---- Back-cover lettering wall as the cover's backdrop -------------------
@@ -148,7 +159,12 @@
    tick fires 2.2s in. */
 .cover .cover__masthead {
   font-family: var(--font-display);
-  font-size: clamp(64px, 12vw, 176px);
+  /* The vh term is the cutout token's fix (see it for the derivation): a
+     12vw masthead on a 16:9 laptop spends 21% of the viewport's height and
+     the column below it collides with the bottom-anchored figure. 19.2vh
+     equals 12vw at the approved 1440×900 aspect — identical there and on
+     anything taller, smaller only where the viewport is wider than 1.6:1. */
+  font-size: clamp(64px, min(12vw, 19.2vh), 176px);
   line-height: 0.86;
   letter-spacing: 0.02em;
   color: var(--paper);
