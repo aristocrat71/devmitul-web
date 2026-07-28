@@ -1,11 +1,19 @@
-import dogvisionShot from "@/assets/projects/dogvision.webp";
 import optilifeShot from "@/assets/projects/optilife.webp";
 import tabloShot from "@/assets/projects/tablo.webp";
+import unhallucinateShot from "@/assets/projects/unhallucinate.webp";
 
 /**
  * THE GOOD PART's featured trio — the approved inventory from design-doc §6.
- * Copy is verbatim from the sign-off; the page renders what's here and adding
- * a fourth project is a design change, not a content edit.
+ *
+ * **The trio changed on 2026-07-28** (Mitul): UNHALLUCINATE came in second and
+ * DOGVISION was dropped outright. Still three, so the page geometry is
+ * untouched — three panels in the 2×2 grid and the catalogue furniture in the
+ * fourth cell, which is exactly what the approved layout holds.
+ *
+ * **Three is the layout, not a habit.** A fourth project fills the grid and
+ * evicts the furniture, which means a third page row, a taller page, a fifth
+ * camera stop and a longer scene. Adding one is a design change, not a content
+ * edit — swapping one, as here, is not.
  */
 export interface Project {
   /** Display name — the panel's masthead, set across the print's left edge. */
@@ -76,6 +84,41 @@ export const PROJECTS: readonly Project[] = [
     },
   },
   {
+    name: "UNHALLUCINATE",
+    hook: "AI LIES CONFIDENTLY. THIS ONE CALLS THE BLUFF.",
+    // The three decisions that govern it, and where each one lives:
+    //
+    // 1. A verdict is never the model's opinion — it is grounded in a fresh
+    //    web search and returns the sources it used. The pipeline is fixed:
+    //    extract claims → search the web → compare claim against results →
+    //    verdict + links (`backend/{claim_extractor,search_module,
+    //    fact_checker}.py`, README "Architecture"). A Chrome extension
+    //    (`hallucination-ext/`) is a second surface over the same FastAPI
+    //    backend as the Next.js app.
+    // 2. The judge is a panel, not a single call. `backend/fact_checker.py`
+    //    runs the same Groq model three times at temperatures 0.1 / 0.3 / 0.5
+    //    and takes the majority verdict via `Counter` — because an LLM asked
+    //    to catch hallucination can hallucinate the answer, and one outlier
+    //    should not decide. It is what the UI means by "All 3 runs agree".
+    // 3. Nothing costs anything and everything has a fallback: SerpAPI with
+    //    DuckDuckGo behind it (`search_module.py`), Groq's free tier, Netlify
+    //    static export. The project's own cost table totals $0. Verdicts are
+    //    three-way on purpose — VERIFIED | HALLUCINATED | UNVERIFIABLE — so
+    //    "not enough evidence" is a real answer rather than a forced guess.
+    spots: [
+      "A WEB APP AND EXTENSION THAT FACT-CHECKS AI TEXT AGAINST LIVE SEARCH",
+      "THREE LLM RUNS VOTE, SO NO SINGLE MISREAD DECIDES A VERDICT",
+      "GROUNDED - VOTED - FREE TO RUN",
+    ],
+    chips: ["NEXT.JS 14", "FASTAPI", "GROQ", "TAILWIND"],
+    repo: "https://github.com/aristocrat71/Unhallucinate-AI",
+    live: "https://unhallucinate-ai.netlify.app/",
+    shot: {
+      src: unhallucinateShot,
+      alt: "Unhallucinate's analysis view: the claim “The sun is cold” flagged HALLUCINATION DETECTED against a text trustworthiness score of 0%, with the reasoning “All 3 runs agree: claim contradicts scientific facts — the sun's surface temperature is around 5500°C” and three supporting source links.",
+    },
+  },
+  {
     name: "OPTILIFE",
     hook: "REAL LIFE, BUT WITH XP.",
     // The three decisions that govern the app, and where each one lives:
@@ -110,27 +153,6 @@ export const PROJECTS: readonly Project[] = [
     shot: {
       src: optilifeShot,
       alt: "OptiLife's landing page: the headline “Tired of your main quests? Recharge your Life Energy with some side quests.” beside a phone showing the Side Quests screen — Adventure, Fitness and Creative cards, each worth ten XP.",
-    },
-  },
-  {
-    name: "DOGVISION",
-    hook: "WHAT BREED IS THAT CUTE PUPPY? THERE'S AN APP FOR THAT.",
-    // Sources (the repo's GitHub project page): transfer learning over the
-    // Stanford Dogs dataset, trained locally and frozen to a `.h5` the server
-    // loads rather than retraining on deploy; React on Netlify and the Flask
-    // inference API deployed independently; an upload returns the breed with
-    // the model's confidence in one round trip.
-    spots: [
-      "TRANSFER-LEARNED ON STANFORD DOGS",
-      "TWO TIERS, DEPLOYED APART",
-      "UPLOAD, PREDICT, ANSWER",
-    ],
-    chips: ["TENSORFLOW", "KERAS", "FLASK", "REACT"],
-    repo: "https://github.com/aristocrat71/DogVision",
-    live: "https://aristocrat71-dogvision.netlify.app",
-    shot: {
-      src: dogvisionShot,
-      alt: "DogVision's web app after a prediction: an uploaded photo classified as an Old English Sheepdog at 100% confidence, over a photograph of two golden retriever puppies.",
     },
   },
 ] as const;

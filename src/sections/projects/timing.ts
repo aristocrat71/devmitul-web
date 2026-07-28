@@ -13,9 +13,11 @@ import type { BoundaryTiming } from "@/hooks/useBoundaryZoom";
 import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
- * The camera's reading path (design-doc §6): hold Tablo → pan → hold OptiLife
- * → pan ↓ → hold DogVision → pan ← → hold the catalogue cell → pull-back
- * reveal → hold the full page. Focus zoom ≈ 60% viewport width / 72% height;
+ * The camera's reading path (design-doc §6): hold Tablo → pan → hold
+ * Unhallucinate → pan ↓ → hold OptiLife → pan ← → hold the catalogue cell →
+ * pull-back reveal → hold the full page. _The three panels are whatever
+ * `PROJECTS` holds in order — the trio changed on 2026-07-28 and this table
+ * did not, because it addresses camera stops, not projects._ Focus zoom ≈ 60% viewport width / 72% height;
  * fit leaves 8% of void all around. Do not retune without a design amendment.
  *
  * **Amendment 2026-07-26:** the opening hold is 5%, not the mockup's 20%. The
