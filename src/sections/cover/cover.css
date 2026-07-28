@@ -182,6 +182,13 @@
 }
 
 .cover__credit {
+  /* On the tag-row/socials rail (12vw, see below), not at the column's left
+     edge (2026-07-28, Mitul): the byline used to start under the figure's
+     hair, and the few-px bounding-box graze the approved viewport measured
+     read as the S of STARRING merging into the photo on real laptops. The
+     figure's hair ends ~37vw; this rail starts at ~45vw at every aspect, so
+     the clearance no longer depends on the viewport's shape at all. */
+  margin-left: 12vw;
   margin-top: 2.4vh;
   font-family: var(--font-utility);
   font-weight: bold;
@@ -336,6 +343,7 @@
   .cover__masthead-slam { margin-left: 0; }
   .cover .cover__masthead { font-size: 17vw; }
   .cover .cover__tagline { font-size: 15px; white-space: nowrap; }
+  .cover__credit { margin-left: 0; }
   .cover__tag-row { margin-left: 0; }
   .cover__socials { justify-content: center; margin-left: 0; }
   /* The column centres its inline content, so the cue centres with it. */

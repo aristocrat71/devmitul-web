@@ -96,26 +96,26 @@
      (see the mobile block: "the head still absorbs the slack"). */
   container-type: size;
 }
-/* The masthead is positioned against THIS, not against the panel. Anchoring
-   the overlap to the panel makes it a function of viewport height: the name
-   sat below the print on a tall viewport and across its middle on a short one.
-   The relationship has to belong to the thing it overlaps. */
+/* The masthead's VERTICAL anchor is this box (its foot rides the print's
+   bottom edge, wherever the print ends up); its horizontal anchor is the
+   band, so the name stays on the panel's content rail — see `.projects__logo`
+   for the 2026-07-28 amendment. */
 .projects__art {
   position: relative;
   /* The cqh cap keeps the print from outgrowing its band on wide-and-short
      viewports (2026-07-28, found on a 1366×768 / 1536×864 Windows laptop):
      the print's height is width-driven (16:9 of this width) while the band's
      is vh-driven, and at 16:9 aspects the band's slack collapsed and pushed
-     the masthead's overhang into the spotlights. Centring splits the band's
-     slack half above the print, so the reserve below is doubled: the cap
-     solves artH + 2 × (7% overhang × artH + 4px gap) ≤ band height with
-     artH = W × 9/16 + 6px border, i.e. W ≤ 156cqh − 23px. At the verified
-     viewports it stays above 76% and binds nothing; where it binds, the
-     whole masthead composition scales with the print (its offsets are % of
-     this box), so only the dark margin around the art grows. */
-  width: min(76%, calc(156cqh - 23px));
-  margin-left: auto;
-  align-self: center;
+     the masthead into the spotlights. The bottom margin pins the print
+     34px above the band's floor — room for the masthead's 26px overhang
+     plus a gap — and the auto top margin takes the rest of the slack, so
+     the reserve holds at every viewport instead of halving under `center`.
+     Cap: artH = W × 9/16 + 6px border ≤ 100cqh − 34px − 6px slop, i.e.
+     W ≤ 178cqh − 71px. At the verified viewports it stays above 76% and
+     binds nothing; where it binds, only the dark margin left of the print
+     grows. */
+  width: min(76%, calc(178cqh - 71px));
+  margin: auto 0 34px auto;
 }
 
 /* The screenshot slot. `cover` now, and the diagonal weave survives only as
@@ -156,13 +156,28 @@
   pointer-events: none;
 }
 
-/* The masthead, set across the print's left edge. Overlapping is what makes
-   type read as being in FRONT of a picture rather than above it. */
+/* The masthead, on the panel's content rail (2026-07-28, Mitul — his
+   big-screen render is the reference): the name starts where the spotlight
+   badges start, its foot rides the print's bottom edge, and the kicker sits
+   fully below the print and its shadow, one clean left-aligned column with
+   the spotlights under it. When the print is wide the name still crosses
+   onto it from the left — type in FRONT of a picture — but the crossing is
+   now an outcome of the print's size, not the anchor. Replaces the
+   left:-31% / bottom:-7% / width:64% %-of-art anchoring, which pushed the
+   name deep onto the capture and split the kicker across the print's border
+   once the art shrank on 16:9 laptops.
+
+   Geometry: the box hangs 24px below the print — one 12px kicker line plus
+   its 12px gap, so the title's own foot lands at the print's edge — and
+   `left` walks back from the art's right-aligned box to the band's content
+   edge (100cqw is the band inside its padding; spots share the same 16px
+   inset). The art's 34px floor reserve (see above) is what keeps this
+   overhang off the spotlights. */
 .projects__logo {
   position: absolute;
-  left: -31%;
-  bottom: -7%;
-  width: 64%;
+  left: calc(100% - 100cqw);
+  bottom: -24px;
+  width: 100cqw;
   z-index: 3;
   /* Decorative overlay above the capture (CLAUDE.md rule 2). */
   pointer-events: none;
@@ -188,12 +203,14 @@
   font-size: 10px;
   letter-spacing: 0.18em;
   color: var(--cyn);
-  margin-top: 5px;
-  /* A full ink outline, not the mockup's single offset. The kicker's last line
-     runs under the print's magenta offset shadow on every panel, and cyan on
-     magenta is the worst pairing in the palette — a shadow on one corner only
-     left the overlapping half of the line hard to read. Not interactive, so
-     declaring `text-shadow` here costs no hover burst (CLAUDE.md conventions). */
+  /* 12px, not 5: the kicker sits below the print now, and this gap is what
+     carries it past the print's 7px magenta offset shadow (2026-07-28). */
+  margin-top: 12px;
+  /* A full ink outline, not the mockup's single offset — kept after the
+     2026-07-28 re-anchor moved the kicker off the print's shadow: cyan
+     10px utility type over the panel's dot field still wants the edge. Not
+     interactive, so declaring `text-shadow` here costs no hover burst
+     (CLAUDE.md conventions). */
   text-shadow:
     1px 1px 0 var(--ink),
     -1px 1px 0 var(--ink),
