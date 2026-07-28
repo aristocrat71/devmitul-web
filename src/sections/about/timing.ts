@@ -79,8 +79,14 @@ export const ABOUT_FOCUS = {
   capStagger: 0.18,
   /** C2: the optional gag inset, after the captions. */
   gagDelay: 0.7,
-  /** C3: twelve punched tickets, 60ms apart — the approved appendix stagger. */
-  powerStagger: 0.06,
+  /**
+   * C3: five capability rows, 130ms apart (2026-07-28). The appendix used to
+   * be twelve punched tickets at 60ms — a quick ripple across a wall of small
+   * nouns. Five rows of readable type want a slower beat, or the whole panel
+   * arrives as one block; 5 × 130ms lands the last row about where the twelfth
+   * ticket used to.
+   */
+  detailStagger: 0.13,
 } as const;
 
 /**

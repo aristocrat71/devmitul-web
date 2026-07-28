@@ -56,12 +56,20 @@ export const PROJECTS_WALK: CameraWalk = {
   outroAt: 0.49,
 } as const;
 
-/** Camera arrival → the panel performs (design-doc §6, "Focus beats"). */
+/**
+ * Camera arrival → the panel performs (design-doc §6, "Focus beats").
+ *
+ * **Amended 2026-07-28** with the panel redesign: what stamps in on arrival is
+ * the three architectural spotlights, not the tech chips — the chips are a
+ * static line on the footer rail now and perform nothing. The stagger doubled
+ * with them, 60 → 120ms: the old value was tuned for four small chips landing
+ * in a row, and three lines of display type read as one blur at that rate.
+ */
 export const PROJECTS_FOCUS = {
-  /** First chip lands here, the rest follow one stagger apart. */
-  chipDelay: 0.25,
-  /** 60ms apart, per the approved sign-off. */
-  chipStagger: 0.06,
+  /** First spotlight lands here, the rest follow one stagger apart. */
+  spotDelay: 0.22,
+  /** 120ms apart — three display-type lines, not four chips. */
+  spotStagger: 0.12,
 } as const;
 
 /**

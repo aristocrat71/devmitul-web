@@ -283,6 +283,10 @@
   padding: 3vh 1.6vw;
   transform: rotate(-0.8deg);
   color: var(--ink);
+  /* A column since 2026-07-28: five capability rows have to spread down the
+     whole document, where twelve wrapped tickets filled it by themselves. */
+  display: flex;
+  flex-direction: column;
 }
 .about__powers-title {
   font-family: var(--font-display);
@@ -300,15 +304,93 @@
   opacity: 0.7;
   margin-top: 0.4vh;
 }
-.about__powers-grid {
+/* ---- The capability rows (2026-07-28) -----------------------------------
+   Replaced the twelve punched `<EvidenceTag>` tickets that used to fill this
+   document. Each row is an exhibit number, the claim, and the evidence line
+   under it — so the panel is read down rather than scanned across, which is
+   the whole point of the change (Mitul: nobody reads a wall of tech nouns).
+
+   The rule between rows is the document's own ruling, not a border on the
+   entry: `:last-child` keeps the panel from ending on a hanging line. */
+.about__details {
+  margin-top: 1.4vh;
+  list-style: none;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 2vh;
+  flex-direction: column;
+  /* Takes the document's remaining height and spreads the rows through it, so
+     the appendix reads as a filled page rather than a list that ran out. */
+  flex: 1;
+  justify-content: space-evenly;
 }
-/* The camera's arrival is what stamps the appendix in; the ticket itself is
-   the shared `<EvidenceTag>` primitive, whose gate is always the page's. */
-.about .cm-cell--on .cm-tag {
+.about__detail {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9vw;
+  padding: 1.05vh 0;
+  border-bottom: 2px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  opacity: 0;
+}
+.about__detail:last-child { border-bottom: 0; }
+
+/* The exhibit number: acid, monospaced, and the one loud thing in a document
+   that is otherwise all ink on paper. */
+.about__detail-no {
+  flex: none;
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(11px, 1vw, 14px);
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--acid);
+  border: 2px solid var(--ink);
+  padding: 2px 5px;
+  /* Its own slight counter-angle against the document's −0.8°, so the numbers
+     read as stamped on afterwards rather than typeset with the page. */
+  transform: rotate(1.6deg);
+}
+.about__detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35vh;
+  min-width: 0;
+}
+.about__detail-power {
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.42vw, 23px);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  /* Not the display skew: five skewed lines stacked in a document read as a
+     rendering fault. The title above keeps the skew and stays the heading. */
+  text-shadow: 1.5px 1.5px 0 color-mix(in srgb, var(--cyn) 55%, transparent);
+}
+.about__detail-source {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(8.5px, 0.66vw, 11px);
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  opacity: 0.62;
+}
+
+/* Closes the document, and answers the one fair objection to dropping the
+   tech list: the tools didn't leave the site, they're on the page where they
+   can be attached to a job. A cross-reference is what a dossier would print. */
+.about__powers-foot {
+  flex: none;
+  margin-top: 1.2vh;
+  padding-top: 1vh;
+  border-top: 2px dashed color-mix(in srgb, var(--ink) 32%, transparent);
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: clamp(8.5px, 0.66vw, 11px);
+  letter-spacing: 0.18em;
+  opacity: 0.55;
+}
+
+/* The camera's arrival is what stamps the appendix in — the page owns the
+   gate, exactly as it did for the tickets. Shares the kit's own tag keyframes
+   rather than declaring a fourth near-identical stamp. */
+.about .cm-cell--on .about__detail {
   animation: cm-tag-in 0.16s steps(2) both var(--cm-delay, 0s);
 }
 
@@ -548,6 +630,58 @@
   .about__greet { font-size: 13px; }
   .about__cap { font-size: 12px; }
   .about .cm-title-box__title { font-size: 9vw; }
+
+  /* ---- The appendix on a phone ------------------------------------------
+     The cell is 46vw × 56vh, so at 390px the document is only ~239px wide,
+     while the row type bottoms out on its `clamp()` px floors — the two stop
+     scaling together and five headline rows overflowed the panel by 201px
+     (333px at 360×740). The twelve tickets this replaced never hit it: an
+     11px chip in a wrapping grid has no minimum row height to blow.
+
+     These sizes look far too small read as numbers — the camera holds this
+     cell magnified, so a phone actually shows roughly 1.6× everything here.
+     Sized against the rendered result, not the stylesheet.
+
+     They keep scaling with the viewport (a vw term under the desktop floor)
+     rather than sitting at flat px behind a second breakpoint: at flat px the
+     panel fitted a 390px phone and overflowed a 360px one by 44px, and the
+     next narrow device would have wanted a third block. */
+  .about__powers { padding: 2vh 1.6vw; }
+  /* 10px at 0.3em tracking is three lines in a 239px document, and the
+     heading it belongs to is one. */
+  .about__powers-sub {
+    font-size: clamp(5.5px, 1.75vw, 7px);
+    letter-spacing: 0.12em;
+  }
+  .about__details { margin-top: 0.8vh; }
+  .about__detail {
+    padding: 0.6vh 0;
+    gap: 1.8vw;
+  }
+  .about__detail-no {
+    font-size: clamp(6.5px, 2vw, 8px);
+    padding: 1px 3px;
+    border-width: 1.5px;
+  }
+  .about__detail-power {
+    font-size: clamp(8.5px, 2.75vw, 11px);
+    line-height: 1.06;
+    letter-spacing: 0;
+    text-shadow: 1px 1px 0 color-mix(in srgb, var(--cyn) 55%, transparent);
+  }
+  .about__detail-source {
+    font-size: clamp(5.5px, 1.75vw, 7px);
+    letter-spacing: 0.06em;
+    line-height: 1.22;
+  }
+  /* Near-zero tracking here: at 0.06em the cross-reference wrapped to three
+     lines and left "02" alone on the last one. */
+  .about__powers-foot {
+    margin-top: 0.6vh;
+    padding-top: 0.6vh;
+    font-size: clamp(5.5px, 1.75vw, 7px);
+    letter-spacing: 0.01em;
+  }
 }
 
 /* ---- Reduced motion -----------------------------------------------------
@@ -558,6 +692,10 @@
   .about__greet,
   .about__tag,
   .about__cap,
+  /* The capability rows rest at 0 and are lit by the camera's arrival, so
+     without this the appendix is a blank document. The kit does the same for
+     `.cm-tag`, which is what used to fill this panel. */
+  .about__detail,
   .about__gag,
   .about__outro-el {
     opacity: 1;

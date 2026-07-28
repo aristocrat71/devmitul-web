@@ -28,31 +28,90 @@ export interface Caption {
   right?: boolean;
 }
 
+/**
+ * Rewritten 2026-07-28 (Mitul: details, not "regular ass quotes"). The arc is
+ * the approved one and so is the shape — code box, two alternating bio lines,
+ * punchline — but the two middle captions were abstractions of a real career
+ * ("teaching machines to see, hear and think" / "giving them a platform to
+ * express themselves") and now name what actually happened: the satellites are
+ * NRSC @ ISRO, the dogs are DogVision, and the shift to shipping product is
+ * Canspirit and Unravel. Sourced, like the appendix below.
+ *
+ * The motto in the code box is untouched — it's Mitul's own line, not filler.
+ */
 export const CAPTIONS: readonly Caption[] = [
   { text: "while(True) { Design; Code; Refine; }", code: true },
-  { text: "TEACHING MACHINES TO SEE, HEAR, AND THINK..." },
+  { text: "STARTED BY TEACHING MACHINES TO SEE — SATELLITES FIRST, THEN DOGS." },
   {
-    text: "...WHILE ALSO GIVING THEM A PLATFORM TO EXPRESS THEMSELVES.",
+    text: "...THEN STARTED BUILDING THE THINGS PEOPLE ACTUALLY CLICK ON.",
     right: true,
   },
-  { text: "LIKE A WEBPAGE, MAYBE.", right: true },
+  { text: "STILL DOING BOTH. THIS PAGE IS EXHIBIT A.", right: true },
 ] as const;
 
-/** C3 — the skills appendix, stamped in as punched evidence tickets. */
-export const POWERS = [
-  "PYTHON",
-  "C++",
-  "TENSORFLOW",
-  "KERAS",
-  "PYTORCH",
-  "REACT",
-  "NODEJS",
-  "POSTGRESQL",
-  "MYSQL",
-  "DOCKER",
-  "GIT / GITHUB",
-  "LINUX",
-] as const;
+/* ---- C3 — the appendix ---------------------------------------------------
+   The twelve tech tickets that used to live here are gone (Mitul, 2026-07-28:
+   "nobody cares about that in this day and age"). What replaces them is the
+   same section making a stronger claim: not the tools, but what was done with
+   them and where that was observed. A dossier page should print evidence.
+
+   **Every line below is sourced from elsewhere in this repo** — the case files
+   in `sections/experience/content.ts` and the featured trio in
+   `sections/projects/content.ts`. Nothing here is invented. On a page whose
+   whole conceit is a case file, a detail that isn't true of one of those has
+   no business being printed as an observation (the same reasoning the witness
+   rule applies to quotes).
+
+   The tech itself hasn't left the site: the projects still stamp their chips
+   and every case file still prints its four evidence tickets. It just isn't
+   listed as a wall of nouns any more. */
+
+export interface Detail {
+  /** The claim, set in display face — what the subject can demonstrably do. */
+  power: string;
+  /** Where it was observed. The evidence line, in utility face beneath it. */
+  source: string;
+}
+
+/**
+ * Five, and deliberately five different *kinds* of ability rather than five
+ * entries from the same job: research, operations, breadth, invention, craft.
+ * A sixth was cut for space — the panel is a document lying on the page, and
+ * it has to stay readable at the camera's resting distance.
+ */
+export const DETAILS: readonly Detail[] = [
+  {
+    power: "TAUGHT A MODEL TO READ FARMLAND FROM ORBIT",
+    source: "CROP-MAPPING & YIELD PREDICTION ・ NRSC @ ISRO, 2024",
+  },
+  {
+    power: "MOVED A CLIENT'S CLOUD WITHOUT DROPPING A ROW",
+    source: "ZERO-DATA-LOSS MIGRATION RUNBOOKS ・ UNRAVEL TECH",
+  },
+  {
+    power: "SHIPPED A DOCX CRAFTER, A WINE STORE AND A CHATBOT",
+    source: "THREE CLIENT BUILDS, END TO END ・ CANSPIRIT.AI, 2025",
+  },
+  {
+    power: "GAVE REAL LIFE AN XP BAR",
+    source: "OPTILIFE ・ SIDE QUESTS WORTH TEN XP EACH",
+  },
+  {
+    power: "BUILT THIS ISSUE BY HAND, PAGE BY PAGE",
+    source: "NO TEMPLATE, NO PAGE BUILDER ・ 60FPS UNDER 4× THROTTLE",
+  },
+];
+
+/**
+ * The document's closing line. It exists because dropping the tech list has
+ * one fair objection — a reader looking for "does he know React" now has
+ * nowhere to look — and the honest answer is that the tools are still on the
+ * site, printed against the job or the project that used them, which is worth
+ * more than the same words in a grid. A dossier would print the cross-
+ * reference, so this one does.
+ */
+export const APPENDIX_FOOT =
+  "TOOLS FILED WITH THE JOBS THAT USED THEM ・ SEE CASE FILES, PAGE 02";
 
 /** C4 — the finale bubble, which is also the dive target into the back cover. */
 export const FINALE = {

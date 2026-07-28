@@ -46,14 +46,24 @@
   top: 3vh;
 }
 
-/* ---- Panels -------------------------------------------------------------- */
+/* ---- Panels -------------------------------------------------------------
+   **Redesigned 2026-07-28 (Mitul's call — variant F, "THE COVER LOGO", from
+   `projects-panel-redesign-mockup.html`).** The panel's contents are ranked
+   *name › image › spotlights › stack* and the layout is that ranking. The
+   panel BOX is untouched — ink stock, 6px ink border, offset shadow, cyan
+   halftone — and so is everything outside it: the mega page is still paper,
+   because it is a comic page.
+
+   Three treatments were retired with the redesign, listed so nobody restores
+   one on its own: the hook's speech bubble (now the masthead's kicker), the
+   stamped paper tech chips (now the unstamped footer rail), and the plain
+   32px title between them (now the masthead). */
 .projects__panel {
   background: var(--ink-panel);
   border: 6px solid var(--ink);
   box-shadow: 10px 10px 0 color-mix(in srgb, var(--ink) 35%, transparent);
   display: flex;
   flex-direction: column;
-  /* The hook bubble hangs off the top edge. */
   overflow: visible;
 }
 /* Cyan halftone over the whole panel — print texture, not a layer of its own. */
@@ -70,121 +80,203 @@
   pointer-events: none;
 }
 
-/* The screenshot slot. The diagonal weave is the mockup's, and it stays: the
-   slot's aspect ratio is the panel's rather than any capture's, so it shows as
-   the letterbox around a `contain`ed image. */
-.projects__shot {
+/* ---- The print, and the masthead set across it --------------------------
+   `.projects__head` absorbs the panel's slack so the print can sit centred in
+   whatever is left. It, and not the spotlight list, is the flexible band:
+   with both on `flex: 1` the two split the leftover evenly, the head came out
+   shorter than the print inside it, and `align-self: center` then centred the
+   overflow — the capture printed 15px above the panel's own top border. */
+.projects__head {
   flex: 1;
-  margin: 10px;
+  min-height: 0;
+  display: flex;
+  padding: 14px 16px 0;
+}
+/* The masthead is positioned against THIS, not against the panel. Anchoring
+   the overlap to the panel makes it a function of viewport height: the name
+   sat below the print on a tall viewport and across its middle on a short one.
+   The relationship has to belong to the thing it overlaps. */
+.projects__art {
+  position: relative;
+  width: 76%;
+  margin-left: auto;
+  align-self: center;
+}
+
+/* The screenshot slot. `cover` now, and the diagonal weave survives only as
+   the frame's own stock — nothing shows through it.
+
+   The approved slot had to `contain` because its ratio was the panel's and
+   therefore SWUNG, 1.84:1 at 1440 down to 0.55:1 on mobile, so no single crop
+   fit everywhere. Giving the frame its own fixed `aspect-ratio` removes that
+   swing: it is 16:9 at every breakpoint and all three captures are 1.67–2.04:1,
+   so the crop is a sliver. Ask whether the slot swings, not whether the
+   picture fits (CLAUDE.md conventions). */
+.projects__shot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
   border: 3px solid var(--paper);
+  box-shadow: 7px 7px 0 color-mix(in srgb, var(--mag) 45%, transparent);
   background: repeating-linear-gradient(
     135deg,
     var(--ink-slot) 0 14px,
     color-mix(in srgb, var(--ink-slot) 50%, var(--ink-panel)) 14px 28px
   );
-  display: grid;
-  place-items: center;
-  position: relative;
   overflow: hidden;
 }
 /* Absolutely positioned, so the capture contributes nothing to layout and the
-   slot keeps exactly the size the approved mockup gives it. In flow, a portrait
-   screenshot's min-content height inflates this `flex: 1` slot and pushes the
-   panel open — OptiLife's phone screen made the slot 934px tall. */
+   slot keeps exactly the size the layout gives it. In flow, a portrait
+   screenshot's min-content height inflates the slot and pushes the panel open
+   — OptiLife's phone screen made the old slot 934px tall. */
 .projects__shot-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  /* Decorative-only: the panel's title, hook and chips already say what this
-     is, and the <img> carries the description that isn't written anywhere
+  object-fit: cover;
+  /* Decorative-only: the panel's name, hook and spotlights already say what
+     this is, and the <img> carries the description that isn't written anywhere
      else (CLAUDE.md rule 2 — nothing here is interactive). */
   pointer-events: none;
 }
 
+/* The masthead, set across the print's left edge. Overlapping is what makes
+   type read as being in FRONT of a picture rather than above it. */
+.projects__logo {
+  position: absolute;
+  left: -31%;
+  bottom: -7%;
+  width: 64%;
+  z-index: 3;
+  /* Decorative overlay above the capture (CLAUDE.md rule 2). */
+  pointer-events: none;
+}
 .projects__panel-title {
   font-family: var(--font-display);
-  font-size: clamp(20px, 2.2vw, 32px);
+  font-size: clamp(28px, 3.5vw, 52px);
+  line-height: 0.9;
   letter-spacing: 0.03em;
   color: var(--paper);
   transform: skew(-6deg, -2deg);
-  text-shadow: 3px 3px 0 var(--mag);
-  padding: 2px 16px 0;
+  transform-origin: left bottom;
+  /* The two ink offsets are what let the name cross from the panel's stock
+     onto the capture without either edge dissolving into it. */
+  text-shadow:
+    4px 4px 0 var(--mag),
+    -2px -2px 0 var(--ink),
+    2px -2px 0 var(--ink);
+}
+.projects__hook {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--cyn);
+  margin-top: 5px;
+  /* A full ink outline, not the mockup's single offset. The kicker's last line
+     runs under the print's magenta offset shadow on every panel, and cyan on
+     magenta is the worst pairing in the palette — a shadow on one corner only
+     left the overlapping half of the line hard to read. Not interactive, so
+     declaring `text-shadow` here costs no hover burst (CLAUDE.md conventions). */
+  text-shadow:
+    1px 1px 0 var(--ink),
+    -1px 1px 0 var(--ink),
+    1px -1px 0 var(--ink),
+    -1px -1px 0 var(--ink);
+}
+
+/* ---- Architectural spotlights -------------------------------------------
+   Three claims about the build, each an index badge and a line of display
+   type. Display type is what lets a spotlight out-rank the stack line below
+   it; the badge is decorative, and the markup is a real <ul> so a screen
+   reader is told there are three of them without reading the numbers.
+
+   `flex: none` — see the note on `.projects__head` for what happens when both
+   bands are flexible. */
+.projects__spots {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 16px 6px;
+  list-style: none;
+}
+.projects__spot {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  opacity: 0;
+}
+.projects__spot-n {
+  font-family: var(--font-utility);
+  font-weight: bold;
+  font-size: 10px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  background: var(--cyn);
+  color: var(--ink);
+}
+.projects__spot-head {
+  font-family: var(--font-display);
+  font-size: clamp(12px, 1.12vw, 17px);
+  line-height: 1.05;
+  letter-spacing: 0.035em;
+  color: var(--paper);
 }
 
 /* ---- Focus beats --------------------------------------------------------
    The camera's arrival is what starts the performance: the engine adds
    `cm-cell--on` to the focused cell and the panel plays. Only the focused
    panel performs — except during the pull-back, when they all do (design-doc
-   §8's global rule). Every beat is stepped; nothing tweens. */
-.projects__bubble {
-  position: absolute;
-  top: -26px;
-  left: 4%;
-  max-width: 88%;
-  background: var(--paper);
-  color: var(--ink);
-  border: 3px solid var(--ink);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--ink) 40%, transparent);
-  font-family: var(--font-display);
-  font-size: clamp(13px, 1.2vw, 18px);
-  letter-spacing: 0.04em;
-  padding: 0.45em 0.9em;
-  opacity: 0;
-  z-index: 6;
-  /* It overhangs the panel above it; nothing in it is interactive (rule 2). */
-  pointer-events: none;
+   §8's global rule). Every beat is stepped; nothing tweens.
+
+   Since the 2026-07-28 redesign the spotlights are what stamp in; the stack
+   line is static and the hook rides the masthead, so both are simply printed. */
+.cm-cell--on .projects__spot {
+  animation: projects-spot-in 0.2s steps(2) both var(--cm-delay, 0.22s);
 }
-.projects__bubble::after {
-  content: "";
-  position: absolute;
-  bottom: -12px;
-  left: 28px;
-  border: 8px solid transparent;
-  border-top-color: var(--ink);
-}
-.cm-cell--on .projects__bubble {
-  animation: projects-bubble-in 0.22s steps(2) both 0.15s;
-}
-@keyframes projects-bubble-in {
-  0% { opacity: 0; transform: scale(0.4) rotate(-4deg); }
-  60% { opacity: 1; transform: scale(1.08) rotate(1deg); }
-  100% { opacity: 1; transform: scale(1); }
+@keyframes projects-spot-in {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
-.projects__chips {
+/* ---- Footer rail: the stack, then the actions ---------------------------- */
+.projects__foot {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 16px 2px;
-  /* Holds the row open while the chips are still unstamped. */
-  min-height: 32px;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 16px 11px;
+  border-top: 3px solid color-mix(in srgb, var(--ink) 70%, transparent);
+  background: color-mix(in srgb, var(--ink) 55%, var(--ink-panel));
 }
-.projects__chip {
+/* The stack, demoted: one monospace line, no stamp, no paper behind it —
+   present and legible, and the last thing the eye lands on. */
+.projects__stack {
+  flex: 1;
+  min-width: 0;
   font-family: var(--font-utility);
   font-weight: bold;
   font-size: 10px;
-  letter-spacing: 0.15em;
-  color: var(--ink);
-  background: var(--paper);
-  padding: 3px 8px;
-  opacity: 0;
+  letter-spacing: 0.2em;
+  color: color-mix(in srgb, var(--paper) 62%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-/* One chip at a time — the stagger is per-chip, from the section's table. */
-.cm-cell--on .projects__chip {
-  animation: projects-chip-in 0.18s steps(2) both var(--cm-delay, 0.25s);
-}
-@keyframes projects-chip-in {
-  0% { opacity: 0; transform: scale(1.5) rotate(-3deg); }
-  100% { opacity: 1; transform: scale(1); }
+.projects__stack-sep {
+  color: var(--cyn);
+  font-style: normal;
 }
 
 /* ---- Action buttons ------------------------------------------------------ */
 .projects__actions {
   display: flex;
   gap: 10px;
-  padding: 9px 16px 15px;
+  align-items: center;
 }
 /* **Amended 2026-07-27 (Mitul's call):** the acid halftone sweep that wiped
    across these on hover is gone, along with the `position`/`overflow` that
@@ -197,10 +289,11 @@
   font-family: var(--font-display);
   font-size: 14px;
   letter-spacing: 0.08em;
-  padding: 0.4em 1.1em;
+  padding: 0.34em 1.05em;
   text-decoration: none;
   border: 3px solid var(--paper);
   color: var(--paper);
+  white-space: nowrap;
 }
 .projects__abtn-label {
   /* An explicit line box, shared by the icon button and the text one: the mark
@@ -336,10 +429,46 @@
   padding: 2px 6px;
 }
 
-/* ---- Mobile -------------------------------------------------------------- */
+/* ---- Mobile -------------------------------------------------------------
+   The panel turns portrait here — 46vw × 56vh is 179 × 473 at 390×844, shown
+   at ~230px wide once the camera magnifies it — and the masthead's overlap is
+   the first thing to go. At that width a name set across the print's left edge
+   covers the app instead of framing it, so the two stack: name over picture,
+   overlap surrendered. Worth knowing that F's signature move is a desktop
+   move; below 820px the panel is a plainer thing. */
 @media (max-width: 820px) {
-  .projects__bubble { font-size: 14px; }
   .projects .cm-title-box__title { font-size: 11vw; }
+
+  /* The head still absorbs the slack, same as desktop — with it fixed, the
+     panel packed to the top and left ~35% of ink hanging below the rail. */
+  .projects__head { padding: 10px 12px 0; }
+  .projects__art { width: 100%; margin: 0; }
+  .projects__logo {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .projects__panel-title { font-size: 26px; }
+  .projects__spots { padding: 8px 12px 5px; gap: 6px; }
+  .projects__spot-head { font-size: 12.5px; }
+
+  /* The rail can't hold a stack line and two buttons across 179px — it clips
+     the stack to "TAU…". Wrap it: the stack takes the whole first line and the
+     actions sit under it. This only works because the separator carries real
+     whitespace (see ProjectPanel.tsx); joined tight the line has no break
+     opportunity and `normal` wrapping does nothing. */
+  .projects__foot {
+    padding: 7px 12px 9px;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .projects__stack {
+    flex: 1 0 100%;
+    white-space: normal;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+  .projects__abtn { font-size: 12px; padding: 0.3em 0.8em; }
 }
 
 /* ---- Reduced motion -----------------------------------------------------
@@ -347,8 +476,7 @@
    whose resting state is invisible needs a complete one: the whole page
    renders performed (design-doc §6 acceptance). */
 @media (prefers-reduced-motion: reduce) {
-  .projects__bubble,
-  .projects__chip,
+  .projects__spot,
   .projects__outro-el {
     opacity: 1;
   }
