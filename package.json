@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "check:content": "bun scripts/content-check.ts",
     "smoke": "bun scripts/engine-smoke.ts"
   },
   "dependencies": {
