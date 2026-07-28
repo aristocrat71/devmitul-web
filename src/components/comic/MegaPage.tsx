@@ -45,9 +45,9 @@ export function MegaPage({
 
 /**
  * A cell on the page. `focus` marks it as a camera stop — the camera's
- * keyframes are the focus cells in reading order, so the fourth (`bl`) cell,
- * which both camera-walk pages keep for furniture revealed by the pull-back,
- * simply omits it.
+ * keyframes are the focus cells in reading order. A cell may omit it to be
+ * furniture the camera never visits, though since 2026-07-27 both camera-walk
+ * pages visit all four of their cells.
  *
  * The engine toggles `cm-cell--on` when the camera arrives; the cell's own
  * page styles decide what performing looks like.

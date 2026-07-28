@@ -14,8 +14,7 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 
 /**
  * The camera's reading path (design-doc §8): hold C1 WASSUPPP → pan → hold C2
- * THE ORIGIN → pan ↓ → hold C3 POWERS → pan ← → hold C4 YOUR TURN → pull-back
- * reveal → hold the full page.
+ * THE ORIGIN → pan ↓ → hold C3 POWERS → pan ← → hold C4 YOUR TURN → dive.
  *
  * This is deliberately the same table as `PROJECTS_WALK`: §8 specifies ORIGIN
  * STORY as the structural twin of THE GOOD PART — same page dimensions, same

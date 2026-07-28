@@ -19,7 +19,7 @@ import {
 } from "./timing";
 import "./projects.css";
 
-/** Grid slots in reading order: the camera walks TL → TR → BR, then pulls back. */
+/** Grid slots in reading order: the camera walks TL → TR → BR, then BL. */
 const SLOTS = ["tl", "tr", "br"] as const;
 
 const BACK_ISSUES_STAMP: CSSVarStyle = {
@@ -48,7 +48,7 @@ const PROJECTS_DIVE: BoundaryConfig = {
  *
  * A port of the approved `projects-page-mockup.html` v3: three featured builds
  * printed as panels on one big comic page, plus a fourth cell of furniture the
- * pull-back reveals. The page is the subject; `<CameraWalkScene>` is the
+ * camera visits last. The page is the subject; `<CameraWalkScene>` is the
  * camera that reads it panel by panel, walking `PROJECTS_WALK` (design-doc §6).
  *
  * The void behind the page is this scene's own backdrop, not the stage's: the
@@ -93,10 +93,10 @@ export function ProjectsScene() {
           />
         ))}
 
-        {/* Fourth cell — the camera's last stop before the pull-back (amended
-            2026-07-27; it used to be met only in the zoomed-out reveal). Its
-            furniture still stamps on the megapage-outro gate, which now fires
-            as the camera turns toward the cell. */}
+        {/* Fourth cell — the camera's last stop and the dive's launch point
+            (a camera stop since 2026-07-27; the pull-back that used to follow
+            it was cut 2026-07-28). Its furniture stamps on the megapage-outro
+            gate, which fires as the camera turns toward the cell. */}
         <MegaCell at="bl" className="projects__extra" focus={3}>
           <div className="projects__outro-el" style={BACK_ISSUES_STAMP}>
             {/* The stamp owns the rotation on the wrapper so this anchor keeps

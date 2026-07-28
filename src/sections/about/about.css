@@ -366,7 +366,7 @@
   transform: rotate(var(--cm-rot));
 }
 
-/* ---- C4: the finale — the camera's last stop before the pull-back -------- */
+/* ---- C4: the finale — the camera's last stop, the dive's launch point ---- */
 /* A column, not the mockup's figure-beside-bubble row: the placeholder cutout
    that used to hold the left third is gone, and the contact block that replaced
    it needs the cell's full width for the address (Mitul, 2026-07-27). Centred
@@ -716,9 +716,9 @@
 }
 
 /* ---- Reduced motion -----------------------------------------------------
-   No camera walk means no `cm-cell--on` and no pull-back, so every element
-   whose resting state is invisible needs a complete one: the whole page renders
-   performed (design-doc §8 acceptance). */
+   No camera walk means no `cm-cell--on`, so every element whose resting
+   state is invisible needs a complete one: the whole page renders performed
+   (design-doc §8 acceptance). */
 @media (prefers-reduced-motion: reduce) {
   .about__greet,
   .about__tag,

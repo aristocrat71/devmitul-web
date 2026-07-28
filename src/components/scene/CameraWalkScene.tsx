@@ -20,8 +20,11 @@ import { useSceneScrub } from "@/hooks/useSceneScrub";
  *    (scroll-up re-performs, like the mockup). Past `outroAt` the page gets
  *    `cm-megapage--outro`. Both are pure CSS gates: the page decides what
  *    performing looks like, the engine only decides when.
- *  - PULL-BACK RULE (design-doc §8, global): during the pull-back segment
+ *  - PULL-BACK RULE (design-doc §8, global): past the last focus window
  *    every cell performs — a zoom-out must never show unperformed panels.
+ *    (Both current walks cut their pull-back on 2026-07-28 and end parked on
+ *    the last stop; the gate still runs so reverse entry from the next scene
+ *    lands on a fully-performed page.)
  *  - Reduced motion parks the camera on the fit-page pose with everything
  *    performed: the complete static page, no walk (design-doc §6 acceptance).
  *
@@ -72,7 +75,7 @@ export interface CameraWalk {
   readonly segments: readonly CameraSegment[];
   /**
    * Focus windows: stop i performs while progress < focusUntil[i]; past the
-   * last window the pull-back has begun and every cell performs.
+   * last window every cell performs (the pull-back rule).
    */
   readonly focusUntil: readonly number[];
   /** Past this progress the page carries `cm-megapage--outro`. */
@@ -273,7 +276,7 @@ function buildCamera(
     page.classList.toggle("cm-megapage--outro", on);
   };
 
-  // -1 = the pull-back: everything performs (design-doc §8's global rule).
+  // -1 = past the last focus window: everything performs (§8's global rule).
   let focusIdx: number | null = null;
   const setFocus = (idx: number) => {
     if (idx === focusIdx) return;

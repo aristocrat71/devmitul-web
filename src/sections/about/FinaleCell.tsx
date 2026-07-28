@@ -19,9 +19,9 @@ const actionStamp = (index: number, rotate: string): CSSVarStyle => ({
 });
 
 /**
- * C4 — YOUR TURN: the finale, the camera's last stop before the pull-back
- * (design-doc §8, amended 2026-07-27 — it used to be met only in the
- * zoomed-out reveal).
+ * C4 — YOUR TURN: the finale, the camera's last stop and the dive's launch
+ * point (design-doc §8; a camera stop since 2026-07-27, and since the
+ * 2026-07-28 pull-back cut the boundary dives straight from this close-up).
  *
  * The bubble is the dive target into the back cover — entering the speech
  * bubble IS starting the conversation, and the next gutter reads
@@ -30,7 +30,7 @@ const actionStamp = (index: number, rotate: string): CSSVarStyle => ({
  * (CLAUDE.md rule 12).
  *
  * Three nested elements, one transform each, because three different things
- * want to move this bubble: the pull-back stamp, the boundary's zoom, and the
+ * want to move this bubble: the outro stamp, the boundary's zoom, and the
  * settled pulse. Stacking them on one element is what makes the mockup have to
  * re-declare `opacity: 1` to survive its own pulse (see about.css).
  *

@@ -102,10 +102,11 @@ export function AboutScene() {
           {...INTERESTS_PANEL}
         />
 
-        {/* The camera's last stop before the pull-back (amended 2026-07-27,
-            like THE GOOD PART's catalogue cell). Its furniture still stamps on
-            the megapage-outro gate, which now fires as the camera turns toward
-            the cell. */}
+        {/* The camera's last stop and the dive's launch point (a camera stop
+            since 2026-07-27, like THE GOOD PART's catalogue cell; the
+            pull-back that used to follow it was cut 2026-07-28). Its furniture
+            stamps on the megapage-outro gate, which fires as the camera turns
+            toward the cell. */}
         <FinaleCell focus={3} />
       </CameraWalkScene>
     </>
@@ -117,11 +118,11 @@ export function AboutScene() {
  * threshold on top of the engine's own gates.
  *
  * The engine's `outroAt` is the wrong signal for this: the finale has to stamp
- * in *during* the pull-back so the reveal never shows an empty cell (the global
- * pull-back rule), which is well before the camera stops. So the page watches
+ * in while the camera is still panning toward it — it must never arrive at
+ * blank paper — which is well before the camera stops. So the page watches
  * its own progress through the documented `useSceneProgress` seam and flips one
- * class at the point the last segment begins — rather than teaching the shared
- * engine a second gate that only this page needs.
+ * class at the last pan's end — rather than teaching the shared engine a
+ * second gate that only this page needs.
  */
 function useSettled(pageRef: RefObject<HTMLElement | null>, at: number): void {
   const settled = useRef<boolean | null>(null);

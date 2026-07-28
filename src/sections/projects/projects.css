@@ -231,8 +231,9 @@
 /* ---- Focus beats --------------------------------------------------------
    The camera's arrival is what starts the performance: the engine adds
    `cm-cell--on` to the focused cell and the panel plays. Only the focused
-   panel performs — except during the pull-back, when they all do (design-doc
-   §8's global rule). Every beat is stepped; nothing tweens.
+   panel performs — except past the walk's last focus window, when they all
+   do (design-doc §8's global rule; written for the pull-back, kept after its
+   2026-07-28 cut so reverse entry lands on a fully-performed page). Every beat is stepped; nothing tweens.
 
    Since the 2026-07-28 redesign the spotlights are what stamp in; the stack
    line is static and the hook rides the masthead, so both are simply printed. */
@@ -472,9 +473,9 @@
 }
 
 /* ---- Reduced motion -----------------------------------------------------
-   No camera walk means no `cm-cell--on` and no pull-back, so every element
-   whose resting state is invisible needs a complete one: the whole page
-   renders performed (design-doc §6 acceptance). */
+   No camera walk means no `cm-cell--on`, so every element whose resting
+   state is invisible needs a complete one: the whole page renders performed
+   (design-doc §6 acceptance). */
 @media (prefers-reduced-motion: reduce) {
   .projects__spot,
   .projects__outro-el {
