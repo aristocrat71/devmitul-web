@@ -68,43 +68,37 @@
   }
 }
 
-/* ---- The ink comic frame (C1, C2) ---------------------------------------- */
+/* ---- C1's frame ----------------------------------------------------------
+   **There is no frame left** (Mitul, 2026-07-28, in three passes over one
+   afternoon: first "remove the dotted grid from the image", then the same for
+   C2 and C3's boxes, then "remove the blue box and black border from my
+   picture too"). What this was — an `--ink-panel` ground, a 6px `--ink` border,
+   an 8px offset shadow and a cyan halftone printed over the lot — is gone from
+   every cell on the page. All three pictures now sit directly on the paper.
+
+   Worth recording rather than deleting silently, because the halftone's
+   removal reverses a documented fix: it carried `z-index: 1` so it would print
+   *over* the photo, since a pseudo-element is its parent's first child and at
+   `auto` it painted under any positioned sibling and vanished (CLAUDE.md rule
+   16). That rule is about which fix to reach for when you want the layer on
+   top — it never claimed the layer belongs on top, and here nothing wants it
+   at all.
+
+   The element stays because it is what the stamps and the greeting bubble hang
+   off, and because it is the box the photo is sized against. It just prints
+   nothing of its own now. */
 .about__frame {
   position: absolute;
   inset: 0;
-  background: var(--ink-panel);
-  border: 6px solid var(--ink);
-  box-shadow: 8px 8px 0 color-mix(in srgb, var(--ink) 30%, transparent);
-  /* The stamps hang off the frame's edges. */
+  /* The stamps hang off its edges. */
   overflow: visible;
 }
-/* Cyan halftone over the panel — print texture, not a layer of its own. */
-.about__frame::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--cyn) 20%, transparent) 1.5px,
-    transparent 1.6px
-  );
-  background-size: 12px 12px;
-  pointer-events: none;
-  /* Lifted above the panel's photo. A pseudo-element is its parent's first
-     child, so at `z-index: auto` the halftone would paint *under* any
-     positioned sibling and the print texture would vanish behind the image
-     (CLAUDE.md rule 16 — the fix is to lift, never to sink the photo). */
-  z-index: 1;
-}
-/* Each panel is pressed at its own angle. */
+/* Pressed onto the page at its own angle, which is all that's left of it. */
 .about__frame--greeting { transform: rotate(-1deg); }
-.about__frame--origin { transform: rotate(1deg); }
 
 /* ---- C1: the subject introduces himself --------------------------------- */
 
-/* The action photo, filling the ink frame (design-doc §8). The frame is
-   `overflow: visible` so its stamps can hang off the edges, so the photo is
-   sized to the padding box exactly rather than clipped to it. */
+/* The action photo, sized against the frame's box (design-doc §8). */
 .about__photo {
   position: absolute;
   inset: 0;
@@ -113,27 +107,38 @@
   /* `contain`, not the mockup's `cover` (Mitul, 2026-07-27 — "still too zoomed
      in", twice).
 
-     The capture is a PORTRAIT 2250x4000 and this frame is landscape ~1.32:1,
+     The capture is a PORTRAIT 2250x4000 and this cell is landscape ~1.32:1,
      and that mismatch is the whole story: under `cover` the visible field is
      pinned to the source's full width no matter what the file contains — a
      2250x1667 crop and the entire 2250x4000 frame both show exactly 1703px of
      scene. Widening the crop hit that ceiling on the first pass, so the only
      way to show more is to stop cropping to the frame and letterbox instead.
 
-     The bars are the price, and they cost little here: `--ink-panel` plus the
-     halftone `::before` already covers them, so they read as the same printed
-     panel as C2 rather than as empty space, and the tags that used to sit on
-     top of the photo now hang over the panel where they belong. Same idiom as
-     the project panels (projects.css), which letterbox `contain` on purpose. */
+     **This is why C1 keeps `contain` while the two collages took `cover` a day
+     later.** The collages traded a 21% vertical trim for a third more picture
+     and lost nothing a collage misses; this is one photograph of one person,
+     already rejected twice for being too tight, and the same trade would undo
+     that decision. The bars used to be `--ink-panel` and read as a printed
+     panel; with the frame gone they are page paper, which is why the stamps
+     were pulled in to hang off the photograph itself rather than off a box
+     that no longer prints. */
   object-fit: contain;
   pointer-events: none;
 }
 
-/* The greeting hangs off the frame's top edge, over the page (rule 2 — it
-   overhangs, so it must not hit-test). */
+/* The greeting hangs off the photograph's BOTTOM edge, over the page (rule 2 —
+   it overhangs, so it must not hit-test).
+
+   It hung off the top until 2026-07-28 (Mitul: "move the wassup box below my
+   photo instead of above"). The move is free on this page and wasn't before:
+   the photo is height-bound in every desktop cell, so it ran the full height
+   of the panel and a bubble under it would have sat in the gutter with nothing
+   to point at — but the same is true above, and up there it was also cropping
+   the top of his head at short viewports (1440×700). Below, the gutter between
+   C1 and C4 is ~90px, so a 3.4vh overhang clears the finale cell entirely. */
 .about__greet {
   position: absolute;
-  top: -3.4vh;
+  bottom: -3.4vh;
   left: 4%;
   max-width: 94%;
   background: var(--paper-doc);
@@ -150,21 +155,37 @@
   z-index: 6;
   pointer-events: none;
 }
-/* The tail. */
+/* The tail, which points back up at the speaker now that the bubble is under
+   him. A CSS triangle points *away* from its coloured border, so an upward
+   tail is the bottom border coloured and the box offset by its own width. */
 .about__greet::after {
   content: "";
   position: absolute;
-  bottom: -13px;
+  top: -13px;
   left: 34px;
   border: 9px solid transparent;
-  border-top-color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 .cm-cell--on .about__greet {
   animation: about-pop 0.24s steps(2) both 0.1s;
 }
 
-/* Personality stamps, slammed around the frame. They reuse the kit's stamp
-   keyframes, which already re-state `rotate(var(--cm-rot))`. */
+/* Personality stamps, slammed around the photograph. They reuse the kit's
+   stamp keyframes, which already re-state `rotate(var(--cm-rot))`.
+
+   Their positions moved inward when the frame stopped printing (2026-07-28).
+   They used to hang off the *panel's* edges at −3% and −4%, which put them on
+   ink; with no panel there, those coordinates land them in the middle of empty
+   page paper a hundred-odd pixels clear of the photograph, reading as three
+   stamps dropped nowhere near it.
+
+   They now straddle the photograph's own edge, which needs a number rather
+   than a guess: the photo is 0.787:1 and height-bound in every desktop cell,
+   so its width is 0.787 × 56vh and its edges sit at 20%/80% of the cell at
+   1440×900, 23%/77% at 1920×1080 and 27%/73% at 1440×700. The values below
+   are set to the middle of that ±3.5% swing, so each stamp is half on the
+   picture and half off it at every desktop size — which is what "slammed
+   around it" looks like, and is why they aren't pinned to a single width. */
 .about__tag {
   position: absolute;
   font-family: var(--font-display);
@@ -173,7 +194,11 @@
   color: var(--mag);
   border: 3px solid var(--mag);
   padding: 0.15em 0.5em;
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  /* Opaque since the frame stopped printing (2026-07-28). At the mockup's 92%
+     the 8% of show-through was invisible against a flat ink panel; against the
+     photograph it now lands on, it put the chopsticks and a forearm through
+     AESTHETE and cyan type over a mid-tone photo stopped being readable. */
+  background: var(--paper);
   opacity: 0;
   z-index: 5;
   transform: rotate(var(--cm-rot, 0deg));
@@ -185,38 +210,128 @@
 }
 .about__tag--1 {
   top: 16%;
-  right: -3%;
+  right: 18%;
   --cm-rot: 7deg;
 }
 .about__tag--2 {
   top: 52%;
-  left: -4%;
+  left: 17%;
   --cm-rot: -6deg;
   color: var(--cyn);
   border-color: var(--cyn);
 }
 /* Acid on a near-white stamp is illegible, so this one prints in the darkened
-   acid pass (see note 3). */
+   acid pass (see note 3).
+
+   20%, not the mockup's 8%: the greeting moved under the photograph on
+   2026-07-28 and the bubble carries `z-index: 6` against this stamp's 5, so at
+   8% it wasn't overlapping the bubble — it was invisible behind it, which is
+   the sort of thing a screenshot catches and no geometry check does. */
 .about__tag--3 {
-  bottom: 8%;
-  right: 6%;
+  bottom: 20%;
+  right: 24%;
   --cm-rot: 4deg;
   color: var(--acid-ink);
   border-color: var(--acid-ink);
 }
 
-/* ---- C2: the origin narration ------------------------------------------- */
-.about__narr {
+/* ---- C2 and C3: the collage panels ---------------------------------------
+   Amended 2026-07-28 (Mitul's call — the reasoning is in `content.ts`). What
+   stood here was two long blocks of type: C2's narration column (`.about__narr`
+   with its four alternating captions, the ink/acid code box, and the dashed
+   `.about__gag` stand-in for a browser-frame inset that never arrived) and
+   C3's POWERS & ABILITIES document (`.about__powers` and its five
+   `.about__detail` rows, their exhibit numbers and the cross-reference foot).
+   All of it is deleted. Both cells now print one picture and one line.
+
+   **Neither cell is a frame any more** (Mitul, same day: "remove the black
+   borders and blue backgrounds from the second and third boxes"). C2 kept the
+   ink panel and halftone it shared with C1's photo frame, C3 kept the paper
+   document, and both are gone: the two collages are now printed straight onto
+   the page like photographs laid on it, with only their angles left. C1 is the
+   page's one framed panel and `.about__frame` is now its alone.
+
+   The angles are what's left of the boxes and they carry the whole effect — a
+   picture at +1° with no border reads as placed by hand; the same picture
+   square reads as a mistake. */
+.about__collage-panel {
   position: absolute;
   inset: 0;
-  padding: 3vh 1.4vw;
-  display: flex;
-  flex-direction: column;
-  gap: 2.2vh;
 }
+.about__collage-panel--music {
+  transform: rotate(1deg);
+}
+.about__collage-panel--interests {
+  transform: rotate(-0.8deg);
+}
+
+/* ---- The picture and the column beside it --------------------------------
+   Both collages are portrait (1200×1698) and both cells are landscape — 1.31:1
+   at 1440×900, 1.69:1 at 1440×700 — which is the whole reason the panel is
+   split rather than filled.
+
+   Filling it was built first and is what CLAUDE.md warns about: `contain`ed
+   edge to edge, the picture printed at 35% of the panel width between two
+   slabs of empty stock, which reads as a broken image and not as a letterbox.
+   `cover` is the note's usual answer and it is wrong here — a 1.33:1 crop of a
+   0.71:1 collage keeps its middle 53% and throws away half the pictures in a
+   panel whose entire content is the pictures (the game art the caption talks
+   about is in the band it would cut).
+
+   So the picture takes two thirds of the panel at full height and the caption
+   overlaps it from the other side. The split is what makes the geometry work
+   at every desktop width: the taller the cell, the taller the picture, and the
+   column beside it just gets narrower.
+
+   **Amended the same day (Mitul: "increase the size of the posters, let the
+   caption bleed into the image a bit").** The first pass gave the picture half
+   the panel and `contain`ed it, and half a panel is where `contain` stops
+   paying: at 1440×900 the picture was already *width*-bound at 325px, so the
+   panel's height had ~150px of slack the picture couldn't use and widening its
+   box alone would have bought nothing — past ~51% the height binds instead and
+   it stops growing. Getting a bigger picture means letting it fill its box, so
+   this is `cover` in a 66%-wide box: the picture is a third larger and the
+   crop is a 21% vertical trim, which a collage — a grid of pictures, not one
+   composition — carries without losing what the caption is talking about. The
+   two overlap by 10% of the panel, which is the bleed.
+
+   `top`/`height` rather than `top`/`bottom`: an over-constrained absolutely
+   positioned *replaced* element drops its `bottom`, so the pair that reads as
+   equivalent is the one that isn't. */
+.about__collage {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.about__collage--left { left: 0; }
+.about__collage--right { right: 0; }
+
+/* The caption's column, and the overlap: 66% + 44% is 110% of the panel, so
+   the last tenth of it is printed over the picture.
+
+   Full height so it centres the box against the picture rather than against
+   the panel's foot — with a portrait picture beside it, a caption pinned to
+   the bottom leaves the top two thirds empty and re-creates the hole the split
+   was meant to close. */
+.about__collage-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.2vw;
+}
+.about__collage-side--left { right: 0; }
+.about__collage-side--right { left: 0; }
+
+/* The caption box, kept from the narration this replaced — it is the page's
+   established printed-caption treatment and both new panels want exactly it. */
 .about__cap {
-  align-self: flex-start;
-  max-width: 92%;
   background: var(--paper-doc);
   color: var(--ink);
   border: 3px solid var(--ink);
@@ -227,171 +342,28 @@
   padding: 0.5em 0.9em;
   opacity: 0;
 }
-/* The captions alternate sides down the panel. */
-.about__cap--right {
-  align-self: flex-end;
-}
-/* The code motto, which opens the panel. */
-.about__cap--code {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: clamp(12px, 1.15vw, 17px);
-  letter-spacing: 0.06em;
-  background: var(--ink);
-  color: var(--acid);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--mag) 50%, transparent);
-}
 .cm-cell--on .about__cap {
   animation: about-pop 0.22s steps(2) both var(--cm-delay, 0s);
 }
 
-/* The optional browser-frame gag — a stand-in until the asset exists, and
-   deletable without a trace if it never does (design-doc §8). */
-.about__gag {
-  margin-top: auto;
-  align-self: flex-end;
-  width: 44%;
-  aspect-ratio: 16 / 10;
-  border: 3px dashed color-mix(in srgb, var(--paper) 70%, transparent);
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  --cm-rot: 1.5deg;
-  transform: rotate(var(--cm-rot));
-}
-.about__gag span {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  color: var(--paper);
-  opacity: 0.8;
+/* The caption sits in that column and owns only its resting angle — the
+   column does the centring, because `about-pop` re-states `transform` at every
+   keyframe and would throw away a centring translate for the length of the
+   entrance (CLAUDE.md rule 10 — never split an element's transform between two
+   owners). */
+.about__cap--collage {
+  max-width: 100%;
   text-align: center;
-  line-height: 1.7;
-}
-.cm-cell--on .about__gag {
-  animation: about-pop 0.22s steps(2) both var(--cm-delay, 0.7s);
-}
-
-/* ---- C3: POWERS & ABILITIES — a document lying on the page --------------- */
-.about__powers {
-  position: absolute;
-  inset: 0;
-  background: var(--paper-doc);
-  border: 6px solid var(--ink);
-  box-shadow: 8px 8px 0 color-mix(in srgb, var(--ink) 30%, transparent);
-  padding: 3vh 1.6vw;
-  transform: rotate(-0.8deg);
-  color: var(--ink);
-  /* A column since 2026-07-28: five capability rows have to spread down the
-     whole document, where twelve wrapped tickets filled it by themselves. */
-  display: flex;
-  flex-direction: column;
-}
-.about__powers-title {
-  font-family: var(--font-display);
-  font-size: clamp(20px, 2.2vw, 32px);
-  letter-spacing: 0.05em;
-  /* The display skew, on the type only — the document keeps its own angle. */
-  transform: skew(-6deg, -2deg);
-  text-shadow: 2px 2px 0 var(--mag);
-}
-.about__powers-sub {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  opacity: 0.7;
-  margin-top: 0.4vh;
-}
-/* ---- The capability rows (2026-07-28) -----------------------------------
-   Replaced the twelve punched `<EvidenceTag>` tickets that used to fill this
-   document. Each row is an exhibit number, the claim, and the evidence line
-   under it — so the panel is read down rather than scanned across, which is
-   the whole point of the change (Mitul: nobody reads a wall of tech nouns).
-
-   The rule between rows is the document's own ruling, not a border on the
-   entry: `:last-child` keeps the panel from ending on a hanging line. */
-.about__details {
-  margin-top: 1.4vh;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  /* Takes the document's remaining height and spreads the rows through it, so
-     the appendix reads as a filled page rather than a list that ran out. */
-  flex: 1;
-  justify-content: space-evenly;
-}
-.about__detail {
-  display: flex;
-  align-items: baseline;
-  gap: 0.9vw;
-  padding: 1.05vh 0;
-  border-bottom: 2px solid color-mix(in srgb, var(--ink) 18%, transparent);
-  opacity: 0;
-}
-.about__detail:last-child { border-bottom: 0; }
-
-/* The exhibit number: acid, monospaced, and the one loud thing in a document
-   that is otherwise all ink on paper. */
-.about__detail-no {
-  flex: none;
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: clamp(11px, 1vw, 14px);
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  background: var(--acid);
-  border: 2px solid var(--ink);
-  padding: 2px 5px;
-  /* Its own slight counter-angle against the document's −0.8°, so the numbers
-     read as stamped on afterwards rather than typeset with the page. */
-  transform: rotate(1.6deg);
-}
-.about__detail-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35vh;
-  min-width: 0;
-}
-.about__detail-power {
-  font-family: var(--font-display);
-  font-size: clamp(15px, 1.42vw, 23px);
-  line-height: 1.02;
-  letter-spacing: 0.02em;
-  /* Not the display skew: five skewed lines stacked in a document read as a
-     rendering fault. The title above keeps the skew and stays the heading. */
-  text-shadow: 1.5px 1.5px 0 color-mix(in srgb, var(--cyn) 55%, transparent);
-}
-.about__detail-source {
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: clamp(8.5px, 0.66vw, 11px);
-  letter-spacing: 0.14em;
-  line-height: 1.35;
-  opacity: 0.62;
-}
-
-/* Closes the document, and answers the one fair objection to dropping the
-   tech list: the tools didn't leave the site, they're on the page where they
-   can be attached to a job. A cross-reference is what a dossier would print. */
-.about__powers-foot {
-  flex: none;
-  margin-top: 1.2vh;
-  padding-top: 1vh;
-  border-top: 2px dashed color-mix(in srgb, var(--ink) 32%, transparent);
-  font-family: var(--font-utility);
-  font-weight: bold;
-  font-size: clamp(8.5px, 0.66vw, 11px);
-  letter-spacing: 0.18em;
-  opacity: 0.55;
-}
-
-/* The camera's arrival is what stamps the appendix in — the page owns the
-   gate, exactly as it did for the tickets. Shares the kit's own tag keyframes
-   rather than declaring a fourth near-identical stamp. */
-.about .cm-cell--on .about__detail {
-  animation: cm-tag-in 0.16s steps(2) both var(--cm-delay, 0s);
+  /* Larger than the narration captions this inherits from, because it is no
+     longer one of four boxes down a column — it is the only thing in half a
+     panel, and at the narration's size it sat in the middle of that half like
+     a footnote. Sized so the shorter of the two lines still takes two lines of
+     its column. */
+  font-size: clamp(15px, 1.7vw, 26px);
+  line-height: 1.15;
+  padding: 0.55em 0.8em;
+  --cm-rot: -1.5deg;
+  transform: rotate(var(--cm-rot));
 }
 
 /* ---- C4: the finale — the camera's last stop before the pull-back -------- */
@@ -627,60 +599,119 @@
 
 /* ---- Mobile -------------------------------------------------------------- */
 @media (max-width: 820px) {
-  .about__greet { font-size: 13px; }
-  .about__cap { font-size: 12px; }
+  /* The bubble anchors to the *photograph's* bottom edge here, not the cell's.
+     On desktop those are the same line — the photo is height-bound and fills
+     the panel — but a phone's cell is portrait, so the photo is width-bound
+     and sits in the middle ~50% of it with paper above and below. Hanging the
+     bubble off the cell at −3.4vh leaves it a quarter of a panel clear of him
+     (the mirror of the gap Mitul flagged above the photo, which was this same
+     bug on the other edge).
+
+     73% is arithmetic, not taste: the photo is 0.787:1, so its bottom sits at
+     `0.5 + 0.5219 × (vw/vh)` of the cell — 73.5% at 412×915 through 75.4% at
+     360×740 — and anchoring just inside that band puts the bubble's tail on
+     the picture at every phone size instead of one. */
+  .about__greet {
+    top: 73%;
+    bottom: auto;
+    font-size: 13px;
+  }
   .about .cm-title-box__title { font-size: 9vw; }
 
-  /* ---- The appendix on a phone ------------------------------------------
-     The cell is 46vw × 56vh, so at 390px the document is only ~239px wide,
-     while the row type bottoms out on its `clamp()` px floors — the two stop
-     scaling together and five headline rows overflowed the panel by 201px
-     (333px at 360×740). The twelve tickets this replaced never hit it: an
-     11px chip in a wrapping grid has no minimum row height to blow.
+  /* The stamps' axes swap here, for the same reason the collage panels' split
+     turns 90°: the cell is portrait on a phone (~179 × 473 at 390×844), so the
+     photograph is *width*-bound instead of height-bound. It runs the full
+     width of the cell and occupies only its middle ~48% vertically — so the
+     horizontal overhang the desktop rules had to give up is free again, and
+     what needs pulling in is the vertical: at the desktop's 16% and 8% two of
+     the three stamps sit clear above and below the picture. */
+  .about__tag--1 {
+    top: 30%;
+    right: -3%;
+  }
+  .about__tag--2 { left: -4%; }
+  /* 34%, not the 30% its sibling gets: the bubble now starts at 73% and this
+     stamp would have sat under its top edge. */
+  .about__tag--3 {
+    bottom: 34%;
+    right: 4%;
+  }
 
-     These sizes look far too small read as numbers — the camera holds this
-     cell magnified, so a phone actually shows roughly 1.6× everything here.
-     Sized against the rendered result, not the stylesheet.
+  /* ---- The collage captions on a phone ----------------------------------
+     The whole of the old appendix block lived here: five capability rows and
+     their exhibit numbers, re-sized at every level because the cell is
+     46vw × 56vh (only ~239px wide at 390px) while the row type bottomed out
+     on its `clamp()` px floors and overflowed the document by 201px. One
+     caption per panel has no stack to overflow, so all of it is gone.
 
-     They keep scaling with the viewport (a vw term under the desktop floor)
-     rather than sitting at flat px behind a second breakpoint: at flat px the
-     panel fitted a 390px phone and overflowed a 360px one by 44px, and the
-     next narrow device would have wanted a third block. */
-  .about__powers { padding: 2vh 1.6vw; }
-  /* 10px at 0.3em tracking is three lines in a 239px document, and the
-     heading it belongs to is one. */
-  .about__powers-sub {
-    font-size: clamp(5.5px, 1.75vw, 7px);
-    letter-spacing: 0.12em;
+     What survives is the reason it was written the way it was: keep a vw term
+     under the desktop floor rather than a flat px behind a second breakpoint,
+     so the next narrow device doesn't want a third block. And these numbers
+     look far too small read as numbers — the camera holds a cell magnified
+     ~1.6×, so size against the render, not the stylesheet. */
+  /* The cell is 46vw × 56vh, which on a phone is a *portrait* box (~179 × 473
+     at 390×844) — the one place the panel's ratio inverts. A picture beside a
+     caption in 179px gives each of them ~85px, so the split turns 90°: the
+     picture takes the top of the panel and the caption the width of the foot.
+
+     The type keeps a vw term under its px floor rather than sitting at a flat
+     px behind this breakpoint, which is the rule the appendix that used to be
+     here was rewritten for — flat px fits the phone you tested and hands the
+     next narrow device a third block. And these numbers look far too small
+     read as numbers: the camera holds a cell magnified ~1.6×, so size against
+     the render, not the stylesheet. */
+  /* ---- The picture and its caption, stacked ------------------------------
+     Both children come **out of absolute positioning** here and stack in a
+     centred flex column, which is the only way to put the caption directly
+     under a picture whose height nobody knows.
+
+     The first attempt kept them positioned — picture in the top 64%, caption
+     band in the bottom 34% — and it left a 124px hole between them at 390×844
+     (Mitul: "the caption and photos are far too apart"). Two separate slacks
+     made it: `contain` used only 238px of the 302px box it was given, and the
+     caption then centred itself inside a 161px band. Neither is fixable by
+     nudging percentages, because both depend on the picture's rendered height,
+     which is `cellWidth / 0.707` and moves with the viewport. A flex column
+     has no slack to leave — the two items are laid against each other and the
+     `gap` is the whole distance between them.
+
+     `max-height` caps the picture so a short viewport can't push the caption
+     out of the cell; `contain` keeps the collage whole (the desktop rule's
+     `cover` trades wasted panel height for a bigger picture, and a portrait
+     cell has none of that to trade). Neither item can size the cell: the
+     panel is `inset: 0` on a grid-positioned box. */
+  .about__collage-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4vh;
+    padding: 2% 3%;
   }
-  .about__details { margin-top: 0.8vh; }
-  .about__detail {
-    padding: 0.6vh 0;
-    gap: 1.8vw;
+  .about__collage {
+    position: static;
+    flex: 0 1 auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 74%;
+    object-fit: contain;
   }
-  .about__detail-no {
-    font-size: clamp(6.5px, 2vw, 8px);
-    padding: 1px 3px;
-    border-width: 1.5px;
+  .about__collage-side {
+    position: static;
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    padding: 0;
   }
-  .about__detail-power {
-    font-size: clamp(8.5px, 2.75vw, 11px);
-    line-height: 1.06;
-    letter-spacing: 0;
-    text-shadow: 1px 1px 0 color-mix(in srgb, var(--cyn) 55%, transparent);
-  }
-  .about__detail-source {
-    font-size: clamp(5.5px, 1.75vw, 7px);
-    letter-spacing: 0.06em;
-    line-height: 1.22;
-  }
-  /* Near-zero tracking here: at 0.06em the cross-reference wrapped to three
-     lines and left "02" alone on the last one. */
-  .about__powers-foot {
-    margin-top: 0.6vh;
-    padding-top: 0.6vh;
-    font-size: clamp(5.5px, 1.75vw, 7px);
-    letter-spacing: 0.01em;
+  .about__cap { font-size: 12px; }
+  .about__cap--collage {
+    font-size: clamp(8.5px, 2.75vw, 12px);
+    line-height: 1.12;
+    letter-spacing: 0.02em;
+    padding: 0.45em 0.7em;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 color-mix(in srgb, var(--ink) 45%, transparent);
   }
 }
 
@@ -691,12 +722,9 @@
 @media (prefers-reduced-motion: reduce) {
   .about__greet,
   .about__tag,
+  /* Both collage captions rest at 0 and are lit by the camera's arrival, so
+     without this the two panels are pictures with nothing said about them. */
   .about__cap,
-  /* The capability rows rest at 0 and are lit by the camera's arrival, so
-     without this the appendix is a blank document. The kit does the same for
-     `.cm-tag`, which is what used to fill this panel. */
-  .about__detail,
-  .about__gag,
   .about__outro-el {
     opacity: 1;
   }

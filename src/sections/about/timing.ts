@@ -3,7 +3,7 @@
  * section (CLAUDE.md conventions).
  *
  * The values here are the ones the JSX writes as CSS variables, because they're
- * computed per index — stamp delays, caption stagger, the twelve skill tickets.
+ * computed per index or per cell — stamp delays, the collage captions' beat.
  * Beats that are identical for every instance (durations, the stepped eases)
  * live in `about.css`, in the one place they're used, rather than being
  * mirrored here and drifting.
@@ -75,18 +75,15 @@ export const ABOUT_SETTLED_AT = 0.79;
 export const ABOUT_FOCUS = {
   /** C1: the greeting pops first, then the three stamps slam around the frame. */
   tagDelays: [0.35, 0.47, 0.59],
-  /** C2: narration captions, one after another down the panel. */
-  capStagger: 0.18,
-  /** C2: the optional gag inset, after the captions. */
-  gagDelay: 0.7,
   /**
-   * C3: five capability rows, 130ms apart (2026-07-28). The appendix used to
-   * be twelve punched tickets at 60ms — a quick ripple across a wall of small
-   * nouns. Five rows of readable type want a slower beat, or the whole panel
-   * arrives as one block; 5 × 130ms lands the last row about where the twelfth
-   * ticket used to.
+   * C2 and C3: the one caption under each collage (2026-07-28). Both cells
+   * used to stagger a stack — four narration captions 180ms apart in C2, five
+   * capability rows 130ms apart in C3 — and neither has a stack any more. The
+   * collage itself doesn't perform: it prints with the cell, so the caption is
+   * the only beat, and it lands where the second item of the old stack did so
+   * the panel still reads picture-then-line rather than both at once.
    */
-  detailStagger: 0.13,
+  collageCap: 0.22,
 } as const;
 
 /**

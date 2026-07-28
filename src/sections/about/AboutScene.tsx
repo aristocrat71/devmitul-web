@@ -8,10 +8,12 @@ import {
 } from "@/hooks/useBoundaryZoom";
 import { useMegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 import { useSceneProgress } from "@/hooks/useSceneScrub";
+import interestsCollage from "@/assets/about/interests-collage.webp";
+import musicCollage from "@/assets/about/music-collage.webp";
+import { CollageCell } from "./CollageCell";
+import { INTERESTS_PANEL, MUSIC_PANEL } from "./content";
 import { FinaleCell } from "./FinaleCell";
 import { GreetingCell } from "./GreetingCell";
-import { OriginCell } from "./OriginCell";
-import { PowersCell } from "./PowersCell";
 import {
   ABOUT_ASSEMBLE,
   ABOUT_BOUNDARY,
@@ -83,8 +85,22 @@ export function AboutScene() {
         {/* Reading order is camera order: the walk's keyframes are the cells
             carrying a focus number, sorted by it. */}
         <GreetingCell focus={0} />
-        <OriginCell focus={1} />
-        <PowersCell focus={2} />
+        <CollageCell
+          at="tr"
+          focus={1}
+          name="music"
+          side="right"
+          src={musicCollage}
+          {...MUSIC_PANEL}
+        />
+        <CollageCell
+          at="br"
+          focus={2}
+          name="interests"
+          side="left"
+          src={interestsCollage}
+          {...INTERESTS_PANEL}
+        />
 
         {/* The camera's last stop before the pull-back (amended 2026-07-27,
             like THE GOOD PART's catalogue cell). Its furniture still stamps on
