@@ -39,37 +39,43 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
  * boundary's assembly window while the page prints in around it, so the
  * mockup's own opening hold double-counts and the first panel ends up held
  * nearly twice as long as the others.
+ *
+ * **Amendment 2026-07-28 (Mitul's call, same table as the twin):** the
+ * pull-back is CUT — the walk ends parked on C4 and the boundary dives into
+ * the bubble from that close-up instead of zooming out first. Its 11% went
+ * back to the beats that paid for the fourth stop; the boundary table is
+ * untouched (`useBoundaryZoom` measures the target's rendered pose). The fit
+ * pose stays in the keyframe set for reduced motion's park only.
  */
 export const ABOUT_WALK: CameraWalk = {
   focus: { w: 0.6, h: 0.72 },
   fitMargin: 0.92,
   segments: [
-    { a: 0, b: 0.05, from: 0, to: 0 },
-    { a: 0.05, b: 0.14, from: 0, to: 1 },
-    { a: 0.14, b: 0.27, from: 1, to: 1 },
-    { a: 0.27, b: 0.36, from: 1, to: 2 },
-    { a: 0.36, b: 0.49, from: 2, to: 2 },
-    { a: 0.49, b: 0.58, from: 2, to: 3 },
-    { a: 0.58, b: 0.68, from: 3, to: 3 },
-    { a: 0.68, b: 0.79, from: 3, to: 4 },
-    { a: 0.79, b: 1, from: 4, to: 4 },
+    { a: 0, b: 0.06, from: 0, to: 0 },
+    { a: 0.06, b: 0.16, from: 0, to: 1 },
+    { a: 0.16, b: 0.31, from: 1, to: 1 },
+    { a: 0.31, b: 0.41, from: 1, to: 2 },
+    { a: 0.41, b: 0.56, from: 2, to: 2 },
+    { a: 0.56, b: 0.66, from: 2, to: 3 },
+    { a: 0.66, b: 1, from: 3, to: 3 },
   ],
-  // Focus hands over at each pan's midpoint; past the last window the
-  // pull-back has begun and every cell performs (design-doc §8's global rule).
-  focusUntil: [0.095, 0.315, 0.535, 0.68],
-  outroAt: 0.49,
+  // Focus hands over at each pan's midpoint; the last window closes where the
+  // boundary's table takes over (0.79), past which every cell performs — so
+  // reverse entry from the back cover lands on a fully-performed page.
+  focusUntil: [0.11, 0.36, 0.61, 0.79],
+  outroAt: 0.56,
 } as const;
 
 /**
- * Where the pull-back ends and the camera comes to rest on the whole page —
- * "pulsing once the camera settles" (design-doc §8, C4). It is the last
- * segment's start on purpose: the finale bubble stamps in as the camera turns
- * toward it (the walk's `outroAt`) and is visited up close, but it only starts
- * pulsing once the camera has actually stopped, so the pulse reads as the page
- * inviting a reply rather than as one more thing moving while the camera is
- * still travelling.
+ * Where the last pan ends and the camera comes to rest on C4 — "pulsing once
+ * the camera settles" (design-doc §8, C4). It is the last segment's start on
+ * purpose: the finale bubble stamps in as the camera turns toward it (the
+ * walk's `outroAt`), but it only starts pulsing once the camera has actually
+ * stopped, so the pulse reads as the page inviting a reply rather than as one
+ * more thing moving while the camera is still travelling. (0.79 before the
+ * 2026-07-28 pull-back cut — the rest point moved with the walk.)
  */
-export const ABOUT_SETTLED_AT = 0.79;
+export const ABOUT_SETTLED_AT = 0.66;
 
 /** Camera arrival → the cell performs (design-doc §8). */
 export const ABOUT_FOCUS = {
@@ -133,7 +139,7 @@ export const ABOUT_ASSEMBLE: MegaPageAssemble = {
  * holds, and this one stays a per-section constant so their boundaries stay
  * free to diverge. Phases are fractions of the scene's scrub.
  *
- * The bubble pulses from `ABOUT_SETTLED_AT` (0.79) and keeps pulsing through
+ * The bubble pulses from `ABOUT_SETTLED_AT` (0.66) and keeps pulsing through
  * the early fade — the gate is the zoom's start, so the page invites right up
  * until the reader commits.
  */

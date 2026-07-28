@@ -15,7 +15,7 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
 /**
  * The camera's reading path (design-doc §6): hold Tablo → pan → hold
  * Unhallucinate → pan ↓ → hold OptiLife → pan ← → hold the catalogue cell →
- * pull-back reveal → hold the full page. _The three panels are whatever
+ * dive. _The three panels are whatever
  * `PROJECTS` holds in order — the trio changed on 2026-07-28 and this table
  * did not, because it addresses camera stops, not projects._ Focus zoom ≈ 60% viewport width / 72% height;
  * fit leaves 8% of void all around. Do not retune without a design amendment.
@@ -36,26 +36,38 @@ import type { MegaPageAssemble } from "@/hooks/useMegaPageAssemble";
  * the boundary's table owns it. `outroAt` moved to the pan's START so the
  * cell prints in while the camera is still travelling toward it — arriving
  * at blank paper would break the never-reveal-empty rule in spirit.
+ *
+ * **Amendment 2026-07-28 (Mitul's call — no zoom-out before the dive):** the
+ * pull-back is CUT. The walk now ends parked on the catalogue cell and the
+ * boundary dives into the CREW PASS from that close-up — zooming out to the
+ * full page only to zoom straight back in read as wasted motion. Its 11% went
+ * back to the beats that paid for the fourth stop (holds 39 → 45vh, pans
+ * 27 → 30vh), so the camera settles at 0.66 and the last hold reads as long
+ * as the others before the fade at 0.81. The boundary table is untouched:
+ * `useBoundaryZoom` measures the target's *rendered* pose at zoom time, so
+ * the deeper park needs no retune there. The fit pose stays in the keyframe
+ * set — reduced motion still parks on it — but the walk never visits it: the
+ * full assembled page is no longer seen in motion, which is the point.
  */
 export const PROJECTS_WALK: CameraWalk = {
   focus: { w: 0.6, h: 0.72 },
   fitMargin: 0.92,
   segments: [
-    { a: 0, b: 0.05, from: 0, to: 0 },
-    { a: 0.05, b: 0.14, from: 0, to: 1 },
-    { a: 0.14, b: 0.27, from: 1, to: 1 },
-    { a: 0.27, b: 0.36, from: 1, to: 2 },
-    { a: 0.36, b: 0.49, from: 2, to: 2 },
-    { a: 0.49, b: 0.58, from: 2, to: 3 },
-    { a: 0.58, b: 0.68, from: 3, to: 3 },
-    { a: 0.68, b: 0.79, from: 3, to: 4 },
-    { a: 0.79, b: 1, from: 4, to: 4 },
+    { a: 0, b: 0.06, from: 0, to: 0 },
+    { a: 0.06, b: 0.16, from: 0, to: 1 },
+    { a: 0.16, b: 0.31, from: 1, to: 1 },
+    { a: 0.31, b: 0.41, from: 1, to: 2 },
+    { a: 0.41, b: 0.56, from: 2, to: 2 },
+    { a: 0.56, b: 0.66, from: 2, to: 3 },
+    { a: 0.66, b: 1, from: 3, to: 3 },
   ],
-  // Focus hands over at each pan's midpoint, and everything performs once the
-  // pull-back starts — the same relationships the mockup had, moved with the
-  // segments rather than re-derived.
-  focusUntil: [0.095, 0.315, 0.535, 0.68],
-  outroAt: 0.49,
+  // Focus hands over at each pan's midpoint — the mockup's relationship,
+  // moved with the segments rather than re-derived. The last window closes
+  // where the boundary's table takes over (0.79): there is no pull-back any
+  // more, but past that point every cell performs, so reverse entry from
+  // CASE FILES still lands on a fully-performed page.
+  focusUntil: [0.11, 0.36, 0.61, 0.79],
+  outroAt: 0.56,
 } as const;
 
 /**
